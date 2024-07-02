@@ -16,7 +16,6 @@ export default defineConfig(function ({mode}) {
   }
 
   return {
-    cacheDir: ".cache",
     resolve: {
       extensions: [".ts", ".vue", ".cjs", ".js", ".tsx"],
       alias: {
