@@ -6,7 +6,7 @@
 // 引入项目全局样式
 import "src/styles/main.scss";
 
-import { AppName } from "./config/index";
+import { AppName } from "./config";
 import { createApp } from "./bootstrap/main";
 import { userStore } from "src/store";
 
