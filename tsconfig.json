@@ -19,27 +19,47 @@
     "moduleResolution": "Node",
     "strict": true,
     "jsx": "preserve",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "lib": ["ESNext", "DOM"],
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
     "skipLibCheck": true,
     "noEmit": true,
     "skipDefaultLibCheck": true,
     "types": [
+      "vue",
       "node",
       "vite/client",
-      "vue-router"
-    ], 
+      "vue-router",
+      "react",
+      "react-dom",
+      "@ue/icon",
+      "cloudflare-r2",
+      "@js-lion/upload"
+    ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types",
+    ],
     "paths": {
-      "src/*": ["./src/*"]
-    },
+      "src/*": [
+        "./src/*"
+      ],
+      "types/*": [
+        "./types/*"
+      ]
+    }
   },
   "include": [
-    "src/**/*.ts", 
-    "src/**/*.d.ts", 
-    "src/**/*.tsx", 
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "src/**/*.vue",
+    "types/**/*.ts",
     "vite.config.ts"
-  ],
+  ]
 }

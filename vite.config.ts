@@ -20,6 +20,7 @@ export default defineConfig(function ({mode}) {
       extensions: [".ts", ".vue", ".cjs", ".js", ".tsx"],
       alias: {
         "src/": `${path.resolve(__dirname, "src")}/`,
+        "types/": `${path.resolve(__dirname, "types")}/`,
       },
     },
     plugins: [
@@ -29,7 +30,12 @@ export default defineConfig(function ({mode}) {
       htmlPlugin({headScripts}),
     ],
     server: {
-      port: 9088
+      port: 9088,
+      host: "0.0.0.0"
+    },
+    optimizeDeps: {
+      include: [
+      ]
     }
   }
 })

@@ -4,6 +4,7 @@ const deep = require("./tailwind/deep.cjs");
 const { opacity, spacing, height, width, colors } = require("./tailwind/config.cjs");
 
 module.exports = {
+  important: ".eci",
   content: [
     './index.html', 
     './src/**/*.{vue,js,ts,jsx,tsx}'

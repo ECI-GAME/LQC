@@ -5,7 +5,7 @@
 
 import _ from "lodash-es";
 import { defineStore } from "pinia";
-import { UserIfno } from "src/types/user";
+import { UserIfno } from "types/user";
 
 interface State {
   info: UserIfno

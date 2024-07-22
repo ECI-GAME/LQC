@@ -3,11 +3,11 @@
  * @author svon.me@gmail.com
  */
 
-import type { RouteRecordBase } from "src/types/common";
+import type { RouteRecordBase } from "types/common";
  
 export const Home: RouteRecordBase = {
-  name: "Home",
-  path: "/home"
+  name: "dashboard",
+  path: "/dashboard"
 }
 
 export const NotFount: RouteRecordBase = {

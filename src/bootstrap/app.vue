@@ -6,7 +6,6 @@
 
 import {ref} from "vue";
 import {style} from "src/config/style";
-import Index from "src/pages/home/index.vue";
 import zhCN from "ant-design-vue/es/locale/zh_CN";
 import {ConfigProvider, StyleProvider} from "ant-design-vue";
 
@@ -32,7 +31,7 @@ const theme = {
 <template>
   <ConfigProvider :locale="locale" :theme="theme">
     <StyleProvider hash-priority="low">
-      <Index></Index>
+      <router-view></router-view>
     </StyleProvider>
   </ConfigProvider>
 </template>
