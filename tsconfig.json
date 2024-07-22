@@ -40,7 +40,9 @@
       "react-dom",
       "@ue/icon",
       "cloudflare-r2",
-      "@js-lion/upload"
+      "@js-lion/upload",
+      "@ue/modal",
+      "@ue/form"
     ],
     "typeRoots": [
       "./node_modules/@types",

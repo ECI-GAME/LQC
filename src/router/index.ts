@@ -23,6 +23,18 @@ const routes: RouteRecordRaw[] = [
         ...alias.NotFount,
         component: () => import("src/pages/common/404.vue"),
       },
+      {
+        ...alias.ProjectList,
+        component: () => import("src/pages/project/list.vue"),
+      },
+      {
+        ...alias.ProjectDetails,
+        component: () => import("src/pages/project/details/index.vue"),
+      },
+      {
+        ...alias.ProjectVersion,
+        component: () => import("src/pages/project/version/index.vue"),
+      }
     ],
   },
 ];

@@ -1,14 +1,23 @@
 <script setup lang="tsx">
-import {ref} from "vue";
+import {computed} from "vue";
 import {items} from "./config";
 import {Menu} from "ant-design-vue";
+import {useRouter, useRoute} from "vue-router";
 
-type MenuData = typeof items[0];
+const route = useRoute();
+const router = useRouter();
+const selectedKeys = computed(function () {
+  console.log(route);
+  return [];
+});
 
-const selectedKeys = ref([items[0].key]);
-
-const onChangeMenu = function ({item}: { item: MenuData }) {
-  console.log(item);
+const onChangeMenu = function ({key}: { key: string }) {
+  try {
+    const page = router.resolve({name: key});
+    router.push(page);
+  } catch (e) {
+    // todo
+  }
 }
 
 </script>

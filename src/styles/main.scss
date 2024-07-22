@@ -3,13 +3,17 @@
  * @author svon.me@gmail.com
  */
 
-/** 全局样式 */
-@import "ant-design-vue/dist/reset.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 @tailwind screens;
+
+
+/** 全局样式 */
+
+@import "@ue/modal/dist/index.css";
+
+
 
 html, body {
   @apply min-h-screen;
@@ -18,4 +22,14 @@ html, body {
 h2 {
   // @apply max-w-80;
   @apply text-black;
+}
+
+.ue-modal-main {
+  .ant-modal-content {
+    @apply p-0;
+  }
+
+  .ant-modal-confirm-content {
+    max-width: 100% !important;
+  }
 }

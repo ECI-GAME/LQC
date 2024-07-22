@@ -4,6 +4,7 @@
  */
 
 // 引入项目全局样式
+import "ant-design-vue/dist/reset.css";
 import "src/styles/main.scss";
 
 import { AppName } from "./config";
