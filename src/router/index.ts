@@ -32,8 +32,8 @@ const routes: RouteRecordRaw[] = [
         component: () => import("src/pages/project/details/index.vue"),
       },
       {
-        ...alias.ProjectVersion,
-        component: () => import("src/pages/project/version/index.vue"),
+        ...alias.TaskDetails,
+        component: () => import("src/pages/task/index.vue"),
       }
     ],
   },

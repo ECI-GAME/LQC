@@ -26,7 +26,7 @@ export const ProjectDetails: RouteRecordBase = {
   path: "/project/:projectId"
 }
 
-export const ProjectVersion: RouteRecordBase = {
-  name: "Project Version",
-  path: "/project/version/:versionId"
+export const TaskDetails: RouteRecordBase = {
+  name: "Project Task Details",
+  path: "/task/:taskId"
 }

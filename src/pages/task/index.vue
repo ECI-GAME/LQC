@@ -1,7 +1,11 @@
 <script setup lang="ts">
+/**
+ * @file 任务详情
+ */
 import {Icon} from "@ue/icon";
+import {onCreate} from "./config";
 import * as alias from "src/router/alias";
-import {Table, Button, Card} from "ant-design-vue";
+import {Table, Button, Card, Form, FormItem, Input, Space} from "ant-design-vue";
 
 const columns = [
   {title: "名称", dataIndex: 'name', key: 'name'},
@@ -28,16 +32,48 @@ const data = [
   }
 ];
 
+const onCreateTask = async function () {
+  const res = await onCreate();
+  console.log(res);
+}
+
 </script>
 
 <template>
-  <Card title="版本管理">
+  <Card>
+    <Form layout="inline">
+      <FormItem label="任务名称">
+        <Input/>
+      </FormItem>
+      <FormItem label="状态">
+        <Input/>
+      </FormItem>
+      <FormItem label="处理人">
+        <Input/>
+      </FormItem>
+      <FormItem>
+        <template #label></template>
+        <Space>
+          <Button>搜索</Button>
+          <Button>重置</Button>
+        </Space>
+      </FormItem>
+    </Form>
+  </Card>
+
+  <Card class="mt-5">
+    <Space size="large">
+      <Button @click="onCreateTask">新建任务</Button>
+      <Button>生成交付文件</Button>
+      <Button>归档</Button>
+    </Space>
+  </Card>
+
+  <Card class="mt-5">
     <Table :data-source="data" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'name'">
-          <RouterLink :to="{ name: alias.ProjectVersion.name, params: { versionId: record.id } }">
-            <Button type="link">{{ text }}</Button>
-          </RouterLink>
+          <Button type="link">{{ text }}</Button>
         </template>
         <template v-else-if="column.key === 'image'">
           <Button v-if="text" type="link">预览</Button>
