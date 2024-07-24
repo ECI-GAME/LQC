@@ -38,6 +38,11 @@ const routes: RouteRecordRaw[] = [
       {
         ...alias.TaskDetails,
         component: () => import("src/pages/task/details.vue"),
+      },
+      // 工作
+      {
+        ...alias.Work,
+        component: () => import("src/pages/work/index.vue"),
       }
     ],
   },

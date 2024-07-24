@@ -4,6 +4,8 @@
  */
 
 import {Icon} from "@ue/icon";
+import {RouterLink} from "vue-router";
+import * as alias from "src/router/alias";
 import {Table, Button, Card, Space} from "ant-design-vue";
 
 const columns = [
@@ -35,21 +37,28 @@ const data = [
 </script>
 
 <template>
-  <Card>
-    <Space size="large">
-      <Button>批量下载</Button>
-    </Space>
-  </Card>
+  <div>
+    <Card>
+      <Space size="large">
+        <Button>批量下载</Button>
+      </Space>
+    </Card>
 
-  <Card class="mt-5">
-    <Table :data-source="data" :columns="columns" :bordered="true">
-      <template #bodyCell="{ column, text, record  }">
-        <template v-if="column.key === 'action'">
+    <Card class="mt-5">
+      <Table :data-source="data" :columns="columns" :bordered="true">
+        <template #bodyCell="{ column, text, record  }">
+          <template v-if="column.key === 'name'">
+            <RouterLink :to="{ name: alias.Work.name, params:{ workId: record.fileId } }">
+              <Button type="link">{{ text }}</Button>
+            </RouterLink>
+          </template>
+          <template v-else-if="column.key === 'action'">
           <span class="inline-block">
             <Icon class="text-xl text-primary cursor-pointer" type="edit-square"></Icon>
           </span>
+          </template>
         </template>
-      </template>
-    </Table>
-  </Card>
+      </Table>
+    </Card>
+  </div>
 </template>

@@ -3,6 +3,7 @@
  * @author svon.me@gmail.com
  */
 
+import {PageType} from "./common";
 import type {RouteRecordBase} from "types/common";
 
 export const Home: RouteRecordBase = {
@@ -34,4 +35,12 @@ export const TaskList: RouteRecordBase = {
 export const TaskDetails: RouteRecordBase = {
   name: "Project Task Details",
   path: "/task/:projectId/:taskId"
+}
+
+export const Work: RouteRecordBase = {
+  name: "Project Work",
+  path: "/work/:workId",
+  meta: {
+    type: PageType.work
+  }
 }
