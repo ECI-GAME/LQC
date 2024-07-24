@@ -1,4 +1,5 @@
 <script setup lang="tsx">
+import { Icon } from "@ue/icon";
 import {computed} from "vue";
 import {items} from "./config";
 import {Menu} from "ant-design-vue";
@@ -23,8 +24,15 @@ const onChangeMenu = function ({key}: { key: string }) {
 </script>
 
 <template>
-  <Menu class="px-5 deep-[.ant-menu-item]:flex deep-[.ant-menu-item]:items-center"
-        :items="items"
-        v-model:selectedKeys="selectedKeys"
-        @select="onChangeMenu"></Menu>
+  <div class="relative">
+    <Menu class="h-full px-5 deep-[.ant-menu-item]:flex deep-[.ant-menu-item]:items-center"
+          :items="items"
+          v-model:selectedKeys="selectedKeys"
+          @select="onChangeMenu"></Menu>
+    <div class="absolute top-1/2 right-0 -translate-y-1/2">
+      <div class="translate-x-2.5">
+        <Icon class="text-4xl text-[#f0f0f0] hover:text-primary cursor-pointer" type="caret-left"></Icon>
+      </div>
+    </div>
+  </div>
 </template>

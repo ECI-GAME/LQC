@@ -1,14 +1,19 @@
 <script setup lang="ts">
 /**
- * @file 任务详情
+ * @file 任务列表
  */
 import {Icon} from "@ue/icon";
 import {onCreate} from "./config";
 import * as alias from "src/router/alias";
+import {RouterLink, useRoute} from "vue-router";
 import {Table, Button, Card, Form, FormItem, Input, Space} from "ant-design-vue";
 
+
+const route = useRoute();
+console.log('Project ID = "%s"', route.params.projectId);
+
 const columns = [
-  {title: "名称", dataIndex: 'name', key: 'name'},
+  {title: "任务名称", dataIndex: 'name', key: 'name'},
   {title: "状态", dataIndex: 'status', key: 'status', align: "center"},
   {title: "处理人", dataIndex: 'personnel', key: 'personnel', align: "center"},
   {title: "TEP 图片", dataIndex: 'tepImage', key: 'image', align: "center"},
@@ -21,14 +26,15 @@ const columns = [
 
 const data = [
   {
-    name: "XXX.png",
+    name: "任务一",
     status: "TEP",
     personnel: "Mary",
     tepImage: "",
     dtpImage: "",
     qaImage: "",
     successImage: "",
-    id: "1"
+    id: "1",        // 任务ID
+    projectId: "1", // 项目ID
   }
 ];
 
@@ -73,7 +79,9 @@ const onCreateTask = async function () {
     <Table :data-source="data" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'name'">
-          <Button type="link">{{ text }}</Button>
+          <RouterLink :to="{ name: alias.TaskDetails.name, params:{ projectId: record.projectId, taskId: record.id } }">
+            <Button type="link">{{ text }}</Button>
+          </RouterLink>
         </template>
         <template v-else-if="column.key === 'image'">
           <Button v-if="text" type="link">预览</Button>

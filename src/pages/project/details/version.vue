@@ -30,7 +30,7 @@ const data = [
     <Table :data-source="data" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'name'">
-          <RouterLink :to="{ name: alias.TaskDetails.name, params: { taskId: record.id } }">
+          <RouterLink :to="{ name: alias.TaskList.name, params: { projectId: record.id } }">
             <Button type="link">{{ text }}</Button>
           </RouterLink>
         </template>

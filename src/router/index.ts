@@ -19,23 +19,31 @@ const routes: RouteRecordRaw[] = [
         ...alias.Home,
         component: () => import("src/pages/dashboard/index.vue"),
       },
-      {
-        ...alias.NotFount,
-        component: () => import("src/pages/common/404.vue"),
-      },
+      // 项目列表
       {
         ...alias.ProjectList,
         component: () => import("src/pages/project/list.vue"),
       },
+      // 项目详情
       {
         ...alias.ProjectDetails,
         component: () => import("src/pages/project/details/index.vue"),
       },
+      // 任务列表
+      {
+        ...alias.TaskList,
+        component: () => import("src/pages/task/list.vue"),
+      },
+      // 任务明细
       {
         ...alias.TaskDetails,
-        component: () => import("src/pages/task/index.vue"),
+        component: () => import("src/pages/task/details.vue"),
       }
     ],
+  },
+  {
+    ...alias.NotFount,
+    component: () => import("src/pages/common/404.vue"),
   },
 ];
 

@@ -26,7 +26,12 @@ export const ProjectDetails: RouteRecordBase = {
   path: "/project/:projectId"
 }
 
+export const TaskList: RouteRecordBase = {
+  name: "Project Task List",
+  path: "/task/:projectId?"
+}
+
 export const TaskDetails: RouteRecordBase = {
   name: "Project Task Details",
-  path: "/task/:taskId"
+  path: "/task/:projectId/:taskId"
 }
