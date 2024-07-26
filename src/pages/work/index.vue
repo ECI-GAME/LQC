@@ -4,19 +4,20 @@
  * @author svon.me@gmail.com
  */
 
+import List from "./list.vue";
 import Preview from "src/components/preview/index.vue";
 import {Layout, LayoutContent, LayoutSider} from "ant-design-vue";
 </script>
 
 <template>
   <Layout class="!p-0 h-screen">
-    <LayoutSider class="bg-white !w-80 !max-w-80 !flex-auto border-r border-slate-600 border-solid">
-      <span>左侧内容</span>
+    <LayoutSider class="bg-white !w-80 !max-w-80 !flex-auto">
+      <List class="h-full"></List>
     </LayoutSider>
-    <LayoutContent>
+    <LayoutContent class="border-x border-slate-600 border-solid">
       <Preview class="h-full"></Preview>
     </LayoutContent>
-    <LayoutSider class="bg-white !w-80 !max-w-80 !flex-auto border-l border-slate-600 border-solid">
+    <LayoutSider class="bg-white !w-80 !max-w-80 !flex-auto">
       <span>右侧内容</span>
     </LayoutSider>
   </Layout>

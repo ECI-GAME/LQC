@@ -14,7 +14,14 @@ enum DotType {
   location = "location",
 }
 
-const src = "https://assets.vuejs.com/208e0972-71b8-5be4-a5c0-4d29ad1f6261/2987d30fc481516b82d3e976beb342e5.png";
+defineProps({
+  src: {
+    type: String,
+    required: true,
+  }
+});
+
+// const src = "https://assets.vuejs.com/208e0972-71b8-5be4-a5c0-4d29ad1f6261/2987d30fc481516b82d3e976beb342e5.png";
 
 const boxRef = ref();
 const imageRef = ref();
