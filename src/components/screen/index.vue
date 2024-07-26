@@ -1,11 +1,41 @@
 <script setup lang="ts">
-import {ref, computed} from "vue";
+import {Icon} from "@ue/icon";
+import {ref, computed, onMounted} from "vue";
 import safeGet from "@fengqiaogang/safe-get";
+import BigNumber from "bignumber.js";
 
-const x = ref<number>(100);
-const y = ref<number>(100);
+const $emit = defineEmits(["success", "remove"]);
+const props = defineProps({
+  left: {
+    type: Number,
+    required: true
+  },
+  top: {
+    type: Number,
+    required: true
+  }
+});
+
+const x = ref<number>(0);
+const y = ref<number>(0);
 const width = ref<number>(200);
 const height = ref<number>(120);
+
+onMounted(function () {
+  if (props.left > 0) {
+    const num = new BigNumber(props.left).minus(new BigNumber(width.value).div(2)).toNumber();
+    if (num > 0) {
+      x.value = num;
+    }
+  }
+
+  if (props.top > 0) {
+    const num = new BigNumber(props.top).minus(new BigNumber(height.value).div(2)).toNumber();
+    if (num > 0) {
+      y.value = num;
+    }
+  }
+});
 
 const direction = ["left-top", "right-top", "left-bottom", "right-bottom"];
 
@@ -25,6 +55,7 @@ let startHeight = 0;
 let startLeft = 0;
 let startTop = 0;
 let resizing = false;
+let dragging = false;
 let currentHandle: string;
 
 const onResize = function (e: Event, type: string) {
@@ -110,22 +141,75 @@ const resize = (event: Event) => {
       y.value = startTop - Math.abs(h);
     }
   }
-
-
 };
+
+const startDrag = function (event: Event) {
+  if (resizing) {
+    // 如果当前正在进行大小调整，则禁止拖动
+    return;
+  }
+  dragging = true;
+  startX = safeGet<number>(event, "clientX")!;
+  startY = safeGet<number>(event, "clientY")!;
+  startLeft = x.value;
+  startTop = y.value;
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', stopDrag);
+}
+
+const drag = (event: Event) => {
+  if (!dragging) return;
+  const dx = safeGet<number>(event, "clientX")! - startX;
+  const dy = safeGet<number>(event, "clientY")! - startY;
+  x.value = startLeft + dx;
+  y.value = startTop + dy;
+};
+
+const stopDrag = () => {
+  dragging = false;
+  document.removeEventListener('mousemove', drag);
+  document.removeEventListener('mouseup', stopDrag);
+};
+
+
+const onRemove = function () {
+  $emit("remove");
+}
+
+const onSuccess = function () {
+  const data = {
+    x1: x.value,
+    y1: y.value,
+    x2: x.value + width.value,
+    y2: y.value + height.value
+  };
+  $emit("success", data);
+}
+
 </script>
 
 <template>
-  <div class="screen-box ease-in-out" :style="screenStyle">
-    <template v-for="name in direction" :key="name">
-      <div class="screen-dot" :class="name" @mousedown="onResize($event, name)"></div>
-    </template>
+  <div class="absolute z-10 top-[var(--screen-y)] left-[var(--screen-x)] " :style="screenStyle">
+    <div class="text-xl absolute left-full top-0 pl-2 -translate-y-1">
+      <div class="bg-white rounded-full p-0.5">
+        <Icon class="text-primary cursor-pointer" type="check-circle-fill" @click.stop.prevent="onSuccess"></Icon>
+      </div>
+      <div class="bg-white rounded-full p-0.5 mt-1" @click.stop.prevent="onRemove">
+        <Icon class="text-red-500 cursor-pointer" type="close-circle-fill"></Icon>
+      </div>
+    </div>
+    <div class="screen-box ease-in-out cursor-pointer" @mousedown="startDrag">
+      <template v-for="name in direction" :key="name">
+        <div class="screen-dot" :class="name" @mousedown="onResize($event, name)"></div>
+      </template>
+    </div>
+
   </div>
 </template>
 
 <style scoped lang="scss">
 .screen-box {
-  @apply absolute z-10 border border-primary border-solid top-[var(--screen-y)] left-[var(--screen-x)] w-[var(--screen-width)] h-[var(--screen-height)];
+  @apply relative border border-primary border-solid w-[var(--screen-width)] h-[var(--screen-height)];
 }
 
 .screen-dot {

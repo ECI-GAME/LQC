@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, onMounted} from "vue";
+import {ref, reactive} from "vue";
 import BigNumber from "bignumber.js";
 import Screen from "../screen/index.vue";
 import safeGet from "@fengqiaogang/safe-get";
@@ -7,8 +7,12 @@ import {Slider, Layout, LayoutContent, LayoutHeader, Badge, Space} from "ant-des
 
 const src = "https://assets.vuejs.com/208e0972-71b8-5be4-a5c0-4d29ad1f6261/2987d30fc481516b82d3e976beb342e5.png";
 
+const boxRef = ref();
 const ratio = ref<number>(100);
 const dots = ref<object[]>([]);
+const screenStatus = ref<boolean>(false);
+const screenX = ref<number>(0);
+const screenY = ref<number>(0);
 
 const getScale = function (value: number) {
   let scale = 1;
@@ -33,15 +37,24 @@ const onCaptureLocation = function (e: Event) {
   const rect = container.getBoundingClientRect();
 
   // 计算相对于容器的坐标
-  const x = clickX - rect.left + container.scrollLeft;
-  const y = clickY - rect.top + container.scrollTop;
+  screenX.value = clickX - rect.left - boxRef.value.scrollLeft;
+  screenY.value = clickY - rect.top - boxRef.value.scrollTop;
+  screenStatus.value = true;
+}
+
+const onRemoveScreen = function () {
+  screenStatus.value = false
+}
+const onAddDot = function (data: any) {
+  onRemoveScreen();
   const scale = getScale(ratio.value);
-  const value = {
-    x: Number(new BigNumber(x).div(scale).toFixed(0)),
-    y: Number(new BigNumber(y).div(scale).toFixed(0)),
+  const res = {
+    x1: Number(new BigNumber(data.x1).plus(boxRef.value.scrollLeft).div(scale).toFixed(2)),
+    y1: Number(new BigNumber(data.y1).plus(boxRef.value.scrollTop).div(scale).toFixed(2)),
+    x2: Number(new BigNumber(data.x2).plus(boxRef.value.scrollLeft).div(scale).toFixed(2)),
+    y2: Number(new BigNumber(data.y2).plus(boxRef.value.scrollTop).div(scale).toFixed(2)),
   };
-  console.log(value)
-  // dots.value.push(value);
+  dots.value.push(res);
 }
 
 </script>
@@ -51,28 +64,28 @@ const onCaptureLocation = function (e: Event) {
     <LayoutHeader class="bg-white">
       <div class="flex items-center">
         <div class="flex-1">
-          <Slider :min="50" :max="200" :step="1" v-model:value="ratio" :tooltip-open="false"></Slider>
+          <Slider :min="50" :max="300" :step="1" v-model:value="ratio" :tooltip-open="false"></Slider>
         </div>
-        <div class="pl-5">ratio = {{ ratio }}</div>
+        <div class="pl-5">{{ratio}}%</div>
       </div>
     </LayoutHeader>
     <LayoutContent class="px-5">
       <div class="relative h-full">
-        <div class="h-full overflow-auto w-full select-none" :style="`--image-scale: ${getScale(ratio)};`">
+        <div ref="boxRef" class="h-full overflow-auto w-full select-none" :style="`--image-scale: ${getScale(ratio)};`">
           <div class="relative inline-block origin-top-left scale-[var(--image-scale)]">
             <img class="inline-block" :src="src" :key="ratio" @click="onCaptureLocation"/>
             <div>
               <template v-for="(item, index) in dots" :key="index">
                   <span
-                      class="inline-block cursor-pointer absolute left-[var(--dot-x)] top-[var(--dot-y)] -translate-x-1/2 -translate-y-1/2 p-2"
-                      :style="`--dot-x: ${item.x}px; --dot-y: ${item.y}px;`">
+                      class="inline-block cursor-pointer absolute left-[var(--dot-x)] top-[var(--dot-y)]"
+                      :style="`--dot-x: ${item.x1}px; --dot-y: ${item.y1}px;`">
                     <Badge :count="index + 1" color="blue"></Badge>
                   </span>
               </template>
             </div>
           </div>
         </div>
-        <Screen></Screen>
+        <Screen v-if="screenStatus" :left="screenX" :top="screenY" @remove="onRemoveScreen" @success="onAddDot"/>
       </div>
     </LayoutContent>
   </Layout>
