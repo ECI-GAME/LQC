@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import {Icon} from "@ue/icon";
+import BigNumber from "bignumber.js";
 import {ref, computed, onMounted} from "vue";
 import safeGet from "@fengqiaogang/safe-get";
-import BigNumber from "bignumber.js";
 
-const $emit = defineEmits(["success", "remove"]);
+import type { Screen } from "./config";
+
+const $emit = defineEmits(["location", "orc", "remove"]);
 const props = defineProps({
   left: {
     type: Number,
@@ -176,14 +178,21 @@ const onRemove = function () {
   $emit("remove");
 }
 
-const onSuccess = function () {
-  const data = {
+const getValue = function (): Screen {
+  return {
     x1: x.value,
     y1: y.value,
     x2: x.value + width.value,
     y2: y.value + height.value
   };
-  $emit("success", data);
+}
+
+const onOrc = function () {
+  $emit("orc", getValue());
+}
+
+const onLocation = function () {
+  $emit("location", getValue());
 }
 
 </script>
@@ -191,10 +200,13 @@ const onSuccess = function () {
 <template>
   <div class="absolute z-10 top-[var(--screen-y)] left-[var(--screen-x)] " :style="screenStyle">
     <div class="text-xl absolute left-full top-0 pl-2 -translate-y-1">
-      <div class="bg-white rounded-full p-0.5">
-        <Icon class="text-primary cursor-pointer" type="check-circle-fill" @click.stop.prevent="onSuccess"></Icon>
+      <div class="bg-white rounded-full p-0.5 border border-solid border-primary">
+        <Icon class="text-primary cursor-pointer" type="font-size" @click.stop.prevent="onOrc"></Icon>
       </div>
-      <div class="bg-white rounded-full p-0.5 mt-1" @click.stop.prevent="onRemove">
+      <div class="bg-white rounded-full p-0.5 border border-solid border-primary mt-1">
+        <Icon class="text-primary cursor-pointer" type="location-fill" @click.stop.prevent="onLocation"></Icon>
+      </div>
+      <div class="bg-white rounded-full p-0.5 border border-solid border-primary mt-1" @click.stop.prevent="onRemove">
         <Icon class="text-red-500 cursor-pointer" type="close-circle-fill"></Icon>
       </div>
     </div>
