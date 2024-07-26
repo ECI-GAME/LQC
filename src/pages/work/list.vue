@@ -3,6 +3,14 @@ import {ref, onMounted} from "vue";
 import BigNumber from "bignumber.js";
 import BoxScale from "src/components/box/scale.vue";
 
+const $emit = defineEmits(["update:active"]);
+defineProps({
+  active: {
+    type: String,
+    required: false
+  }
+})
+
 const list = [
   "https://assets.vuejs.com/208e0972-71b8-5be4-a5c0-4d29ad1f6261/2987d30fc481516b82d3e976beb342e5.png",
   "https://assets.vuejs.com/09879b95-ffc1-5b25-8b24-5a820b49b334/aca2ab0c46205c39bd289eb1ff0f0e6c.png",
@@ -14,11 +22,10 @@ const list = [
 ];
 
 const boxRef = ref();
-const active = ref<string>();
 const top = ref<number>(0);
 
 const onChange = function (src: string) {
-  active.value = src;
+  $emit("update:active", src);
   const index = list.indexOf(src);
   const width = boxRef.value.clientWidth;
   const height = new BigNumber(width).times(1.2).toNumber();
@@ -28,7 +35,7 @@ const onChange = function (src: string) {
 }
 
 onMounted(function () {
-  setTimeout(function() {
+  setTimeout(function () {
     onChange(list[2]);
   }, 0);
 });
@@ -40,7 +47,8 @@ onMounted(function () {
     <div class="absolute left-0 top-0 w-full translate-y-[var(--box-top)] ease-in-out duration-500">
       <BoxScale v-for="src in list" :key="src" :scale="120">
         <div class="h-full pb-1 cursor-pointer" @click="onChange(src)">
-          <div class="h-full bg-cover bg-no-repeat bg-center hover:blur-none ease-in-out" :class="{'blur-sm': active !== src}" :style="`background-image: url(${src});`"></div>
+          <div class="h-full bg-cover bg-no-repeat bg-center hover:blur-none ease-in-out"
+               :class="{'blur-sm': active !== src}" :style="`background-image: url(${src});`"></div>
         </div>
       </BoxScale>
     </div>
