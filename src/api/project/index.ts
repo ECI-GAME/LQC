@@ -15,14 +15,13 @@ export default class {
    */
   @tryError([])
   @Gql("/graphql")
-  async list(params: object): Promise<PageResult<object>> {
-    const input = JSON.stringify(params);
+  async list(pageNum: number, pageSize: number = 20): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
-      qeuryComicProjectInfo (input: ${input}) {
-        mail
-        nickname
-        description
+      qeuryComicProjectInfo (input: { pageNum: ${pageNum}, pageSize: ${pageSize} }) {
+        code
+        rows
+        msg
       }
     }`;
     const callback = function (res: object) {

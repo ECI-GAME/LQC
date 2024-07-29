@@ -19,7 +19,7 @@ export class PageResult<T = object> {
       this.results = Array.isArray(res) ? res : [res];
       this.total = Math.max(this.results.length, total);
     } else if (res && typeof res === "object") {
-      this.results = res["results"] || [res];
+      this.results = res["rows"] || [res];
       this.total = Math.max(res["total"] || 0, this.results.length, total);
     } else {
       this.results = [];

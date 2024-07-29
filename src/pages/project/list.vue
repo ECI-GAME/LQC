@@ -9,6 +9,7 @@ import {onCreate} from "src/utils/project";
 
 const columns = [
   {title: "项目名称", dataIndex: 'projectName', key: 'projectName'},
+  {title: "项目编号", dataIndex: 'projectName', key: 'projectNum'},
   {title: "发行商", dataIndex: 'groupName', key: 'groupName', align: "center"},
   {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
   {title: "当前版本", dataIndex: 'version', key: 'version', align: "center"},
@@ -21,7 +22,7 @@ const columns = [
 const {state, execute: onLoad, isLoading} = model.list<object>(
   // 执行逻辑
   function () {
-    return api.project.list({pageNum: 1, pageSize: 20});
+    return api.project.list(1);
   },
   // 默认值，为空时自动创建
   new model.PageResult<object>([]),
