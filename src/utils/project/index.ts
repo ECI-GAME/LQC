@@ -14,8 +14,9 @@ const onSubmit = function (formData: object) {
  * @author svon.me@gmail.com
  */
 export const onCreate = function () {
-  modal.form([
+  return modal.form([
     {
+      key: "name",
       label: "项目名称",
       component: Input,
     },

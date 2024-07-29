@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import api from "src/api";
 import {Icon} from "@ue/icon";
 import {RouterLink} from "vue-router";
+import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
 import {Table, Button} from "ant-design-vue";
+import {onCreate} from "src/utils/project";
 
 const columns = [
   {title: "项目名称", dataIndex: 'projectName', key: 'projectName'},
@@ -14,22 +17,35 @@ const columns = [
   {title: "Actions", dataIndex: 'id', key: 'action', align: "right"},
 ];
 
-const data = [
-  {
-    projectName: "测试项目",
-    groupName: "测试公司",
-    createTime: "2024-07-22 10:00:00",
-    version: "V1.0.1",
-    pm: "Root",
-    id: "1"
+// 构造当前列表数据对象
+const {state, execute: onLoad, isLoading} = model.list<object>(
+  // 执行逻辑
+  function () {
+    return api.project.list({pageNum: 1, pageSize: 20});
+  },
+  // 默认值，为空时自动创建
+  new model.PageResult<object>([]),
+  // 是否默认执行，默认为 false
+  true
+);
+
+const onCreateProject = async function () {
+  // 创建项目
+  const status = await onCreate();
+  // 状态判断
+  if (status) {
+    await onLoad(100); // 100 毫秒后刷新列表
   }
-];
+}
 
 </script>
 
 <template>
   <div>
-    <Table :data-source="data" :columns="columns" :bordered="true">
+    <div class="text-right">
+      <Button @click="onCreateProject">新建</Button>
+    </div>
+    <Table class="mt-5" :loading="isLoading" :data-source="state.results" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'projectName'">
           <RouterLink :to="{ name: alias.ProjectDetails.name, params: { projectId: record.id } }">
