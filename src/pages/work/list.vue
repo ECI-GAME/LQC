@@ -3,7 +3,7 @@ import {ref, onMounted} from "vue";
 import BigNumber from "bignumber.js";
 import BoxScale from "src/components/box/scale.vue";
 
-const $emit = defineEmits(["update:active"]);
+const $emit = defineEmits(["update:active", "change"]);
 defineProps({
   active: {
     type: String,
@@ -25,6 +25,7 @@ const boxRef = ref();
 const top = ref<number>(0);
 
 const onChange = function (src: string) {
+  $emit("change", src);
   $emit("update:active", src);
   const index = list.indexOf(src);
   const width = boxRef.value.clientWidth;

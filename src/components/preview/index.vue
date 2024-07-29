@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import {ref} from "vue";
+import {Icon} from "@ue/icon";
 import ORC from "src/utils/orc";
 import {DotData} from "./config";
 import BigNumber from "bignumber.js";
 import Screen from "../screen/index.vue";
 import safeGet from "@fengqiaogang/safe-get";
-import {Badge, Layout, LayoutContent, LayoutHeader, Slider} from "ant-design-vue";
+import * as image from "src/utils/brower/image";
+import {downloadFile} from "src/utils/brower/download";
+import {Badge, Layout, LayoutContent, LayoutHeader, Slider, Space, Button} from "ant-design-vue";
 
+import type {PropType} from "vue";
 import type {Screen as ScreenValue} from "../screen/config";
 
 enum DotType {
@@ -14,19 +18,28 @@ enum DotType {
   location = "location",
 }
 
-defineProps({
+const $emit = defineEmits(["dot"]);
+
+const props = defineProps({
   src: {
     type: String,
     required: true,
+  },
+  dots: {
+    required: false,
+    default: () => [],
+    type: Array as PropType<DotData[]>,
+  },
+  disabled: {
+    type: Boolean,
+    required: false,
+    default: () => false,
   }
 });
-
-// const src = "https://assets.vuejs.com/208e0972-71b8-5be4-a5c0-4d29ad1f6261/2987d30fc481516b82d3e976beb342e5.png";
 
 const boxRef = ref();
 const imageRef = ref();
 const ratio = ref<number>(100);
-const dots = ref<DotData[]>([]);
 const screenStatus = ref<boolean>(false);
 const screenX = ref<number>(0);
 const screenY = ref<number>(0);
@@ -82,22 +95,39 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
       // todo
     }
   }
-  dots.value.push(res);
+  $emit("dot", res);
 }
 
 </script>
 
 <template>
   <Layout>
-    <LayoutHeader class="bg-white h-[initial]">
+    <LayoutHeader class="bg-white h-[initial] leading-[initial] px-2">
       <div class="flex items-center">
-        <div class="flex-1">
-          <Slider :min="50" :max="300" :step="1" v-model:value="ratio" :tooltip-open="false"></Slider>
+        <Space>
+          <Button class="px-0" type="link" @click="downloadFile(src)">
+            <Space :size="4">
+              <Icon class="text-xl flex" type="download"></Icon>
+              <span>下载</span>
+            </Space>
+          </Button>
+          <a class="inline-block" :href="image.preview(src)" target="_blank">
+            <Button class="px-0" type="link">
+              <Space :size="4">
+                <Icon class="text-xl flex" type="expend"></Icon>
+                <span>预览</span>
+              </Space>
+            </Button>
+          </a>
+        </Space>
+        <div class="flex-1 flex justify-end">
+          <Slider class="mx-0 w-100" :min="30" :max="300" :step="1" v-model:value="ratio"
+                  :tooltip-open="false"></Slider>
         </div>
         <div class="pl-5">{{ ratio }}%</div>
       </div>
     </LayoutHeader>
-    <LayoutContent class="px-5">
+    <LayoutContent class="px-2">
       <div class="relative h-full">
         <div ref="boxRef" class="h-full overflow-auto w-full select-none" :style="`--image-scale: ${getScale(ratio)};`">
           <div class="relative inline-block origin-top-left scale-[var(--image-scale)]">
@@ -114,7 +144,7 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
             </div>
           </div>
         </div>
-        <Screen v-if="screenStatus" :left="screenX" :top="screenY" @remove="onRemoveScreen"
+        <Screen v-if="!disabled && screenStatus" :left="screenX" :top="screenY" @remove="onRemoveScreen"
                 @orc="onAddDot($event, DotType.orc)"
                 @location="onAddDot($event, DotType.location)"/>
       </div>

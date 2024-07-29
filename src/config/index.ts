@@ -8,3 +8,7 @@ export const AppName = import.meta.env.VITE_APP_NAME;
 
 // 接口基础路径
 export const API_BASE = import.meta.env.VITE_API_BASE;
+
+export const PREVIEW_DOMAIN: string = "https://lqa-api.svon.org";
+
+export const PREVIEW_IMAGE: string = "https://preview.svon.org/image";
