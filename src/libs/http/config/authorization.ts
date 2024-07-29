@@ -21,7 +21,7 @@ const Authorization = function(cookieName: string, tokenKey?: string) {
   const headers = {};
   if (value) {
     const key = tokenKey || "token";
-    Object.assign(headers, { [key]: value });
+    Object.assign(headers, { [key]: `Bearer ${value}` });
   }
   return headers;
 }
