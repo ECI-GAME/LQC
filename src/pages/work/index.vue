@@ -4,7 +4,7 @@
  * @author svon.me@gmail.com
  */
 
-import { ref } from "vue";
+import {ref} from "vue";
 import List from "./list.vue";
 import Preview from "src/components/preview/index.vue";
 import {Layout, LayoutContent, LayoutSider} from "ant-design-vue";

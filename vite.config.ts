@@ -21,6 +21,7 @@ export default defineConfig(function ({mode}) {
       alias: {
         "src/": `${path.resolve(__dirname, "src")}/`,
         "types/": `${path.resolve(__dirname, "types")}/`,
+        "@ue/http": path.resolve(__dirname, "src/libs/http"),
       },
     },
     plugins: [
@@ -34,8 +35,7 @@ export default defineConfig(function ({mode}) {
       host: "0.0.0.0"
     },
     optimizeDeps: {
-      include: [
-      ]
+      include: []
     }
   }
 })

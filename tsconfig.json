@@ -54,7 +54,8 @@
       ],
       "types/*": [
         "./types/*"
-      ]
+      ],
+      "@ue/http": ["./src/libs/http/index.ts"],
     }
   },
   "include": [
