@@ -1,19 +1,27 @@
-<script setup>
+<script setup lang="ts">
 /**
  * @file 文件上传
  * @author svon.me@gmail.com
  */
 
 
+import {ref} from "vue";
 import {computed} from "vue";
 import * as _ from "lodash-es";
 import {Icon} from "@ue/icon";
 import {Upload} from "@js-lion/upload";
 import * as config from "src/utils/upload/common";
 
-const $emit = defineEmits(["success", "update:loading", "change", "abnormal"]);
+import type {Result} from "@js-lion/upload";
+import type {FileData} from "src/utils/upload/common";
+
+const $emit = defineEmits(["success", "update:loading", "progress", "abnormal", "update:value", "change"]);
 
 const props = defineProps({
+  value: {
+    type: [Array, String],
+    required: false
+  },
   // 是否多选，默认单选
   multiple: {
     type: Boolean,
@@ -57,6 +65,8 @@ const props = defineProps({
   }
 });
 
+const fileList = ref<FileData[]>([])
+
 const status = computed({
   get: () => props.loading,
   set: (value) => {
@@ -64,14 +74,26 @@ const status = computed({
   }
 });
 
-const onSuccess = function (list) {
-  const res = _.map(list, config.format);
+const onSuccess = function (list: Result[]) {
+  const res: FileData[] = _.map(list, config.format);
+  const value = [...fileList.value, ...res];
+  console.log(value);
+  onUpdate(value);
   $emit("success", res);
 }
-const onChange = function (...args) {
-  // $emit("change", ...args);
+
+const onUpdate = function (list: FileData[]) {
+  const array = [...list];
+  fileList.value = array;
+  $emit("update:value", array);
+  $emit("change", array);
 }
-const onAbnormal = function (...args) {
+
+
+const onProgress = function (...args: any[]) {
+  $emit("progress", ...args);
+}
+const onAbnormal = function (...args: any[]) {
   $emit("abnormal", ...args);
 }
 </script>
@@ -86,13 +108,16 @@ const onAbnormal = function (...args) {
         :drag="drag"
         :max-size="maxSize"
         :limit="limit"
-        :bucket="config.Bucket" @change="onChange" @success="onSuccess" @abnormal="onAbnormal">
+        :bucket="config.Bucket" @change.stop.prevent="onProgress" @success="onSuccess" @abnormal="onAbnormal">
       <slot>
-        <span class="flex items-center">
+        <span class="flex items-center cursor-pointer">
           <Icon class="flex text-xl" type="cloud-upload"></Icon>
           <span>上传</span>
         </span>
       </slot>
     </Upload>
+    <div>
+      <slot name="preview" :files="fileList" :update="onUpdate"></slot>
+    </div>
   </div>
 </template>
