@@ -98,6 +98,30 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
   $emit("dot", res);
 }
 
+const setPosition = function (x: number, y: number) {
+  const dom: HTMLDivElement = boxRef.value;
+  if (dom) {
+    const scale = getScale(ratio.value);
+    const left = new BigNumber(x).times(scale).toNumber();
+    const top = new BigNumber(y).times(scale).toNumber();
+    if (top <= 0) {
+      dom.scrollTop = 0;
+    } else {
+      dom.scrollTop = top;
+    }
+    if (left < dom.clientWidth && dom.scrollLeft < left) {
+      return;
+    }
+    if (left <= 0) {
+      dom.scrollLeft = 0;
+    } else {
+      dom.scrollLeft = left;
+    }
+  }
+}
+
+defineExpose({setPosition});
+
 </script>
 
 <template>
@@ -129,9 +153,10 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
     </LayoutHeader>
     <LayoutContent class="px-2">
       <div class="relative h-full">
-        <div ref="boxRef" class="h-full overflow-auto w-full select-none" :style="`--image-scale: ${getScale(ratio)};`">
+        <div ref="boxRef" class="h-full overflow-auto w-full select-none ease-in-out"
+             :style="`--image-scale: ${getScale(ratio)};`">
           <div class="relative inline-block origin-top-left scale-[var(--image-scale)]">
-            <img ref="imageRef" class="inline-block" :src="src" crossorigin="anonymous" :key="ratio"
+            <img ref="imageRef" class="inline-block max-w-[initial]" :src="src" crossorigin="anonymous" :key="ratio"
                  @click="onCaptureLocation"/>
             <div>
               <template v-for="(item, index) in dots" :key="index">
