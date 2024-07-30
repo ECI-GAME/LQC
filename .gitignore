@@ -5,6 +5,7 @@ dist
 *.zip
 *.7z
 *.local
+.history
 .idea
 .env.*.local
 *lock.yaml
