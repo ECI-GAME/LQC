@@ -12,6 +12,7 @@ export interface FileData {
   src: string;
   size: number;
   name: string;
+  type: string;
 }
 
 export const format = function (data: Result) {
@@ -28,6 +29,7 @@ export const format = function (data: Result) {
     size: data.size,
     name: data.name,
     fileName: data.name,
+    type: data.type,
     src: URL.format(asset),
   };
   return value;

@@ -6,7 +6,6 @@ export enum Status {
 }
 
 export class Result {
-  ticket?: string;
   size: number;
   type: string;
   name: string;

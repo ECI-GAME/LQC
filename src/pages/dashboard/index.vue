@@ -24,6 +24,9 @@ const onDemo = async function () {
       component: Upload,
       props: {
         multiple: true,
+        onSuccess: function(files: FileData[]) {
+          console.log(111, files)
+        }
       },
       slots: {
         preview: ({files, update}: { files: FileData[], update: (files: FileData[]) => void }) => {

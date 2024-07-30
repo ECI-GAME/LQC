@@ -77,7 +77,6 @@ const status = computed({
 const onSuccess = function (list: Result[]) {
   const res: FileData[] = _.map(list, config.format);
   const value = [...fileList.value, ...res];
-  console.log(value);
   onUpdate(value);
   $emit("success", res);
 }
