@@ -46,7 +46,7 @@
     ],
     "typeRoots": [
       "./node_modules/@types",
-      "./types",
+      "./types"
     ],
     "paths": {
       "src/*": [
@@ -55,7 +55,12 @@
       "types/*": [
         "./types/*"
       ],
-      "@ue/http": ["./src/libs/http/index.ts"],
+      "@ue/http": [
+        "./src/libs/http/index.ts"
+      ],
+      "@js-lion/upload": [
+        "./src/libs/upload/upload.ts"
+      ]
     }
   },
   "include": [

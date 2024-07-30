@@ -1,14 +1,13 @@
-import {defineConfig, loadEnv} from 'vite'
-import vue from '@vitejs/plugin-vue'
 import path from "path";
+import vue from '@vitejs/plugin-vue'
 import jsx from "@vitejs/plugin-vue-jsx";
+import {defineConfig, loadEnv, type UserConfig} from 'vite';
 import commonjs from 'vite-plugin-commonjs';
 import htmlPlugin from "vite-plugin-html-config";
 
-// https://vitejs.dev/config/
-export default defineConfig(function ({mode}) {
-  const env = loadEnv(mode, "./");
 
+const Config = defineConfig(function ({mode}: UserConfig) {
+  const env = loadEnv(mode || "production", "./");
   const headScripts = [];
   // 引入 iconfont
   if (env.VITE_APP_ICONFONT) {
@@ -22,6 +21,7 @@ export default defineConfig(function ({mode}) {
         "src/": `${path.resolve(__dirname, "src")}/`,
         "types/": `${path.resolve(__dirname, "types")}/`,
         "@ue/http": path.resolve(__dirname, "src/libs/http"),
+        "@js-lion/upload": path.resolve(__dirname, "src/libs/upload/upload"),
       },
     },
     plugins: [
@@ -38,4 +38,7 @@ export default defineConfig(function ({mode}) {
       include: []
     }
   }
-})
+});
+
+
+export default Config;
