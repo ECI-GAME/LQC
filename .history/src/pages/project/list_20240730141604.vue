@@ -6,7 +6,7 @@ import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
 import {Table, Button} from "ant-design-vue";
 import {onCreate} from "src/utils/project";
-import { ref,onMounted} from "vue";
+import { stat } from "fs";
 
 const columns = [
   {title: "项目名称", dataIndex: 'projectName', key: 'projectName'},
@@ -14,35 +14,30 @@ const columns = [
   {title: "发行商", dataIndex: 'comicPublisher', key: 'comicPublisher', align: "center"},
   {title: "语言对", dataIndex: 'languageInfo', key: 'languageInfo', align: "center"},
   {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
-  {title: "当前画册", dataIndex: 'versionName', key: 'versionName', align: "center"},
-  {title: "已进行时长(H)", dataIndex: 'timeCount', key: 'timeCount', align: "center"},
+  {title: "当前画册", dataIndex: 'version', key: 'version', align: "center"},
+  {title: "已进行时长(H)", dataIndex: 'runTime', key: 'runTime', align: "center"},
   {title: "PM", dataIndex: 'createUserName', key: 'createUserName', align: "center"},
   {title: "Actions", dataIndex: 'id', key: 'action', align: "right"},
 ];
-const tableData =  ref([]);
+
 // 构造当前列表数据对象
 const {state, execute: onLoad, isLoading} = model.list<object>(
   // 执行逻辑
   function () {
-    return  api.project.list(1);
+    const data = api.project.list(1)
+        
+    console.log('-------');
+
+    console.log(data.result);
+    console.log('-------');  
+    return data;
   },
   // 默认值，为空时自动创建
   new model.PageResult<object>([]),
   // 是否默认执行，默认为 false
   true
 );
-const modifyData = async () => {
-  await onLoad();
-  if (state._value && state._value.results.length > 0) {
-    tableData.value = state._value.results.map(item => ({
-      ...item,
-      languageInfo: `${item.sourceLanguage} -> ${item.targetLanguage}`
-    }));
-    console.log(tableData);
-  }
-  
 
-};
 const onCreateProject = async function () {
   // 创建项目
   const status = await onCreate();
@@ -51,9 +46,6 @@ const onCreateProject = async function () {
     await onLoad(100); // 100 毫秒后刷新列表
   }
 }
-onMounted(() => {
-  modifyData();
-});
 
 </script>
 
@@ -62,7 +54,7 @@ onMounted(() => {
     <div class="text-right">
       <Button @click="onCreateProject">新建</Button>
     </div>
-    <Table class="mt-5" :loading="isLoading" :data-source="tableData" :columns="columns" :bordered="true">
+    <Table class="mt-5" :loading="isLoading" :data-source="state.results" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'projectName'">
           <RouterLink :to="{ name: alias.ProjectDetails.name, params: { projectId: record.id } }">

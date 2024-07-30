@@ -2,32 +2,40 @@
 import { Icon } from "@ue/icon";
 import * as alias from "src/router/alias";
 import {Table, Button} from "ant-design-vue";
+import * as model from "src/utils/model";
+import { useRoute } from 'vue-router';
+
+import api from "src/api";
+
+const route = useRoute();
+const projectId = route.params.projectId;
 
 const columns = [
-  {title: "版本名称", dataIndex: 'name', key: 'name'},
-  {title: "语言对", dataIndex: 'language', key: 'language', align: "center"},
+  {title: "版本名称", dataIndex: 'versionName', key: 'versionName'},
+  {title: "语言对", dataIndex: 'languagePair', key: 'languagePair', align: "center"},
   {title: "状态", dataIndex: 'status', key: 'status', align: "center"},
-  {title: "时间区域", dataIndex: 'time', key: 'time', align: "center"},
-  {title: "版本进度", dataIndex: 'progress', key: 'progress', align: "center"},
+  {title: "时间区域", dataIndex: 'dateInterval', key: 'dateInterval', align: "center"},
+  {title: "版本进度", dataIndex: 'doneCnt', key: 'doneCnt', align: "center"},
   {title: "操作", dataIndex: 'id', key: 'action', align: "right"},
 ];
 
-const data = [
-  {
-    name: "第一个版本",
-    language: "XXX - XXX",
-    status: "进行中",
-    time: "2024-07-22",
-    progress: 30,
-    id: "1"
-  }
-];
-
+// 构造当前列表数据对象
+const {state, execute: onLoad, isLoading} = model.list<object>(
+  // 执行逻辑
+  function () {
+    return api.version.list(1,projectId);
+  },
+  // 默认值，为空时自动创建
+  new model.PageResult<object>([]),
+  // 是否默认执行，默认为 false
+  
+  true
+);
 </script>
 
 <template>
   <div>
-    <Table :data-source="data" :columns="columns" :bordered="true">
+    <Table :data-source="state.results" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'name'">
           <RouterLink :to="{ name: alias.TaskList.name, params: { projectId: record.id } }">

@@ -4,7 +4,7 @@ import api from "src/api";
 
 const versionInfo= await api.version.geVersionInfoById(1)
 // 处理表单数据，传给接口完成项目创建逻辑
-const onSubmit = function (formData: object) {
+const onSubmit = async function (formData: object) {
   formData.projectNum = versionInfo.projectNum
   formData.versionId = versionInfo.id
   formData.sourceLanguage = versionInfo.languagePair.split("->")[0]

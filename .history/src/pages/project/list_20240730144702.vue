@@ -14,8 +14,8 @@ const columns = [
   {title: "发行商", dataIndex: 'comicPublisher', key: 'comicPublisher', align: "center"},
   {title: "语言对", dataIndex: 'languageInfo', key: 'languageInfo', align: "center"},
   {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
-  {title: "当前画册", dataIndex: 'versionName', key: 'versionName', align: "center"},
-  {title: "已进行时长(H)", dataIndex: 'timeCount', key: 'timeCount', align: "center"},
+  {title: "当前画册", dataIndex: 'version', key: 'version', align: "center"},
+  {title: "已进行时长(H)", dataIndex: 'runTime', key: 'runTime', align: "center"},
   {title: "PM", dataIndex: 'createUserName', key: 'createUserName', align: "center"},
   {title: "Actions", dataIndex: 'id', key: 'action', align: "right"},
 ];

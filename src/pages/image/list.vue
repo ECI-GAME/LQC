@@ -26,23 +26,35 @@ const columns = [
   {title: "进度", dataIndex: 'task', key: 'task', align: "center"},
   {title: "操作", dataIndex: 'id', key: 'action', align: "right"},
 ];
-
-// 初始化集合
+// 构造当前列表数据对象
 const {state, execute: onLoad, isLoading} = model.list<object>(
+  // 执行逻辑
   function () {
     return api.task.list(1,1);
   },
+  // 默认值，为空时自动创建
   new model.PageResult<object>([]),
+  // 是否默认执行，默认为 false
+  
   true
 );
-
+const data = [
+  {
+    name: "任务一",
+    status: "TEP",
+    personnel: "Mary",
+    tepImage: "",
+    dtpImage: "",
+    qaImage: "",
+    successImage: "",
+    id: "1",        // 任务ID
+    projectId: "1", // 项目ID
+  }
+];
 
 const onCreateTask = async function () {
   const res = await onCreate();
   console.log(res);
-  if (res) {
-    await onLoad(100); // 100 毫秒后刷新列表
-  }
 }
 
 </script>
@@ -79,7 +91,7 @@ const onCreateTask = async function () {
     </Card>
 
     <Card class="mt-5">
-      <Table :data-source="state.results" :columns="columns" :bordered="true"  :loading="isLoading">
+      <Table :data-source="state.results" :columns="columns" :bordered="true">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'name'">
             <RouterLink :to="{ name: alias.TaskDetails.name, params:{ projectId: record.projectId, taskId: record.id } }">

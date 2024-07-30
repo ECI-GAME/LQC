@@ -6,7 +6,7 @@ import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
 import {Table, Button} from "ant-design-vue";
 import {onCreate} from "src/utils/project";
-import { ref,onMounted} from "vue";
+import { onMounted} from "vue";
 
 const columns = [
   {title: "项目名称", dataIndex: 'projectName', key: 'projectName'},
@@ -14,12 +14,12 @@ const columns = [
   {title: "发行商", dataIndex: 'comicPublisher', key: 'comicPublisher', align: "center"},
   {title: "语言对", dataIndex: 'languageInfo', key: 'languageInfo', align: "center"},
   {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
-  {title: "当前画册", dataIndex: 'versionName', key: 'versionName', align: "center"},
-  {title: "已进行时长(H)", dataIndex: 'timeCount', key: 'timeCount', align: "center"},
+  {title: "当前画册", dataIndex: 'version', key: 'version', align: "center"},
+  {title: "已进行时长(H)", dataIndex: 'runTime', key: 'runTime', align: "center"},
   {title: "PM", dataIndex: 'createUserName', key: 'createUserName', align: "center"},
   {title: "Actions", dataIndex: 'id', key: 'action', align: "right"},
 ];
-const tableData =  ref([]);
+const tableData = []
 // 构造当前列表数据对象
 const {state, execute: onLoad, isLoading} = model.list<object>(
   // 执行逻辑
@@ -34,11 +34,11 @@ const {state, execute: onLoad, isLoading} = model.list<object>(
 const modifyData = async () => {
   await onLoad();
   if (state._value && state._value.results.length > 0) {
-    tableData.value = state._value.results.map(item => ({
+    tableData = state._value.results.map(item => ({
       ...item,
       languageInfo: `${item.sourceLanguage} -> ${item.targetLanguage}`
     }));
-    console.log(tableData);
+    console.log(state._value.results);
   }
   
 

@@ -4,48 +4,36 @@
  */
 
 import {Get, Gql, post, tryError, validate} from "@js-lion/api";
-import api from "src/api";
 
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 
 export default class {
   /**
-   * 用户详情
-   * @returns UserIfno
+   * 版本集合
+   * @returns UserInfo
    */
   @tryError([])
   @Gql("/graphql")
-  async list(pageNum: number, pageSize: number = 20): Promise<PageResult<object>> {
+  async list(pageNum: number, projectId:number ,pageSize: number = 20): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
-      qeuryComicProjectInfo (input: { pageNum: ${pageNum}, pageSize: ${pageSize} }) {
+      getProjectVersionPageList (input: { pageNum: ${pageNum},projectId: ${projectId}, pageSize: ${pageSize} }) {
         code
         rows
         msg
       }
     }`;
     const callback = function (res: object) {
-      return safeGet<object>(res, "qeuryComicProjectInfo");
+      return safeGet<object>(res, "getProjectVersionPageList");
     }
     // @ts-ignore
     return {data, callback};
   }
 
-  //初始化项目
-  @Get("/project/initProject")
-  @validate
-  projectInit ( ) {
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
-    // @ts-ignore
-    return {};
-  }
 
 
-
-  //提交项目
+  //提价项目
   @post("/project")
   @validate
   addProject (data:object) {
@@ -57,11 +45,11 @@ export default class {
   }
 
   
-  //根据ID查询项目信息
-  @Get("project/:projectId")
+  //根据ID查询版本信息
+  @Get("project/version/:id")
   @validate
-  getProjectInfoById ( data: number) {
-    const params = { projectId: data };
+  geVersionInfoById ( data: number) {
+    const params = { id: data };
     // @ts-ignore
     const callback = function (res: object) {
       return safeGet<object>(res, "data");
