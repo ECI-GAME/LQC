@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * @file 任务列表
+ * @file 图片管理
  */
  import api from "src/api";
  import * as model from "src/utils/model";
@@ -9,49 +9,70 @@ import {Icon} from "@ue/icon";
 import {onCreate} from "./config";
 import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
-import {Table, Button, Card, Form, FormItem, Input, Space} from "ant-design-vue";
+import {Table, Button, Card, Form, FormItem, Input, Space, Select,message} from "ant-design-vue";
+import Upload from "src/components/upload/index.vue";
+import { FileData } from "src/utils/upload/common";
 
 
 const route = useRoute();
 console.log('Project ID = "%s"', route.params.projectId);
 
 const columns = [
-  {title: "任务名称", dataIndex: 'taskName', key: 'taskName'},
-  {title: "状态", dataIndex: 'taskStatus', key: 'taskStatus', align: "center"},
-  {title: "处理人", dataIndex: 'handlerName', key: 'handlerName', align: "center"},
-  {title: "TEP 图片", dataIndex: 'tepImage', key: 'image', align: "center"},
-  {title: "DTP 图片(PSD)", dataIndex: 'dtpImage', key: 'image', align: "center"},
-  {title: "QA 图片", dataIndex: 'qaImage', key: 'image', align: "center"},
-  {title: "归档图片", dataIndex: 'successImage', key: 'image', align: "center"},
-  {title: "进度", dataIndex: 'task', key: 'task', align: "center"},
+  {title: "图片名称", dataIndex: 'imageName', key: 'imageName'},
+  {title: "关联画册", dataIndex: 'versionId', key: 'versionId'},
+  {title: "状态", dataIndex: 'imageStatus', key: 'imageStatus', align: "center"},
+  {title: "当前处理人", dataIndex: 'handlerName', key: 'handlerName', align: "center"},
+  {title: "原图", dataIndex: 'originalImagePath', key: 'originalImagePath', align: "center"},
+  {title: "TEP 图片", dataIndex: 'tepImagePath', key: 'tepImagePath', align: "center"},
+  {title: "PSD生成图片", dataIndex: 'psdPath', key: 'psdPath', align: "center"},
+  {title: "DTP 图片(PSD)", dataIndex: 'dtpImagePath', key: 'dtpImagePath', align: "center"},
+  {title: "QA 图片", dataIndex: 'notesImagePath', key: 'notesImagePath', align: "center"},
+  {title: "归档图片", dataIndex: 'deliveryImagePath', key: 'deliveryImagePath', align: "center"},
+  {title: "关联任务", dataIndex: 'taskName', key: 'image', align: "center"},
+  
   {title: "操作", dataIndex: 'id', key: 'action', align: "right"},
 ];
-// 构造当前列表数据对象
+
+
+
 const {state, execute: onLoad, isLoading} = model.list<object>(
-  // 执行逻辑
+
   function () {
-    return api.task.list(1,1);
+    return api.version.geVersionImageDeailByVId(1);
   },
-  // 默认值，为空时自动创建
-  new model.PageResult<object>([]),
-  // 是否默认执行，默认为 false
-  
+  new model.PageResult<object>([]),  
   true
 );
-const data = [
-  {
-    name: "任务一",
-    status: "TEP",
-    personnel: "Mary",
-    tepImage: "",
-    dtpImage: "",
-    qaImage: "",
-    successImage: "",
-    id: "1",        // 任务ID
-    projectId: "1", // 项目ID
-  }
-];
+const onSuccess = async function (files: FileData[]) {
+  let fileInfo: any[] = [];
+  console.log('------');
+  
+  console.log(files);
+  
+  files.forEach( s=>{
+    fileInfo.push({
+      'imageName':s.fileName,
+      'imageSize':s.size,
+      'originalImagePath':s.src,
+      'imageType':s.type,
+      'projectNum': 'C24071700002',
+      'versionId':'1'
+  
+    })
+   
+  })
+  console.log(fileInfo);
+  console.log('------');
+  message.success("上传成功")
+  api.version.addVersionImage(fileInfo);
+  onLoad(100)
 
+}
+const openImage = function(data:string){
+  console.log(data);
+  
+  window.open(data)
+}
 const onCreateTask = async function () {
   const res = await onCreate();
   console.log(res);
@@ -63,17 +84,14 @@ const onCreateTask = async function () {
   <div>
     <Card>
       <Form layout="inline">
-        <FormItem label="任务名称">
+        <FormItem label="画册">
+          <Select class="w-30"/>
+        </FormItem>
+        <FormItem label="图片名称">
           <Input/>
         </FormItem>
-        <FormItem label="状态">
-          <Input/>
-        </FormItem>
-        <FormItem label="处理人">
-          <Input/>
-        </FormItem>
+        
         <FormItem>
-          <template #label></template>
           <Space>
             <Button>搜索</Button>
             <Button>重置</Button>
@@ -84,9 +102,10 @@ const onCreateTask = async function () {
 
     <Card class="mt-5">
       <Space size="large">
-        <Button @click="onCreateTask">新建任务</Button>
-        <Button>生成交付文件</Button>
-        <Button>归档</Button>
+        <Upload :multiple="true" @success="onSuccess">
+          <Button>图片上传</Button>
+        </Upload>
+            
       </Space>
     </Card>
 
@@ -98,8 +117,9 @@ const onCreateTask = async function () {
               <Button type="link">{{ text }}</Button>
             </RouterLink>
           </template>
-          <template v-else-if="column.key === 'image'">
-            <Button v-if="text" type="link">预览</Button>
+          
+          <template v-else-if="['originalImagePath', 'tepImagePath', 'psdPath', 'dtpImagePath', 'notesImagePath', 'deliveryImagePath'].includes(column.key)">
+            <Button v-if="text" type="link" @click="openImage(record[column.key])">预览</Button>
             <span v-else>待生成</span>
           </template>
           <template v-else-if="column.key === 'action'">

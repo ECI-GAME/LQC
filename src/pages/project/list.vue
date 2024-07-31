@@ -49,7 +49,8 @@ const onCreateProject = async function () {
     <Table class="mt-5" :loading="isLoading" :data-source="state.results" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'projectName'">
-          <RouterLink :to="{ name: alias.ProjectDetails.name, params: { projectId: record.id } }">
+          <RouterLink :to="{ name: alias.ProjectDetails.name, params: { projectId: record.id } }"> 
+          <!-- <RouterLink :to="{ name: alias.versionImage.name, params: { projectId: projectId } }"></RouterLink> -->
             <Button type="link">{{ text }}</Button>
           </RouterLink>
         </template>

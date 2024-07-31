@@ -1,20 +1,20 @@
 import * as modal from "@ue/modal";
 import {Input, DatePicker, Select} from "ant-design-vue";
 import api from "src/api";
-import { onMounted } from "vue";
+import { message } from 'ant-design-vue';
+
 
 // 处理表单数据，传给接口完成项目创建逻辑
-const onSubmit =async function (formData: object) {
-  console.log(formData);
-  const returnData = await api.project.addProject(formData)
-  console.log(returnData);
-  return true;
-  
-  
+const onSubmit = function (formData: object) {
+
+  if(formData.sourceLanguage===formData.targetLanguage){
+    message.error('源语言和目标语言不能相同！')
+    return
+  }
+  return api.project.addProject(formData);
 };
 // 字典
-// const result= api.system.getDictData('source_language_type')
-
+const result= await api.system.getDictData('source_language_type')
 
 /**
  * @file 项目创建
@@ -44,12 +44,20 @@ export const onCreate = async function () {
       {
         key: "sourceLanguage",
         label: "源语言",
-        component: Input,
+        component: Select,
+        props:{
+          fieldNames: { label: "dictLabel", value: "code" },
+          options: result
+        }
       },
       {
         key: "targetLanguage",
         label: "目标语言",
-        component: Input,
+        component: Select,
+        props:{
+          fieldNames: { label: "dictLabel", value: "code" },
+          options: result
+        }
       }
     ],
     

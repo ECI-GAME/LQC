@@ -33,10 +33,10 @@ export default class {
 
 
 
-  //提价项目
-  @post("/project")
+  //提交版本
+  @post("/project/version")
   @validate
-  addProject (data:object) {
+  addVersion (data:object) {
     const callback = function (res: object) {
       return safeGet<number>(res, "code");
     }
@@ -44,12 +44,51 @@ export default class {
     return {data};
   }
 
+    //添加版本图片
+    @post("/project/images/batchAdd")
+    @validate
+    addVersionImage (data:object) {
+      const callback = function (res: object) {
+        return safeGet<number>(res, "code");
+      }
+      // @ts-ignore
+      return {data};
+    }
+  
+
   
   //根据ID查询版本信息
   @Get("project/version/:id")
   @validate
   geVersionInfoById ( data: number) {
     const params = { id: data };
+    // @ts-ignore
+    const callback = function (res: object) {
+      return safeGet<object>(res, "data");
+    }
+    // @ts-ignore
+    return {data, params};
+  }
+
+    
+  //根据ID查询版本图片信息
+  @Get("project/images/versionId/:versionId")
+  @validate
+  geVersionImageById ( data: number) {
+    const params = { versionId: data };
+    // @ts-ignore
+    const callback = function (res: object) {
+      return safeGet<object>(res, "data");
+    }
+    // @ts-ignore
+    return {data, params};
+  }
+
+  //根据ID查询版本图片详细信息
+  @Get("project/images/detail/:versionId")
+  @validate
+  geVersionImageDeailByVId ( data: number) {
+    const params = { versionId: data };
     // @ts-ignore
     const callback = function (res: object) {
       return safeGet<object>(res, "data");

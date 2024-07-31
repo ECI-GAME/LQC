@@ -13,24 +13,27 @@ import {Table, Button, Card, Form, FormItem, Input, Space} from "ant-design-vue"
 
 
 const route = useRoute();
-console.log('Project ID = "%s"', route.params.projectId);
+
+
+const versionId = route.params.versionId;
+
+
+console.log('Project ID = "%s"', route.params.versionId);
 
 const columns = [
   {title: "任务名称", dataIndex: 'taskName', key: 'taskName'},
   {title: "状态", dataIndex: 'taskStatus', key: 'taskStatus', align: "center"},
   {title: "处理人", dataIndex: 'handlerName', key: 'handlerName', align: "center"},
-  {title: "TEP 图片", dataIndex: 'tepImage', key: 'image', align: "center"},
-  {title: "DTP 图片(PSD)", dataIndex: 'dtpImage', key: 'image', align: "center"},
-  {title: "QA 图片", dataIndex: 'qaImage', key: 'image', align: "center"},
-  {title: "归档图片", dataIndex: 'successImage', key: 'image', align: "center"},
-  {title: "进度", dataIndex: 'task', key: 'task', align: "center"},
+  {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
+  {title: "更新时间", dataIndex: 'lastDealTime', key: 'lastDealTime', align: "center"},
+  {title: "进度", dataIndex: 'totalCnt', key: 'totalCnt', align: "center"},
   {title: "操作", dataIndex: 'id', key: 'action', align: "right"},
 ];
 
 // 初始化集合
 const {state, execute: onLoad, isLoading} = model.list<object>(
   function () {
-    return api.task.list(1,1);
+    return api.task.list(1,versionId);
   },
   new model.PageResult<object>([]),
   true
@@ -38,7 +41,8 @@ const {state, execute: onLoad, isLoading} = model.list<object>(
 
 
 const onCreateTask = async function () {
-  const res = await onCreate();
+
+  const res = await onCreate(versionId);
   console.log(res);
   if (res) {
     await onLoad(100); // 100 毫秒后刷新列表
@@ -81,8 +85,8 @@ const onCreateTask = async function () {
     <Card class="mt-5">
       <Table :data-source="state.results" :columns="columns" :bordered="true"  :loading="isLoading">
         <template #bodyCell="{ column, text, record  }">
-          <template v-if="column.key === 'name'">
-            <RouterLink :to="{ name: alias.TaskDetails.name, params:{ projectId: record.projectId, taskId: record.id } }">
+          <template v-if="column.key === 'taskName'">
+            <RouterLink :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }">
               <Button type="link">{{ text }}</Button>
             </RouterLink>
           </template>

@@ -27,15 +27,40 @@ export const ProjectDetails: RouteRecordBase = {
   path: "/project/:projectId"
 }
 
+
+export const VersionImage: RouteRecordBase = {
+  name: "Image Details",
+  path: "/image/:projectId"
+}
+
 export const TaskList: RouteRecordBase = {
   name: "Project Task List",
-  path: "/task/:projectId?"
+  path: "/task/:versionId?"
 }
 
 export const TaskDetails: RouteRecordBase = {
   name: "Project Task Details",
-  path: "/task/:projectId/:taskId"
+  path: "/task/:versionId/:taskId"
 }
+export const NodeConfig: RouteRecordBase = {
+  name: "Project Node Config",
+  path: "/node/:projectId"
+}
+export const Knowledge: RouteRecordBase = {
+  name: "Knowledge Config",
+  path: "/knowledge/:projectId"
+}
+
+export const PsTypeConfig: RouteRecordBase = {
+  name: "Ps Config",
+  path: "/psTypeConfig/:projectId"
+}
+
+export const RemarkTypeConfig: RouteRecordBase = {
+  name: "Image reamrk",
+  path: "/remarkTypeConfig/:projectId"
+}
+
 
 export const Work: RouteRecordBase = {
   name: "Project Work",

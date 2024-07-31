@@ -8,10 +8,10 @@ export default class {
   @validate
   getDictData ( data: object) {
     const params = { lang: data };
-    // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
+    // // @ts-ignore
+    // const callback = function (res: object) {
+    //   return safeGet<object>(res, "data");
+    // }
     // @ts-ignore
     return {data, params};
   }

@@ -37,9 +37,9 @@ const {state, execute: onLoad, isLoading} = model.list<object>(
   <div>
     <Table :data-source="state.results" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
-        <template v-if="column.key === 'name'">
-          <RouterLink :to="{ name: alias.TaskList.name, params: { projectId: record.id } }">
-            <Button type="link">{{ text }}</Button>
+        <template v-if="column.key === 'versionName'">
+          <RouterLink :to="{ name: alias.TaskList.name, params: { versionId: record.id } }">
+            <Button type="link">{{ record.versionName }}</Button>
           </RouterLink>
         </template>
         <template v-else-if="column.key === 'action'">

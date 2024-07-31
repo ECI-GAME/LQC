@@ -5,6 +5,7 @@
 
 import {Get, Gql, post, tryError, validate} from "@js-lion/api";
 import api from "src/api";
+import { $error, $success } from "@ue/message"
 
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
@@ -46,6 +47,9 @@ export default class {
 
 
   //提交项目
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
   @post("/project")
   @validate
   addProject (data:object) {

@@ -29,6 +29,10 @@ const routes: RouteRecordRaw[] = [
         ...alias.ProjectDetails,
         component: () => import("src/pages/project/details/index.vue"),
       },
+      {
+        ...alias.VersionImage,
+        component: () => import("src/pages/image/list.vue"),
+      },
       // 任务列表
       {
         ...alias.TaskList,
@@ -39,11 +43,35 @@ const routes: RouteRecordRaw[] = [
         ...alias.TaskDetails,
         component: () => import("src/pages/task/details.vue"),
       },
+      
+      
+      // 人员节点配置
+      {
+        ...alias.NodeConfig,
+        component: () => import("src/pages/nodeConfig/index.vue"),
+      },
       // 工作
       {
         ...alias.Work,
         component: () => import("src/pages/work/index.vue"),
+      },
+      // 知识库
+      {
+        ...alias.Knowledge,
+        component: () => import("src/pages/knowledge/index.vue"),
+      },
+      // PSD配置
+      {
+        ...alias.PsTypeConfig,
+        component: () => import("src/pages/psTypeConfig/index.vue"),
+      },
+      // 错误类型配置
+      {
+        ...alias.RemarkTypeConfig,
+        component: () => import("src/pages/remarkTypeConfig/index.vue"),
       }
+
+    
     ],
   },
   {

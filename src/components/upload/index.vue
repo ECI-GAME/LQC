@@ -111,7 +111,7 @@ const onAbnormal = function (...args: any[]) {
       <slot>
         <span class="flex items-center cursor-pointer">
           <Icon class="flex text-xl" type="cloud-upload"></Icon>
-          <span>上传</span>
+          <span>图片上传</span>
         </span>
       </slot>
     </Upload>

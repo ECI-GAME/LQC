@@ -36,4 +36,30 @@ export default class {
     // @ts-ignore
     return {data};
   }
+
+    //根据ID查询版本信息
+    @Get("project/task/relations/tasks/:id")
+    @validate
+    getTaskInfoDetailById ( data: number) {
+      const params = { id: data };
+      // @ts-ignore
+      const callback = function (res: object) {
+        return safeGet<object>(res, "data");
+      }
+      // @ts-ignore
+      return {data, params};
+    }
+
+        //根据ID查询版本信息
+        @Get("project/tasks/:id")
+        @validate
+        getTaskInfoById ( data: number) {
+          const params = { id: data };
+          // @ts-ignore
+          const callback = function (res: object) {
+            return safeGet<object>(res, "data");
+          }
+          // @ts-ignore
+          return {data, params};
+        }
 }

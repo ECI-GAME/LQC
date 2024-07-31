@@ -4,18 +4,23 @@ import { useRoute } from 'vue-router';
 import Version from './version.vue';
 import { Descriptions, DescriptionsItem, Card, Button, Space } from 'ant-design-vue';
 import api from 'src/api';
+import {onCreate} from "src/utils/version";
+import * as alias from "src/router/alias";
+
 
 const route = useRoute();
 const projectId = route.params.projectId;
 const projectInfo = ref(null);
-
 onMounted(async () => {
   try {
     projectInfo.value = await api.project.getProjectInfoById(projectId);
+    
   } catch (error) {
     console.error('Error fetching project info:', error);
   }
 });
+
+
 
 const projectTitle = computed(() => {
   if (projectInfo.value) {
@@ -23,6 +28,15 @@ const projectTitle = computed(() => {
   }
   return 'Loading...';
 });
+
+const onCreateVersion = async function () {
+  // 创建项目
+  const status = await onCreate(projectId);
+  // 状态判断
+  if (status) {
+    await onLoad(100); // 100 毫秒后刷新列表
+  }
+}
 </script>
 
 <template>
@@ -42,14 +56,30 @@ const projectTitle = computed(() => {
 
     <Card class="mt-5" title="配置中心">
       <Space size="large">
-        <Button type="primary">流程人员配置</Button>
-        <Button type="primary">错误类型配置</Button>
-        <Button type="primary">PSD生成配置</Button>
-        <Button type="primary">知识库配置</Button>
+        <RouterLink :to="{ name: alias.NodeConfig.name, params: { projectId: projectId } }">
+            <Button type="primary">流程人员配置</Button>
+          </RouterLink>
+        
+        <RouterLink :to="{ name: alias.RemarkTypeConfig.name, params: { projectId: projectId } }">
+            <Button type="primary">错误类型配置</Button>
+        </RouterLink>
+        <RouterLink :to="{ name: alias.PsTypeConfig.name, params: { projectId: projectId } }">
+            <Button type="primary">PSD生成配置</Button>
+        </RouterLink>
+        <RouterLink :to="{ name: alias.Knowledge.name, params: { projectId: projectId } }">
+            <Button type="primary">知识库配置</Button>
+        </RouterLink>
       </Space>
     </Card>
 
     <Card class="mt-5" title="版本管理">
+      <div class="float-right">
+        <Button type="primary" class="ml-2" @click="onCreateVersion">创建版本</Button>
+        <RouterLink :to="{ name: alias.VersionImage.name, params: { projectId: projectId } }">
+          <Button type="primary" class="ml-2" >图片管理</Button>
+        </RouterLink>
+        <Button type="primary" class="ml-2">任务中心</Button>
+      </div>
       <Version></Version>
     </Card>
   </div>
