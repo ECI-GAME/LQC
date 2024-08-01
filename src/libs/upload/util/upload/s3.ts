@@ -310,6 +310,7 @@ export default class Client extends S3Client {
           const res = await this.multipartUpload(file);
           list.push(res);
         } catch (e) {
+          console.log(e)
           abnormal.push(file)
         }
       }

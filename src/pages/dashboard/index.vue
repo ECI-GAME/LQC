@@ -13,6 +13,13 @@ import * as modal from "@ue/modal";
 
 import type {FileData} from "src/utils/upload/common";
 
+interface PreviewOption {
+  // 文件列表
+  files: FileData[];
+  // 修改文件列表数据
+  update: (files: FileData[]) => void
+}
+
 const onSuccess = function (files: FileData[]) {
   console.log(files);
 }
@@ -24,12 +31,14 @@ const onDemo = async function () {
       component: Upload,
       props: {
         multiple: true,
-        onSuccess: function(files: FileData[]) {
-          console.log(111, files)
+        // 单次选择上传的文件
+        onSuccess: function (files: FileData[]) {
+          console.log(files);
         }
       },
       slots: {
-        preview: ({files, update}: { files: FileData[], update: (files: FileData[]) => void }) => {
+        // 处理已上传的图片预览
+        preview: ({files, update}: PreviewOption) => {
           return createElement(UploadPreview, {
             list: files,
             onChange: update

@@ -47,20 +47,23 @@ const FileDialogBox = function () {
   }
 }
 
-defineExpose({FileDialogBox});
+const onReset = function () {
+  if (fileInput.value) {
+    const dom: HTMLInputElement = fileInput.value;
+    dom.value = "";
+  }
+}
+
+defineExpose({FileDialogBox, reset: onReset});
 
 </script>
 
 <template>
   <template v-if="!disabled&&multiple">
-    <input type="file" ref="fileInput" :accept="getAcceptValue(accept)" multiple
-           style="display: none"
-           @input.stop.prevent
-           @change.stop.prevent="onSelectFile">
+    <input type="file" ref="fileInput" :accept="getAcceptValue(accept)" multiple style="display: none"
+           @change="onSelectFile">
   </template>
   <template v-else-if="!disabled">
-    <input type="file" ref="fileInput" :accept="getAcceptValue(accept)" style="display: none"
-           @input.stop.prevent
-           @change.stop.prevent="onSelectFile">
+    <input type="file" ref="fileInput" :accept="getAcceptValue(accept)" style="display: none" @change="onSelectFile">
   </template>
 </template>

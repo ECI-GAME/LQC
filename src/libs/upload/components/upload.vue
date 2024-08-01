@@ -64,7 +64,6 @@ const props = defineProps({
 
 const fileRef = ref();
 const dragenter = ref(false);
-const uuid = ref<number>(Math.random());
 
 const onChange = function (file: File, progress: number, data?: Result) {
   $emit("change", file, progress, data);
@@ -79,7 +78,6 @@ const onUpload = async function (value: File[]) {
     // 异常
     $emit("abnormal", e);
   }
-  uuid.value = Math.random();
   setTimeout(function () {
     $emit("update:loading", false);
   }, 300);
@@ -124,7 +122,7 @@ const onDragLeave = function () {
 <template>
   <div @dragenter.prevent="onDragenter" @drop.prevent="onDrop" @dragover.prevent="onDragOver" @dragleave="onDragLeave">
     <label>
-      <FileBox ref="fileRef" :disabled="disabled" :accept="accept" :multiple="multiple" :key="uuid"
+      <FileBox ref="fileRef" :disabled="disabled" :accept="accept" :multiple="multiple"
                @change="onUpload"></FileBox>
     </label>
     <div @click.stop.prevent="onClick">

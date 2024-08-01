@@ -115,7 +115,7 @@ const onAbnormal = function (...args: any[]) {
         </span>
       </slot>
     </Upload>
-    <div>
+    <div :key="fileList.length">
       <slot name="preview" :files="fileList" :update="onUpdate"></slot>
     </div>
   </div>
