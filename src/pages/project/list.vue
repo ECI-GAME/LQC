@@ -6,6 +6,7 @@ import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
 import {Table, Button} from "ant-design-vue";
 import {onCreate} from "src/utils/project";
+import { ref } from 'vue';
 
 const columns = [
   {title: "项目名称", dataIndex: 'projectName', key: 'projectName'},
@@ -18,27 +19,40 @@ const columns = [
   {title: "PM", dataIndex: 'createUserName', key: 'createUserName', align: "center"},
   {title: "Actions", dataIndex: 'id', key: 'action', align: "right"},
 ];
-// 构造当前列表数据对象
 const {state, execute: onLoad, isLoading} = model.list<object>(
-  // 执行逻辑
   function () {
     return  api.project.list(1);
   },
-  // 默认值，为空时自动创建
   new model.PageResult<object>([]),
-  // 是否默认执行，默认为 false
   true
 );
 
 const onCreateProject = async function () {
-  // 创建项目
   const status = await onCreate();
-  // 状态判断
   if (status) {
-    await onLoad(100); // 100 毫秒后刷新列表
+    await onLoad(100);
   }
 }
-
+const languageInfos = ref([]);
+const fetchLanguageInfo = async () => {
+  try {
+    languageInfos.value = await api.system.getDictData('comic_language_type');
+  } catch (error) {
+    console.error("Failed to fetch language:", error);
+  }
+};
+fetchLanguageInfo()
+//语言映射
+const changeLanguage = function(source:String){
+ 
+  for (const element of languageInfos.value) {
+    if (source === element.code) {
+      return element.dictLabel;
+    }
+  
+  }
+  return '-';
+}
 </script>
 
 <template>
@@ -55,7 +69,7 @@ const onCreateProject = async function () {
           </RouterLink>
         </template>
         <template v-if="column.key === 'languageInfo'">
-          {{record.sourceLanguage}}->{{record.targetLanguage}}
+          {{changeLanguage(record.sourceLanguage)}}->{{changeLanguage(record.sourceLanguage)}}
         </template>
         <template v-else-if="column.key === 'action'">
           <span class="inline-block">

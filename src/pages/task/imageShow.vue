@@ -2,9 +2,13 @@
 <script setup lang="ts">
 import { ref, reactive, watch,onCreate } from 'vue';
 import { Modal, Image, Card, Checkbox, Divider, Row, Col } from "ant-design-vue";
-import api from "src/api";
-import * as model from "src/utils/model";
 
+import {useRoute} from "vue-router";
+
+const route = useRoute();
+
+
+console.log('Version ID = "%s"', route.params.versionId);
 const open = ref<boolean>(true);
 
 
@@ -27,7 +31,6 @@ const onCheckAllChange = (e: any) => {
     checkedList: e.target.checked ? plainOptions : [],
     indeterminate: false,
   });
-  console.log(data.results);
   
 };
 watch(
@@ -38,13 +41,7 @@ watch(
   },
 );
 
-
-const {data, execute: onLoad, isLoading} = model.list<object>(
-  function () {
-    return api.version.geVersionImageById(1)
-  },
-  true
-);
+const data = []
 
 </script>
 <style>

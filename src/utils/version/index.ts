@@ -13,15 +13,12 @@ const onSuccess = function (files: FileData[]) {
 const imageList = []
 const projectInfo= await api.project.getProjectInfoById(3)
 projectInfo.languagePair = projectInfo.sourceLanguage+'->'+projectInfo.targetLanguage
-console.log('------');
-
-console.log(projectInfo);
-console.log('------');
 // 处理表单数据，传给接口完成项目创建逻辑
 const onSubmit = function (formData: object) {
   formData.projectNum = projectInfo.projectNum
   formData.projectVersionImageVos = imageList
-  return api.version.addVersion(formData);
+  api.version.addVersion(formData)
+  return true;
 };
 
 /**

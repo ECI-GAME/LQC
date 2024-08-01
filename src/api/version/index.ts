@@ -7,6 +7,7 @@ import {Get, Gql, post, tryError, validate} from "@js-lion/api";
 
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
+import { $error, $success } from "@ue/message"
 
 export default class {
   /**
@@ -15,7 +16,7 @@ export default class {
    */
   @tryError([])
   @Gql("/graphql")
-  async list(pageNum: number, projectId:number ,pageSize: number = 20): Promise<PageResult<object>> {
+  async list(pageNum: number, projectId:number ,pageSize: number = 10): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
       getProjectVersionPageList (input: { pageNum: ${pageNum},projectId: ${projectId}, pageSize: ${pageSize} }) {
@@ -34,6 +35,9 @@ export default class {
 
 
   //提交版本
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
   @post("/project/version")
   @validate
   addVersion (data:object) {

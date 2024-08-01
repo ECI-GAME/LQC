@@ -37,6 +37,26 @@ const onCreateVersion = async function () {
     await onLoad(100); // 100 毫秒后刷新列表
   }
 }
+const languageInfos = ref([]);
+const fetchLanguageInfo = async () => {
+  try {
+    languageInfos.value = await api.system.getDictData('comic_language_type');
+  } catch (error) {
+    console.error("Failed to fetch language:", error);
+  }
+};
+fetchLanguageInfo()
+//语言映射
+const changeLanguage = function(source:String){
+ 
+  for (const element of languageInfos.value) {
+    if (source === element.code) {
+      return element.dictLabel;
+    }
+  
+  }
+  return '-';
+}
 </script>
 
 <template>
@@ -44,7 +64,7 @@ const onCreateVersion = async function () {
     <Card :title="projectTitle">
       <Descriptions v-if="projectInfo" :column="3" :bordered="true">
         <DescriptionsItem label="项目编号">{{ projectInfo.projectNum }}</DescriptionsItem>
-        <DescriptionsItem label="语言对">{{ projectInfo.sourceLanguage }} - {{ projectInfo.targetLanguage }}</DescriptionsItem>
+        <DescriptionsItem label="语言对">{{ changeLanguage(projectInfo.sourceLanguage) }} - {{ changeLanguage(projectInfo.targetLanguage) }}</DescriptionsItem>
         <DescriptionsItem label="发行商">{{ projectInfo.comicPublisher }}</DescriptionsItem>
         <DescriptionsItem label="开始/结束日期">{{ projectInfo.planStartTime }}-{{ projectInfo.planEndTime }}</DescriptionsItem>
         <DescriptionsItem label="状态">{{ projectInfo.projectStatus }}</DescriptionsItem>

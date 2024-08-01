@@ -4,8 +4,11 @@ import * as alias from "src/router/alias";
 import {Table, Button} from "ant-design-vue";
 import * as model from "src/utils/model";
 import { useRoute } from 'vue-router';
+import { ref } from 'vue';
 
 import api from "src/api";
+import {Progress} from "ant-design-vue";
+
 
 const route = useRoute();
 const projectId = route.params.projectId;
@@ -31,6 +34,47 @@ const {state, execute: onLoad, isLoading} = model.list<object>(
   
   true
 );
+
+
+const languageInfos = ref([]);
+const fetchLanguageInfo = async () => {
+  try {
+    languageInfos.value = await api.system.getDictData('comic_language_type');
+  } catch (error) {
+    console.error("Failed to fetch language:", error);
+  }
+};
+fetchLanguageInfo()
+//语言映射
+const changeLanguage = function(source:String){
+ 
+  for (const element of languageInfos.value) {
+    if (source === element.code) {
+      return element.dictLabel;
+    }
+  
+  }
+  return '-';
+}
+const changePariLanguage = function(source:String){
+  let sourceLang = source.split("->")[0]
+  let targetLang = source.split("->")[1]
+  let sourceRet = ''
+  let targetRet = ''
+  for (const element of languageInfos.value) {
+    if (sourceLang === element.code) {
+      sourceRet = element.dictLabel;
+    }
+    if (targetLang === element.code) {
+      targetRet =  element.dictLabel;
+    }
+  }
+  return sourceRet+'->'+targetRet;
+}
+//进度计算
+const changeProcess = function(doneCount: number,allCount: number){
+  return (doneCount/allCount)*100;
+}
 </script>
 
 <template>
@@ -42,6 +86,12 @@ const {state, execute: onLoad, isLoading} = model.list<object>(
             <Button type="link">{{ record.versionName }}</Button>
           </RouterLink>
         </template>
+        <template v-else-if="column.key === 'languagePair'">
+          {{changePariLanguage(record.languagePair)}}
+        </template>
+        <template v-else-if="column.key === 'doneCnt'">
+            <Progress :percent="changeProcess(record.doneCnt,record.totalCnt)" status="active" :showInfo="true" :format="percent => `${record.doneCnt} /${record.totalCnt}`" />
+          </template>
         <template v-else-if="column.key === 'action'">
           <span class="inline-block">
             <Icon class="text-xl text-primary cursor-pointer" type="edit-square"></Icon>

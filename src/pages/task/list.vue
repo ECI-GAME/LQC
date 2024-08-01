@@ -4,12 +4,13 @@
  */
  import api from "src/api";
  import * as model from "src/utils/model";
+ import { ref, onMounted } from 'vue';
 
 import {Icon} from "@ue/icon";
 import {onCreate} from "./config";
 import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
-import {Table, Button, Card, Form, FormItem, Input, Space} from "ant-design-vue";
+import {Table, Button, Card, Form, FormItem, Input, Space,Progress} from "ant-design-vue";
 
 
 const route = useRoute();
@@ -19,6 +20,17 @@ const versionId = route.params.versionId;
 
 
 console.log('Project ID = "%s"', route.params.versionId);
+
+const taskStatus = ref([]);
+const fetchTaskInfo = async () => {
+  try {
+    taskStatus.value = await api.system.getDictData('comic_task_status');
+  } catch (error) {
+    console.error("Failed to fetch task status:", error);
+  }
+};
+
+fetchTaskInfo()
 
 const columns = [
   {title: "任务名称", dataIndex: 'taskName', key: 'taskName'},
@@ -48,7 +60,20 @@ const onCreateTask = async function () {
     await onLoad(100); // 100 毫秒后刷新列表
   }
 }
+//状态映射
+const changeStatus = function(dict: String){
+  for (const element of taskStatus.value) {
+    if (dict === element.dictValue) {
+      return element.dictLabel;
+    }
+  }
+  return '-';
+}
 
+//进度计算
+const changeProcess = function(doneCount: number,allCount: number){
+  return (doneCount/allCount)*100;
+}
 </script>
 
 <template>
@@ -90,14 +115,19 @@ const onCreateTask = async function () {
               <Button type="link">{{ text }}</Button>
             </RouterLink>
           </template>
+          <template v-else-if="column.key === 'taskStatus'" >
+            <span>{{changeStatus(record.taskStatus)}}</span>
+          </template>
           <template v-else-if="column.key === 'image'">
             <Button v-if="text" type="link">预览</Button>
             <span v-else>待生成</span>
           </template>
-          <template v-else-if="column.key === 'action'">
-          <span class="inline-block">
-            <Icon class="text-xl text-primary cursor-pointer" type="edit-square"></Icon>
-          </span>
+          <template v-else-if="column.key === 'image'">
+            <Button v-if="text" type="link">预览</Button>
+            <span v-else>待生成</span>
+          </template>
+          <template v-else-if="column.key === 'totalCnt'">
+            <Progress :percent="changeProcess(record.doneCnt,record.totalCnt)" status="active" :showInfo="true" :format="percent => `${record.doneCnt} /${record.totalCnt}`" />
           </template>
         </template>
       </Table>

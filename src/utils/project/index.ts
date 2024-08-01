@@ -13,8 +13,7 @@ const onSubmit = function (formData: object) {
   }
   return api.project.addProject(formData);
 };
-// 字典
-const result= await api.system.getDictData('source_language_type')
+
 
 /**
  * @file 项目创建

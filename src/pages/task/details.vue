@@ -15,11 +15,8 @@ import {DownloadOutlined} from "ant-design-vue"
 const route = useRoute();
 const taskId = route.params.taskId;
 const versionId = route.params.versionId;
-console.log('taskId = "%s"', route.params.taskId);
-console.log('versionId = "%s"', route.params.versionId);
-
 const taskInfo = ref({});
-console.log(taskInfo);
+const taskStatus = ref([]);
 onMounted(async () => {
   taskInfo.value = await api.task.getTaskInfoById(taskId);
   console.log(taskInfo.value);
@@ -36,7 +33,23 @@ const {state, execute: onLoad, isLoading} = model.list<object>(
   true
 );
 
-
+const fetchTaskInfo = async () => {
+  try {
+    taskStatus.value = await api.system.getDictData('comic_task_status');
+  } catch (error) {
+    console.error("Failed to fetch task status:", error);
+  }
+};
+fetchTaskInfo()
+//状态映射
+const changeStatus = function(dict){
+  for (const element of taskStatus.value) {
+    if (dict === element.dictValue) {
+      return element.dictLabel;
+    }
+  }
+  return '-';
+}
 
 const columns = [
   {title: "图片名称", dataIndex: 'imageName', key: 'imageName'},
@@ -46,6 +59,8 @@ const columns = [
   {title: "最近处理时间", dataIndex: 'dealTime', key: 'dealTime', align: "center"},
   {title: "操作", dataIndex: 'fileId', key: 'action', align: "center"},
 ];
+
+
 
 </script>
 
@@ -91,6 +106,9 @@ const columns = [
             <RouterLink :to="{ name: alias.Work.name, params:{ workId: record.id } }">
               <Button type="link">{{ text }}</Button>
             </RouterLink>
+          </template>
+          <template v-else-if="column.key === 'imageStatus'" >
+            <span>{{changeStatus(record.imageStatus)}}</span>
           </template>
           <template v-else-if="column.key === 'action'">
             <span class="inline-block">

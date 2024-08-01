@@ -3,6 +3,12 @@ import {Input, RangePicker, Select} from "ant-design-vue";
 import api from "src/api";
 import { ref, h, createApp } from "vue";
 import ImageShow  from "./imageShow";
+import {RouterLink, useRoute} from "vue-router";
+
+const route = useRoute();
+
+
+// console.log('Version ID = "%s"', route.params.versionId);
 
 
 let versionInfo=[]
@@ -18,11 +24,11 @@ const onSubmit = function (formData: object) {
   return api.task.submitTask(formData);  
 };
 
-const onImageShow = async function () {
+const onImageShow =  function () {
   // 动态创建并挂载 ImageShow 组件实例
-  const app =await createApp({
+  const app = createApp({
     render() {
-      return h(ImageShow,{versionId});
+      return h(ImageShow);
     }
   });
 

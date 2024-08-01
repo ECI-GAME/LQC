@@ -33,7 +33,7 @@ const columns = [
   {title: "操作", dataIndex: 'id', key: 'action', align: "right"},
 ];
 
-
+let isOnloading = false;
 
 const {state, execute: onLoad, isLoading} = model.list<object>(
 
@@ -81,8 +81,8 @@ const onCreateTask = async function () {
 </script>
 
 <template>
-  <div>
-    <Card>
+  <div >
+    <Card >
       <Form layout="inline">
         <FormItem label="画册">
           <Select class="w-30"/>
@@ -100,17 +100,17 @@ const onCreateTask = async function () {
       </Form>
     </Card>
 
-    <Card class="mt-5">
+    <Card class="mt-5" >
       <Space size="large">
-        <Upload :multiple="true" @success="onSuccess">
-          <Button>图片上传</Button>
+        <Upload :multiple="true" @success="onSuccess" @loading="isOnloading">
+          <Button :loading="isOnloading">图片上传</Button>
         </Upload>
             
       </Space>
     </Card>
 
     <Card class="mt-5">
-      <Table :data-source="state.results" :columns="columns" :bordered="true">
+      <Table :data-source="state.results"  :columns="columns" :bordered="true">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'name'">
             <RouterLink :to="{ name: alias.TaskDetails.name, params:{ projectId: record.projectId, taskId: record.id } }">
