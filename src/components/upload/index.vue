@@ -10,7 +10,7 @@ import {computed} from "vue";
 import * as _ from "lodash-es";
 import {Icon} from "@ue/icon";
 import {Upload} from "@js-lion/upload";
-import * as config from "src/utils/upload/common";
+import {Bucket, format} from "src/utils/upload/common";
 
 import type {Result} from "@js-lion/upload";
 import type {FileData} from "src/utils/upload/common";
@@ -75,7 +75,7 @@ const status = computed({
 });
 
 const onSuccess = function (list: Result[]) {
-  const res: FileData[] = _.map(list, config.format);
+  const res: FileData[] = _.map(list, format);
   const value = [...fileList.value, ...res];
   onUpdate(value);
   $emit("success", res);
@@ -107,7 +107,7 @@ const onAbnormal = function (...args: any[]) {
         :drag="drag"
         :max-size="maxSize"
         :limit="limit"
-        :bucket="config.Bucket" @change.stop.prevent="onProgress" @success="onSuccess" @abnormal="onAbnormal">
+        :bucket="Bucket" @change="onProgress" @success="onSuccess" @abnormal="onAbnormal">
       <slot>
         <span class="flex items-center cursor-pointer">
           <Icon class="flex text-xl" type="cloud-upload"></Icon>

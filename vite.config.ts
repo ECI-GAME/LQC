@@ -31,7 +31,7 @@ const Config = defineConfig(function ({mode}: UserConfig) {
       htmlPlugin({headScripts}),
     ],
     server: {
-      port: 9088,
+      port: 9090,
       host: "0.0.0.0"
     },
     optimizeDeps: {
