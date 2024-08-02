@@ -200,17 +200,17 @@ const onLocation = function () {
 <template>
   <div class="absolute z-10 top-[var(--screen-y)] left-[var(--screen-x)] " :style="screenStyle">
     <div class="text-xl absolute left-full top-0 pl-2 -translate-y-1">
-      <div class="bg-white rounded-full p-0.5 border border-solid border-primary">
+      <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary">
         <Icon class="text-primary cursor-pointer" type="font-size" @click.stop.prevent="onOrc"></Icon>
       </div>
-      <div class="bg-white rounded-full p-0.5 border border-solid border-primary mt-1">
+      <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary mt-1">
         <Icon class="text-primary cursor-pointer" type="location-fill" @click.stop.prevent="onLocation"></Icon>
       </div>
-      <div class="bg-white rounded-full p-0.5 border border-solid border-primary mt-1" @click.stop.prevent="onRemove">
+      <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary mt-1" @click.stop.prevent="onRemove">
         <Icon class="text-red-500 cursor-pointer" type="close-circle-fill"></Icon>
       </div>
     </div>
-    <div class="screen-box ease-in-out cursor-pointer" @mousedown="startDrag">
+    <div class="screen-box ease-in-out cursor-move" @mousedown="startDrag">
       <template v-for="name in direction" :key="name">
         <div class="screen-dot" :class="name" @mousedown="onResize($event, name)"></div>
       </template>
@@ -222,24 +222,25 @@ const onLocation = function () {
 <style scoped lang="scss">
 .screen-box {
   @apply relative border border-primary border-solid w-[var(--screen-width)] h-[var(--screen-height)];
+  box-shadow: 0 0 8px 3px theme("colors.primary");
 }
 
 .screen-dot {
-  @apply w-2 h-2 absolute rounded-full bg-primary cursor-move;
+  @apply w-2 h-2 absolute rounded-full bg-primary;
   &.left-top {
-    @apply left-0 top-0 -translate-x-1/2 -translate-y-1/2;
+    @apply left-0 top-0 -translate-x-1/2 -translate-y-1/2 cursor-nwse-resize;
   }
 
   &.right-top {
-    @apply right-0 top-0 translate-x-1/2 -translate-y-1/2;
+    @apply right-0 top-0 translate-x-1/2 -translate-y-1/2 cursor-nesw-resize;
   }
 
   &.left-bottom {
-    @apply left-0 bottom-0 -translate-x-1/2 translate-y-1/2;
+    @apply left-0 bottom-0 -translate-x-1/2 translate-y-1/2 cursor-nesw-resize;
   }
 
   &.right-bottom {
-    @apply right-0 bottom-0 translate-x-1/2 translate-y-1/2;
+    @apply right-0 bottom-0 translate-x-1/2 translate-y-1/2 cursor-nwse-resize;
   }
 }
 </style>

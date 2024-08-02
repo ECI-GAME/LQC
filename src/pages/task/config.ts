@@ -1,9 +1,18 @@
 import * as modal from "@ue/modal";
 import {Input,InputNumber, RangePicker, Select} from "ant-design-vue";
 import api from "src/api";
-import { ref, h, createApp } from "vue";
-import ImageShow  from "./imageShow";
-import { log } from "console";
+import { ref, } from "vue";
+import ImageShow  from "./imageShow.vue";
+
+export const columns = [
+  {title: "任务名称", dataIndex: 'taskName', key: 'taskName'},
+  {title: "状态", dataIndex: 'taskStatus', key: 'taskStatus', align: "center"},
+  {title: "处理人", dataIndex: 'handlerName', key: 'handlerName', align: "center"},
+  {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
+  {title: "更新时间", dataIndex: 'lastDealTime', key: 'lastDealTime', align: "center"},
+  {title: "进度", dataIndex: 'totalCnt', key: 'totalCnt', align: "center"},
+  {title: "操作", dataIndex: 'id', key: 'action', align: "right"},
+];
 
 
 let versionInfo=ref([]);
