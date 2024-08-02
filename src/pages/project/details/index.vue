@@ -2,7 +2,7 @@
 import { onMounted, computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Version from './version.vue';
-import { Descriptions, DescriptionsItem, Card, Button, Space } from 'ant-design-vue';
+import { Descriptions, DescriptionsItem, Card, Button, Space,Breadcrumb,BreadcrumbItem } from 'ant-design-vue';
 import api from 'src/api';
 import {onCreate} from "src/utils/version";
 import * as alias from "src/router/alias";
@@ -61,6 +61,16 @@ const changeLanguage = function(source:String){
 
 <template>
   <div>
+    <Breadcrumb>
+      <BreadcrumbItem>Home</BreadcrumbItem>
+      <BreadcrumbItem>
+        <RouterLink :to="{ name: alias.ProjectList.name }">
+            <a href="">项目列表</a>
+        </RouterLink>
+    </BreadcrumbItem>    
+      <BreadcrumbItem>项目中心</BreadcrumbItem>
+    </Breadcrumb>
+    <br/>
     <Card :title="projectTitle">
       <Descriptions v-if="projectInfo" :column="3" :bordered="true">
         <DescriptionsItem label="项目编号">{{ projectInfo.projectNum }}</DescriptionsItem>
@@ -92,14 +102,15 @@ const changeLanguage = function(source:String){
       </Space>
     </Card>
 
-    <Card class="mt-5" title="版本管理">
+    <Card class="mt-5" title="画册管理">
       <div class="float-right">
-        <Button type="primary" class="ml-2" @click="onCreateVersion">创建版本</Button>
+        <Button type="primary" class="ml-2" @click="onCreateVersion">创建画册</Button>
         <RouterLink :to="{ name: alias.VersionImage.name, params: { projectId: projectId } }">
           <Button type="primary" class="ml-2" >图片管理</Button>
         </RouterLink>
         <Button type="primary" class="ml-2">任务中心</Button>
       </div>
+      <br/><br/>
       <Version></Version>
     </Card>
   </div>

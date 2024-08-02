@@ -17,10 +17,10 @@ export default class {
    */
   @tryError([])
   @Gql("/graphql")
-  async list(pageNum: number, pageSize: number = 20): Promise<PageResult<object>> {
+  async list(pageNum: number, searchValue:string='', pageSize: number = 20): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
-      qeuryComicProjectInfo (input: { pageNum: ${pageNum}, pageSize: ${pageSize} }) {
+      qeuryComicProjectInfo (input: { pageNum: ${pageNum}, searchValue:"${searchValue}",pageSize: ${pageSize} }) {
         code
         rows
         msg

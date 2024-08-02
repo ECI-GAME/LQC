@@ -56,12 +56,17 @@ const projectId = route.params.projectId
 <template>
   <div>
     <Breadcrumb>
-      <BreadcrumbItem>Home</BreadcrumbItem>
+    <BreadcrumbItem>Home</BreadcrumbItem>
       <BreadcrumbItem>
+        <RouterLink :to="{ name: alias.ProjectList.name }">
+            <a href="">项目列表</a>
+        </RouterLink>
+    </BreadcrumbItem>  
+    <BreadcrumbItem>
         <RouterLink :to="{ name: alias.ProjectDetails.name, params:{ projectId: projectId } }">
             <a href="">项目中心</a>
         </RouterLink>
-    </BreadcrumbItem>    
+      </BreadcrumbItem>    
       <BreadcrumbItem>流程人员配置</BreadcrumbItem>
     </Breadcrumb>
     

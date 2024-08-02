@@ -4,7 +4,7 @@
  */
  import api from "src/api";
  import * as model from "src/utils/model";
-
+import { ref } from "vue";
 import {Icon} from "@ue/icon";
 import {onCreate} from "./config";
 import * as alias from "src/router/alias";
@@ -33,7 +33,7 @@ const columns = [
   {title: "操作", dataIndex: 'id', key: 'action', align: "right"},
 ];
 
-let isOnloading = false;
+const isOnloading = ref<boolean>(false);
 
 const {state, execute: onLoad, isLoading} = model.list<object>(
 
@@ -43,8 +43,8 @@ const {state, execute: onLoad, isLoading} = model.list<object>(
   new model.PageResult<object>([]),  
   true
 );
+let fileInfo: any[] = [];
 const onSuccess = async function (files: FileData[]) {
-  let fileInfo: any[] = [];
   console.log('------');
   
   console.log(files);
@@ -102,7 +102,7 @@ const onCreateTask = async function () {
 
     <Card class="mt-5" >
       <Space size="large">
-        <Upload :multiple="true" @success="onSuccess" @loading="isOnloading">
+        <Upload :multiple="true" @success="onSuccess" v-model:loading="isOnloading">
           <Button :loading="isOnloading">图片上传</Button>
         </Upload>
             

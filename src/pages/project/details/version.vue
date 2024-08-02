@@ -14,11 +14,11 @@ const route = useRoute();
 const projectId = route.params.projectId;
 
 const columns = [
-  {title: "版本名称", dataIndex: 'versionName', key: 'versionName'},
+  {title: "画册名称", dataIndex: 'versionName', key: 'versionName'},
   {title: "语言对", dataIndex: 'languagePair', key: 'languagePair', align: "center"},
   {title: "状态", dataIndex: 'status', key: 'status', align: "center"},
   {title: "时间区域", dataIndex: 'dateInterval', key: 'dateInterval', align: "center"},
-  {title: "版本进度", dataIndex: 'doneCnt', key: 'doneCnt', align: "center"},
+  {title: "画册进度", dataIndex: 'doneCnt', key: 'doneCnt', align: "center"},
   {title: "操作", dataIndex: 'id', key: 'action', align: "right"},
 ];
 
@@ -56,21 +56,19 @@ const changeLanguage = function(source:String){
   }
   return '-';
 }
-const changePariLanguage = function(source:String){
-  let sourceLang = source.split("->")[0]
-  let targetLang = source.split("->")[1]
-  let sourceRet = ''
-  let targetRet = ''
-  for (const element of languageInfos.value) {
-    if (sourceLang === element.code) {
-      sourceRet = element.dictLabel;
-    }
-    if (targetLang === element.code) {
-      targetRet =  element.dictLabel;
-    }
-  }
-  return sourceRet+'->'+targetRet;
-}
+const changePariLanguage = (source: string) => {
+  const [sourceLang, targetLang] = source.split("->");
+
+  const findLabelByCode = (code: string) => {
+    const language = languageInfos.value.find(element => element.code === code);
+    return language ? language.dictLabel : '';
+  };
+  const sourceRet = findLabelByCode(sourceLang);
+  const targetRet = findLabelByCode(targetLang);
+
+  return `${sourceRet} -> ${targetRet}`;
+};
+
 //进度计算
 const changeProcess = function(doneCount: number,allCount: number){
   return (doneCount/allCount)*100;

@@ -10,7 +10,7 @@ import * as model from "src/utils/model";
 import {RouterLink, useRoute} from "vue-router";
 import * as alias from "src/router/alias";
 import {Table, Button, Card, Space,Breadcrumb,BreadcrumbItem,Row,Col} from "ant-design-vue";
-import {DownloadOutlined} from "ant-design-vue"
+import {DownloadOutlined,Checkbox} from "ant-design-vue"
 
 const route = useRoute();
 const taskId = route.params.taskId;
@@ -55,7 +55,7 @@ const columns = [
   {title: "图片名称", dataIndex: 'imageName', key: 'imageName'},
   {title: "状态", dataIndex: 'imageStatus', key: 'imageStatus', align: "center"},
   {title: "处理人", dataIndex: 'handlerName', key: 'handlerName', align: "center"},
-  {title: "是否已完成", dataIndex: 'upstreamNode', key: 'upstreamNode', align: "center"},
+  {title: "是否已完成", dataIndex: 'isFinish', key: 'isFinish', align: "center"},
   {title: "最近处理时间", dataIndex: 'dealTime', key: 'dealTime', align: "center"},
   {title: "操作", dataIndex: 'fileId', key: 'action', align: "center"},
 ];
@@ -109,6 +109,10 @@ const columns = [
           </template>
           <template v-else-if="column.key === 'imageStatus'" >
             <span>{{changeStatus(record.imageStatus)}}</span>
+          </template>
+          
+          <template v-else-if="column.key === 'isFinish'" >
+            <Checkbox :checked="record.isFinish==1">已完成</Checkbox>
           </template>
           <template v-else-if="column.key === 'action'">
             <span class="inline-block">

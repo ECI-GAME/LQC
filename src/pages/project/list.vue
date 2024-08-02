@@ -4,7 +4,7 @@ import {Icon} from "@ue/icon";
 import {RouterLink} from "vue-router";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
-import {Table, Button} from "ant-design-vue";
+import {Table, Button,InputSearch} from "ant-design-vue";
 import {onCreate} from "src/utils/project";
 import { ref } from 'vue';
 
@@ -21,7 +21,8 @@ const columns = [
 ];
 const {state, execute: onLoad, isLoading} = model.list<object>(
   function () {
-    return  api.project.list(1);
+    
+    return  api.project.list(1,searchValue.value);
   },
   new model.PageResult<object>([]),
   true
@@ -53,11 +54,22 @@ const changeLanguage = function(source:String){
   }
   return '-';
 }
+const onSearch = function(){
+  onLoad()
+}
+const searchValue = ref<string>('');
 </script>
 
 <template>
   <div>
     <div class="text-right">
+      <InputSearch
+      v-model:value="searchValue"
+      placeholder="请输入条件"
+      enter-button
+      @search="onSearch"
+      class="w-100 float-left"
+    />
       <Button @click="onCreateProject">新建</Button>
     </div>
     <Table class="mt-5" :loading="isLoading" :data-source="state.results" :columns="columns" :bordered="true">

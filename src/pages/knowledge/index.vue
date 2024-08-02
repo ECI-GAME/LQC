@@ -19,16 +19,22 @@ const activeKey = ref('1');
 
 <template>
   <div>
+
+    
     <Breadcrumb>
-      <BreadcrumbItem>Home</BreadcrumbItem>
+    <BreadcrumbItem>Home</BreadcrumbItem>
       <BreadcrumbItem>
+        <RouterLink :to="{ name: alias.ProjectList.name }">
+            <a href="">项目列表</a>
+        </RouterLink>
+    </BreadcrumbItem>  
+    <BreadcrumbItem>
         <RouterLink :to="{ name: alias.ProjectDetails.name, params:{ projectId: projectId } }">
             <a href="">项目中心</a>
         </RouterLink>
-    </BreadcrumbItem>    
+      </BreadcrumbItem>    
       <BreadcrumbItem>知识库</BreadcrumbItem>
     </Breadcrumb>
-    
     <Tabs v-model:activeKey="activeKey">
       <TabPane key="1" tab="文件资源">文件资源</TabPane>
       <TabPane key="2" tab="文本资源">文本资源</TabPane>
