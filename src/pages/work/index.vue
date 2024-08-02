@@ -7,20 +7,27 @@
 import {ref} from "vue";
 import List from "./list.vue";
 import Record from "./record/index.vue";
-import {DotData} from "src/components/preview/config";
+import {RecordType} from "./record/config";
 import Preview from "src/components/preview/index.vue";
-import {Layout, LayoutContent, LayoutSider} from "ant-design-vue";
+import RegisterWord from "./register/word.vue";
+import {Layout, LayoutContent, LayoutSider, LayoutHeader, Segmented} from "ant-design-vue";
+
+import {DotData} from "src/components/preview/config";
 
 const active = ref();
 const previewRef = ref();
 const disabled = ref<boolean>();
-const dots = ref<DotData[]>([]);
+const dots = ref<DotData[]>([
+  new DotData(0, 0, 0, 0, "https://assets.vuejs.com/7bacc80b-26f0-5fe5-a8f2-8d15c3eeabd2/b3682056205a591d902040b236307157.png?filename=1722589164674_image.png")
+]);
+const recordActive = ref<string>(RecordType[0]);
+
 
 // 切换左侧图片
 const onChangeImage = function (value: string) {
   if (active.value !== value) {
     active.value = value;
-    dots.value = [];
+    // dots.value = [];
   }
 };
 
@@ -49,7 +56,15 @@ const onPosition = function (x: number, y: number) {
                @dot="onChangeDot"></Preview>
     </LayoutContent>
     <LayoutSider class="!w-80 !max-w-80 !flex-auto bg-[#fff]">
-      <Record @position="onPosition"></Record>
+      <Layout class="h-full">
+        <LayoutHeader class="bg-white h-[initial] leading-[initial] p-2 border-b border-solid border-slate-300">
+          <Segmented v-model:value="recordActive" :options="RecordType" :block="true" size="large" :disabled="true"></Segmented>
+        </LayoutHeader>
+        <LayoutContent class="p-2 overflow-y-auto">
+          <!--          <Record @position="onPosition" :active="recordActive" :key="recordActive"></Record>-->
+          <RegisterWord :data="dots[0]"></RegisterWord>
+        </LayoutContent>
+      </Layout>
     </LayoutSider>
   </Layout>
 </template>

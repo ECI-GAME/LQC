@@ -4,7 +4,8 @@ import jsx from "@vitejs/plugin-vue-jsx";
 import {defineConfig, loadEnv, type UserConfig} from 'vite';
 import commonjs from 'vite-plugin-commonjs';
 import htmlPlugin from "vite-plugin-html-config";
-
+// @ts-ignore
+import ElementPlus from 'unplugin-element-plus/vite';
 
 const Config = defineConfig(function ({mode}: UserConfig) {
   const env = loadEnv(mode || "production", "./");
@@ -29,6 +30,7 @@ const Config = defineConfig(function ({mode}: UserConfig) {
       vue(),
       jsx(),
       htmlPlugin({headScripts}),
+      ElementPlus(),
     ],
     server: {
       port: 9090,

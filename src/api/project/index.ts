@@ -4,7 +4,6 @@
  */
 
 import {Get, Gql, post, tryError, validate} from "@js-lion/api";
-import api from "src/api";
 import { $error, $success } from "@ue/message"
 
 import {PageResult} from "src/utils/model";
@@ -37,9 +36,6 @@ export default class {
   @Get("/project/initProject")
   @validate
   projectInit ( ) {
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
     // @ts-ignore
     return {};
   }
@@ -53,9 +49,6 @@ export default class {
   @post("/project")
   @validate
   addProject (data:object) {
-    const callback = function (res: object) {
-      return safeGet<number>(res, "code");
-    }
     // @ts-ignore
     return {data};
   }

@@ -6,7 +6,7 @@ import safeGet from "@fengqiaogang/safe-get";
 
 import type { Screen } from "./config";
 
-const $emit = defineEmits(["location", "orc", "remove"]);
+const $emit = defineEmits(["location", "cropper", "remove"]);
 const props = defineProps({
   left: {
     type: Number,
@@ -187,8 +187,8 @@ const getValue = function (): Screen {
   };
 }
 
-const onOrc = function () {
-  $emit("orc", getValue());
+const onCropper = function () {
+  $emit("cropper", getValue());
 }
 
 const onLocation = function () {
@@ -201,7 +201,7 @@ const onLocation = function () {
   <div class="absolute z-10 top-[var(--screen-y)] left-[var(--screen-x)] " :style="screenStyle">
     <div class="text-xl absolute left-full top-0 pl-2 -translate-y-1">
       <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary">
-        <Icon class="text-primary cursor-pointer" type="font-size" @click.stop.prevent="onOrc"></Icon>
+        <Icon class="text-primary cursor-pointer" type="font-size" @click.stop.prevent="onCropper"></Icon>
       </div>
       <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary mt-1">
         <Icon class="text-primary cursor-pointer" type="location-fill" @click.stop.prevent="onLocation"></Icon>

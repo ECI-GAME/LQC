@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import {ref} from "vue";
+import api from "src/api";
 import {Icon} from "@ue/icon";
-import ORC from "src/utils/orc";
+import Cropper from "src/utils/cropper";
 import {DotData} from "./config";
 import BigNumber from "bignumber.js";
 import Screen from "../screen/index.vue";
 import safeGet from "@fengqiaogang/safe-get";
 import * as image from "src/utils/brower/image";
 import {downloadFile} from "src/utils/brower/download";
+import Upload from "src/utils/upload/file";
+import * as ImageUtil from "src/utils/image";
+import {format} from "src/utils/upload/common";
 import {Badge, Layout, LayoutContent, LayoutHeader, Slider, Space, Button} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import type {Screen as ScreenValue} from "../screen/config";
 
 enum DotType {
-  orc = "orc",
+  ocr = "ocr",
   location = "location",
 }
 
@@ -87,10 +91,28 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
     Number(new BigNumber(data.x2).plus(boxRef.value.scrollLeft).div(scale).toFixed(2)),
     Number(new BigNumber(data.y2).plus(boxRef.value.scrollTop).div(scale).toFixed(2))
   );
-  if (type === DotType.orc) {
+  if (type === DotType.ocr) {
     try {
-      const orc = new ORC(imageRef.value);
-      res.image = await orc.cropperXY(res.x1, res.y1, res.x2, res.y2);
+      const cropper = new Cropper(imageRef.value);
+      // 裁剪获取 base64 图片数据
+      const value = await cropper.cutXY(res.x1, res.y1, res.x2, res.y2);
+      if (value) {
+        // base64 数据转换为 File 对象
+        const img = ImageUtil.base64ToImage(value);
+        // 上传 File 获取图片地址
+        const upload = new Upload([img]);
+        const [data, text] = await Promise.all([
+          upload.start(),
+          api.system.ocr(img)
+        ]);
+        if (data && data[0]) {
+          const image = format(data[0]);
+          res.image = image.src;
+        }
+        if (text) {
+          res.translatedText = text;
+        }
+      }
     } catch (e) {
       // todo
     }
@@ -170,7 +192,7 @@ defineExpose({setPosition});
           </div>
         </div>
         <Screen v-if="!disabled && screenStatus" :left="screenX" :top="screenY" @remove="onRemoveScreen"
-                @orc="onAddDot($event, DotType.orc)"
+                @cropper="onAddDot($event, DotType.ocr)"
                 @location="onAddDot($event, DotType.location)"/>
       </div>
     </LayoutContent>

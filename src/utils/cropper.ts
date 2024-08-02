@@ -5,7 +5,7 @@
 
 import * as image from "./image";
 
-export default class ORC {
+export default class Cropper {
   public image: HTMLImageElement | string;
 
   constructor(image: HTMLImageElement | string) {
@@ -31,11 +31,11 @@ export default class ORC {
     }
   }
 
-  cropperXY(x1: number, y1: number, x2: number, y2: number) {
-    return this.cropper(x1, y1, x2 - x1, y2 - y1);
+  cutXY(x1: number, y1: number, x2: number, y2: number) {
+    return this.cut(x1, y1, x2 - x1, y2 - y1);
   }
 
-  async cropper(x1: number, y1: number, width: number, height: number): Promise<string | undefined> {
+  async cut(x1: number, y1: number, width: number, height: number): Promise<string | undefined> {
     try {
       const img = await this.getImage();
 

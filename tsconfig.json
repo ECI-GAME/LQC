@@ -42,7 +42,8 @@
       "cloudflare-r2",
       "@js-lion/upload",
       "@ue/modal",
-      "@ue/form"
+      "@ue/form",
+      "element-plus/global"
     ],
     "typeRoots": [
       "./node_modules/@types",

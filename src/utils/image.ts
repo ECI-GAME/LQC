@@ -1,10 +1,12 @@
+import * as _ from "lodash-es";
+
 /**
  * @param base64   Base64
  * @param mimeType 图片类型
  * @param  name    图片名称
  * @description 将 base64 转换为图片并进行上传
  */
-export const base64ToImage = function (base64: string, mimeType = "image/png", name: string = "image.png") {
+export const base64ToImage = function (base64: string, mimeType = "image/png", name?: string) {
   const splitIndex = base64.indexOf(",");
   const byteString = atob(base64.slice(splitIndex + 1));     // base64 内容
 
@@ -14,6 +16,10 @@ export const base64ToImage = function (base64: string, mimeType = "image/png", n
     ia[i] = byteString.charCodeAt(i);
   }
   const blob = new Blob([ab], {type: mimeType});
+  if (!name) {
+    const types: string[] = mimeType.split("/");
+    name = `${Date.now()}_image.${_.last(types)}`;
+  }
   return new File([blob], name, {type: mimeType});
 }
 /**

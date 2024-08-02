@@ -15,7 +15,7 @@ export interface FileData {
   type: string;
 }
 
-export const format = function (data: Result) {
+export const format = function (data: Result): FileData {
   const asset = URL.parse(Domain);
   if (data.path && _.includes(data.path, "?")) {
     const temp = URL.parse(data.path);
@@ -24,7 +24,7 @@ export const format = function (data: Result) {
     asset.pathname = data.path;
   }
   asset.search = `?filename=${encodeURIComponent(data.name)}`;
-  const value: FileData = {
+  return {
     path: data.path,
     size: data.size,
     name: data.name,
@@ -32,5 +32,4 @@ export const format = function (data: Result) {
     type: data.type,
     src: URL.format(asset),
   };
-  return value;
 }

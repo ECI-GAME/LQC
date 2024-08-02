@@ -37,7 +37,7 @@ export default class {
   }
 
   //根据ID查询画册信息
-  @Get("project/task/relations/tasks/:id")
+  @Get("/project/task/relations/tasks/:id")
   @validate
   getTaskInfoDetailById(data: number) {
     const params = {id: data};
@@ -50,7 +50,7 @@ export default class {
   }
 
   //根据ID查询画册信息
-  @Get("project/tasks/:id")
+  @Get("/project/tasks/:id")
   @validate
   getTaskInfoById(data: number) {
     const params = {id: data};
@@ -63,7 +63,7 @@ export default class {
   }
 
   //根据ID查询画册信息
-  @Get("project/task/person/versionId/:id/:nodeId")
+  @Get("/project/task/person/versionId/:id/:nodeId")
   @validate
   getTaskInfoPersonById(data: number, nodeId: number) {
     const params = {id: data, nodeId: nodeId};
