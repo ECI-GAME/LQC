@@ -32,7 +32,11 @@ const Config = defineConfig(function ({mode}: UserConfig) {
     ],
     server: {
       port: 9090,
-      host: "0.0.0.0"
+      host: "0.0.0.0",
+      hmr: {
+        protocol: 'ws',
+        port: 9090,
+      },
     },
     optimizeDeps: {
       include: []
