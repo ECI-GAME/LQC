@@ -11,12 +11,12 @@ import { $error, $success } from "@ue/message"
 
 export default class {
   /**
-   * 版本集合
+   * 画册集合
    * @returns UserInfo
    */
   @tryError([])
   @Gql("/graphql")
-  async list(pageNum: number, projectId:number ,pageSize: number = 10): Promise<PageResult<object>> {
+  async list(pageNum: number, projectId:number ,pageSize: number = 20): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
       getProjectVersionPageList (input: { pageNum: ${pageNum},projectId: ${projectId}, pageSize: ${pageSize} }) {
@@ -34,7 +34,7 @@ export default class {
 
 
 
-  //提交版本
+  //提交画册
   @tryError(false)
   @$error()
   @$success("操作成功")
@@ -48,7 +48,7 @@ export default class {
     return {data};
   }
 
-    //添加版本图片
+    //添加画册图片
     @post("/project/images/batchAdd")
     @validate
     addVersionImage (data:object) {
@@ -61,7 +61,7 @@ export default class {
   
 
   
-  //根据ID查询版本信息
+  //根据ID查询画册信息
   @Get("project/version/:id")
   @validate
   geVersionInfoById ( data: number) {
@@ -75,7 +75,7 @@ export default class {
   }
 
     
-  //根据ID查询版本图片信息
+  //根据ID查询画册图片信息
   @Get("project/images/versionId/:versionId")
   @validate
   geVersionImageById ( data: number) {
@@ -88,7 +88,7 @@ export default class {
     return {data, params};
   }
 
-  //根据ID查询版本图片详细信息
+  //根据ID查询画册图片详细信息
   @Get("project/images/detail/:versionId")
   @validate
   geVersionImageDeailByVId ( data: number) {

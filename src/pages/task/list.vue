@@ -10,13 +10,14 @@ import {Icon} from "@ue/icon";
 import {onCreate} from "./config";
 import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
-import {Table, Button, Card, Form, FormItem, Input, Space,Progress} from "ant-design-vue";
+import {Table, Button, Card, Form, FormItem, Input, Space,Progress,Breadcrumb,BreadcrumbItem} from "ant-design-vue";
 
 
 const route = useRoute();
 
 
 const versionId = route.params.versionId;
+const projectId = route.params.projectId;
 
 
 console.log('Project ID = "%s"', route.params.versionId);
@@ -45,6 +46,8 @@ const columns = [
 // 初始化集合
 const {state, execute: onLoad, isLoading} = model.list<object>(
   function () {
+    
+    
     return api.task.list(1,versionId);
   },
   new model.PageResult<object>([]),
@@ -53,7 +56,7 @@ const {state, execute: onLoad, isLoading} = model.list<object>(
 
 
 const onCreateTask = async function () {
-
+  console.log(versionId);
   const res = await onCreate(versionId);
   console.log(res);
   if (res) {
@@ -78,6 +81,17 @@ const changeProcess = function(doneCount: number,allCount: number){
 
 <template>
   <div>
+    <Breadcrumb>
+      <BreadcrumbItem>Home</BreadcrumbItem>
+      <BreadcrumbItem>
+        <RouterLink :to="{ name: alias.ProjectDetails.name, params:{ projectId: versionId } }">
+            <a href="">项目中心</a>
+        </RouterLink>
+    </BreadcrumbItem>   
+      <BreadcrumbItem>任务列表</BreadcrumbItem>
+      
+    </Breadcrumb>
+    <br/>
     <Card>
       <Form layout="inline">
         <FormItem label="任务名称">
