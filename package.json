@@ -36,6 +36,7 @@
     "url": "^0.11.3",
     "uuid": "^10.0.0",
     "vue": "3.4.31",
+    "vue-draggable-next": "^2.2.1",
     "vue-router": "^4.2.4"
   },
   "devDependencies": {

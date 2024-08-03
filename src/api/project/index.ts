@@ -66,4 +66,36 @@ export default class {
     // @ts-ignore
     return {data, params};
   }
+
+
+  
+
+   //根据ID查询项目关联方法
+   @Get("project/methods/projectId/:id")
+   @validate
+   getProjectMethodById ( data: number) {
+     const params = { id: data };
+     // @ts-ignore
+     const callback = function (res: object) {
+       return safeGet<object>(res, "data");
+     }
+     // @ts-ignore
+     return {data, params};
+   }
+
+   
+
+   //根据节点ID查询项目关联人员
+   @Get("project/task/person/nodeId/:id")
+   @validate
+   getProjectPersonById ( data: number) {
+     const params = { id: data };
+     // @ts-ignore
+     const callback = function (res: object) {
+       return safeGet<object>(res, "data");
+     }
+     // @ts-ignore
+     return {data, params};
+   }
+   
 }
