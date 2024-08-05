@@ -11,6 +11,8 @@ export default class {
     return {params};
   }
 
+  
+
   @tryError(void 0)
   @Post("/ocrutil/identify", {responseType: "text"})
   @validate

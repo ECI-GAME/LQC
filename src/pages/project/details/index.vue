@@ -110,7 +110,7 @@ const changeLanguage = function(source:String){
         </RouterLink>
         <Button type="primary" class="ml-2">任务中心</Button>
       </div>
-      <br/><br/>
+      <br/>
       <Version></Version>
     </Card>
   </div>
