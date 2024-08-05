@@ -7,7 +7,9 @@ import api from "src/api";
 import { onMounted, ref } from 'vue';
 import { useRoute } from "vue-router";
 import * as alias from "src/router/alias";
-import { Button, Breadcrumb, BreadcrumbItem, Row, Col } from "ant-design-vue";
+import {Icon} from "@ue/icon";
+
+import { Button, Breadcrumb, BreadcrumbItem, Row, Col,Popconfirm } from "ant-design-vue";
 import { VueDraggableNext } from 'vue-draggable-next';
 import {onCreate} from "src/utils/nodeConfig";
 import {onCreatePerson} from "src/utils/person";
@@ -22,27 +24,34 @@ let personList = ref([]);
 const initMethod = async () => {
   try {
     methodList.value = await api.project.getProjectMethodById(projectId);
+    console.log(methodList.value);
+    intPerson()
   } catch (error) {
     console.error("Failed to fetch language:", error);
+    
+    
   }
 };
 onMounted(() => {
   initMethod();
-  intPerson()
+ 
 
 });
 let nodeId = 0;
 const intPerson = async () => {
   if (nodeId === 0) {
+   
     methodList.value.forEach(e => {
-      if (e.choseEle == 1) {
-        nodeId == e.id
+      if (e.choseEle === 1) {
+        nodeId = e.id
+        console.log('node_id:'+nodeId);
+        console.log('node_id:'+e.id);
       }
     })
   }
   personList.value = await api.project.getProjectPersonById(nodeId);
 };
-console.log(personList);
+
 
 
 const log = (event) => {
@@ -67,18 +76,30 @@ const changePerson = function (element) {
   intPerson()
 }
 
+const deletePerson =async function(id: number){
+  const status = await api.project.deletePerson(id);
+  console.log('status:'+status);
+  await intPerson();
+  
+}
 
+const deleteNode =async function(id: number){
+  const status = await api.project.deleteNode(id);
+  console.log('status:'+status);
+  await initMethod();
+  
+}
 
 const onCreateWorkFlow = async function () {
-  const status = await onCreate();
+  const status = await onCreate(methodList.value,projectId);
   if (status) {
-    await onLoad(100);
+    await initMethod();
   }
 }
 const onCreatePeople = async function () {
-  const status = await onCreatePerson();
+  const status = await onCreatePerson(nodeId);
   if (status) {
-    await onLoad(100);
+    await intPerson();
   }
 }
 
@@ -110,10 +131,28 @@ const onCreatePeople = async function () {
             <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" v-if="element.choseEle == 1"
               @click="changePerson(element)" style="background-color: blue;color: white;">
               {{ element.methodName }}
+
+              <Popconfirm
+              title="确认删除该节点信息吗?"
+              ok-text="Yes"
+              cancel-text="No"
+              @confirm="deleteNode(element.id)"
+            >
+            <Icon class="text-xl text-primary cursor-pointer float-right text-white" type="delete" ></Icon>
+            </Popconfirm>
             </div>
             <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" @click="changePerson(element)"
               v-else>
               {{ element.methodName }}
+
+              <Popconfirm
+              title="确认删除该节点信息吗?"
+              ok-text="Yes"
+              cancel-text="No"
+              @confirm="deleteNode(element.id)"
+            >
+            <Icon class="text-xl text-primary cursor-pointer float-right" type="delete" ></Icon>
+            </Popconfirm>
             </div>
           </div>
         </VueDraggableNext>
@@ -129,6 +168,15 @@ const onCreatePeople = async function () {
         <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" v-for="person in personList"
           :key="person.handlerId">
           {{ person.handlerName }}
+          <Popconfirm
+              title="确认删除该人员信息吗?"
+              ok-text="Yes"
+              cancel-text="No"
+              @confirm="deletePerson(person.id)"
+            >
+            <Icon class="text-xl text-primary cursor-pointer float-right" type="delete" ></Icon>
+            </Popconfirm>
+          
         </div>
 
         </Col>

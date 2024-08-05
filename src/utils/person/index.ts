@@ -3,13 +3,16 @@ import {Input, DatePicker, Select} from "ant-design-vue";
 import api from "src/api";
 import { message } from 'ant-design-vue';
 import { ref } from 'vue';
+import { text } from "stream/consumers";
+import { node } from "prop-types";
 
 const persons = ref([]);
 const fetchMethodInfo = async () => {
   try {
-    persons.value = await api.system.getDictData('comic_method_job');
+    persons.value = await api.project.getProjectUserInfoBy();
   } catch (error) {
     console.error("Failed to fetch language:", error);
+    
   }
 };
 fetchMethodInfo()
@@ -17,20 +20,30 @@ fetchMethodInfo()
 const onSubmit = async function (formData: object) {
 
   console.log(formData);
-    
-  
+  formData.nodeId = nodeId 
+  const code = await api.project.addProjectUserInfoBy(formData);
+  if (code === false) {
+    return false
+  } else {
+    return true
+  }
+
+  return true
   
 };
+let nodeId =0
+
 /**
  * @file 项目创建
  * @author svon.me@gmail.com
  */
-export const onCreatePerson = async function () {
-  const projectInfo= await api.project.projectInit()
-
+export const onCreatePerson = async function (param1:number) {
+  nodeId = param1
+  console.log('node:'+nodeId);
+  
   return modal.form([
     {
-      key: "nodeCode",
+      key: "handlerId",
       label: "用户名",
       component: Select,
       props:{
@@ -43,6 +56,8 @@ export const onCreatePerson = async function () {
     width: 480,
     buttonClassName: ["pb-5"],
     okText: "Submit",
-    onOk: onSubmit
+    onOk: onSubmit,
+    otherText:  "邀请",
+    
   });
 }
