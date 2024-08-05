@@ -30,11 +30,12 @@ const projectTitle = computed(() => {
 });
 
 const onCreateVersion = async function () {
+   
   // 创建项目
   const status = await onCreate(projectId);
   // 状态判断
   if (status) {
-    await onLoad(100); // 100 毫秒后刷新列表
+    window.location.reload();  
   }
 }
 const languageInfos = ref([]);

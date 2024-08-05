@@ -1,11 +1,12 @@
 <!-- src/components/ImageShow.vue -->
 <script setup lang="ts">
-import { ref, reactive, watch, onCreate, computed } from 'vue';
-import { Modal, Image, Card, Checkbox, Divider, Row, Col,Upload,Button } from "ant-design-vue";
+import { ref, reactive, watch } from 'vue';
+import { Image, Card, Checkbox, Divider, Row, Col,Upload,Button,message } from "ant-design-vue";
+import {ElButton} from "element-plus"
 
-import { useRouter, useRoute } from "vue-router";
 import api from "src/api";
 
+const $emit = defineEmits(["submit","cancel"])
 const props = defineProps({
   versionId: {
     type: [Number, String],
@@ -17,39 +18,38 @@ console.log(props.versionId);
 
 const open = ref<boolean>(true);
 
-
-const handleOk = (e: MouseEvent) => {
-  console.log(e);
-  open.value = false;
-};
-const plainOptions = ['Apple', 'Pear', 'Orange'];
 const state = reactive({
-  indeterminate: true,
   checkAll: false,
-  checkedList: ['Apple', 'Orange'],
+ 
 });
 
 const handleCancel = () => {
   open.value = false;
 };
 const onCheckAllChange = (e: any) => {
-  Object.assign(state, {
-    checkedList: e.target.checked ? plainOptions : [],
-    indeterminate: false,
-  });
-
+ 
+  console.log(e.target.checked);
+  if(e.target.checked){
+    imageInfos.value.forEach(s=>{
+      s.checkStatus = true;
+    })
+  }else{
+    imageInfos.value.forEach(s=>{
+      s.checkStatus = false;
+    })
+  }
+  
 };
-watch(
-  () => state.checkedList,
-  val => {
-    state.indeterminate = !!val.length && val.length < plainOptions.length;
-    state.checkAll = val.length === plainOptions.length;
-  },
-);
+
+
 const imageInfos = ref([]);
 const initImage = async () => {
   try {
     imageInfos.value = await api.version.geVersionImageById(props.versionId);
+    imageInfos.value.forEach(s=>{
+      s.checkStatus = false;
+    })
+    
     console.log(imageInfos.value);
 
   } catch (error) {
@@ -61,10 +61,7 @@ const initImage = async () => {
 initImage()
 
 
-const submit = function() {
-  // return [1,2,3]
-  return false;
-}
+
 
 
 let fileInfo: any[] = [];
@@ -79,8 +76,7 @@ const onSuccess = async function (files: FileData[]) {
       'imageSize':s.size,
       'originalImagePath':s.src,
       'imageType':s.type,
-      'projectNum': 'C24071700002',
-      'versionId':'1'
+      'versionId':versionId
   
     })
    
@@ -92,10 +88,35 @@ const onSuccess = async function (files: FileData[]) {
   onLoad(100)
 
 }
+let imageIds = []
+const submitFrom = ()=>{
+  imageInfos.value.forEach(e=>{
+    if(e.checkStatus){
+      imageIds.push({id: e.id})
+    }
+  })
+  if(imageIds.length===0){
+    message.error('请至少选择一张图片!')
+    return
+  }
+  $emit("submit");
+}
 
+const cancelFrom = ()=>{
 
+  $emit("submit");
+}
 
-defineExpose({ onSubmit: submit })
+const onSave = function() {
+  
+  return { imageIds }
+}
+
+const formatImageName = (imageName: string) => {
+  return imageName.length > 5 ? imageName.substring(0, 5) + '...' : imageName;
+};
+
+defineExpose({ onSubmit: onSave })
 
 </script>
 <style>
@@ -105,16 +126,17 @@ defineExpose({ onSubmit: submit })
 .card-container {  
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: flex-start;
   padding: 10px;
+  align-items: center
 }  
   
   
 </style>
 <template>
-  <div>
+  <div class="ml-4 mr-5 mt-5 mb-5">
    
-    <Checkbox v-model:checked="state.checkAll" class="ml-5 mt-5" :indeterminate="state.indeterminate" @change="onCheckAllChange">
+    <Checkbox v-model:checked="state.checkAll" class="ml-5 mt-5" @change="onCheckAllChange">
       全选
     </Checkbox>
     <Upload :multiple="true" @success="onSuccess" v-model:loading="isOnloading" class="float-right mt-2">
@@ -124,18 +146,20 @@ defineExpose({ onSubmit: submit })
 
   
       <div class="card-container">
-      <Card class="card flex-card" hoverable style="width: 100px;height:80px"   v-for="item in imageInfos"  :key="item.id" >
+      <Card class="card flex-card mt-5  ml-4" hoverable style="width: 100px;height:155px"   v-for="item in imageInfos"  :key="item.id" >
         <template #cover>
           <Image alt="example" class="object-cover" :src="item.originalImagePath" height="120px"/>
         </template>
-
-        <Checkbox v-model:checked="state.checkAll" :indeterminate="state.indeterminate" @change="onCheckAllChange">
+        
+        <Checkbox class="mt-2" v-model:checked="item.checkStatus">
         </Checkbox>
-        {{ item.imageName }}
+       <label>{{ formatImageName(item.imageName) }}</label> 
       </Card>
     </div>
-    <div>
-      <slot name="buttons"></slot>
+    <div class="text-right">
+      <ElButton type="primary" @click="submitFrom">保存</ElButton>
+      <ElButton type="info" @click="cancelFrom">取消</ElButton>
     </div>
   </div>
 </template>
+

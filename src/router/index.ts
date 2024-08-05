@@ -41,7 +41,7 @@ const routes: RouteRecordRaw[] = [
       // 任务明细
       {
         ...alias.TaskDetails,
-        component: () => import("src/pages/task/details.vue"),
+        component: () => import("src/pages/task/detail/details.vue"),
       },
       
       

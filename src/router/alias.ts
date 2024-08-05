@@ -35,12 +35,12 @@ export const VersionImage: RouteRecordBase = {
 
 export const TaskList: RouteRecordBase = {
   name: "Project Task List",
-  path: "/task/:versionId?"
+  path: "/task/:projectId/:versionId?"
 }
 
 export const TaskDetails: RouteRecordBase = {
   name: "Project Task Details",
-  path: "/task/:versionId/:taskId"
+  path: "/task/detail/:versionId/:taskId"
 }
 export const NodeConfig: RouteRecordBase = {
   name: "Project Node Config",

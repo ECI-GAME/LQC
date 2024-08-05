@@ -17,15 +17,15 @@ const versionId: number = route.params.versionId as any;
 
 const taskStatus = ref([]);
 
-const {state: fetchTaskInfo} = model.list<object>(function () {
-    return api.system.getDictData('comic_task_status');
-  },
-  new model.PageResult<object>([]),
-  true
-);
 
-
-
+const initStatus = async () => {
+  try {
+    taskStatus.value = await api.system.getDictData('comic_task_status')
+  } catch (error) {
+    console.error("Failed to fetch language:", error);
+  }
+};
+initStatus()
 // 初始化集合
 const {state, execute: onLoad, isLoading} = model.list<object>(function () {
     return api.task.list(1, versionId);
@@ -34,6 +34,10 @@ const {state, execute: onLoad, isLoading} = model.list<object>(function () {
   true
 );
 
+
+const searchInfo = ()=>{
+  onLoad(100)
+}
 const onCreateTask = async function () {
   console.log(versionId);
   const res = await onCreate(versionId);
@@ -44,6 +48,9 @@ const onCreateTask = async function () {
 }
 //状态映射
 const changeStatus = function (dict: String) {
+  console.log(dict);
+  console.log(taskStatus.value);
+  
   for (const element of taskStatus.value) {
     if (dict === element.dictValue) {
       return element.dictLabel;
@@ -51,6 +58,7 @@ const changeStatus = function (dict: String) {
   }
   return '-';
 }
+
 
 //进度计算
 const changeProcess = function (doneCount: number, allCount: number) {
@@ -63,7 +71,7 @@ const changeProcess = function (doneCount: number, allCount: number) {
     <Breadcrumb v-if="versionId">
       <BreadcrumbItem>Home</BreadcrumbItem>
       <BreadcrumbItem>
-        <RouterLink :to="{ name: alias.ProjectDetails.name, params:{ projectId: versionId } }">
+        <RouterLink :to="{ name: alias.ProjectDetails.name, params:{ projectId: route.params.projectId } }">
           <a href="">项目中心</a>
         </RouterLink>
       </BreadcrumbItem>
@@ -71,7 +79,7 @@ const changeProcess = function (doneCount: number, allCount: number) {
 
     </Breadcrumb>
     <br/>
-    <Card>
+    
       <Form layout="inline">
         <FormItem label="任务名称">
           <Input/>
@@ -83,18 +91,18 @@ const changeProcess = function (doneCount: number, allCount: number) {
           <Input/>
         </FormItem>
         <FormItem>
-          <template #label></template>
+         
           <Space>
-            <Button>搜索</Button>
+            <Button type="primary" @click="searchInfo">搜索</Button>
             <Button>重置</Button>
           </Space>
         </FormItem>
       </Form>
-    </Card>
+    
 
-    <Card class="mt-5">
-      <Space size="large">
-        <Button @click="onCreateTask">新建任务</Button>
+    <Card class="mt-5 h-15">
+      <Space size="large" class="ml-5 mt-2">
+        <Button @click="onCreateTask" type="primary">新建任务</Button>
         <Button>生成交付文件</Button>
         <Button>归档</Button>
       </Space>

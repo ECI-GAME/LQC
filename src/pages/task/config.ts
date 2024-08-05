@@ -1,8 +1,9 @@
 import * as modal from "@ue/modal";
-import {Input,InputNumber, RangePicker, Select} from "ant-design-vue";
+import {Input,InputNumber, RangePicker, Select,Link, message} from "ant-design-vue";
 import api from "src/api";
 import { ref, } from "vue";
 import ImageShow  from "./imageShow.vue";
+import { log } from "console";
 
 export const columns = [
   {title: "任务名称", dataIndex: 'taskName', key: 'taskName'},
@@ -20,55 +21,75 @@ let persons=ref([]);
 let nodes=ref([]);
 const languageInfos = ref([]);
 let versionId =0
-
+let formImages = [];
 //提交
-const onSubmit = function (formData: object) {
+const onSubmit =async function (formData: object) {
+  if(formImages.length===0){
+    message.error('请至少选择一张图片后提交!')
+    return
+  }
+  formData.taskType = 1
+  formData.projectVersionImages = formImages
   formData.projectNum = versionInfo.projectNum
   formData.versionId = versionInfo.id
   formData.sourceLanguage = versionInfo.languagePair.split("->")[0]
   formData.targetLanguage = versionInfo.languagePair.split("->")[1]
-  formData.projectVersionImages = [{id:20}]
-  return api.task.submitTask(formData);  
+  formData.handlerName = gethandlerName(formData.handlerId)
+  
+  const code = await api.task.submitTask(formData);  
+  if(code===false){
+    return false
+  }else{
+    return true
+  }
+};
+const gethandlerName = function(handlerId) {
+  const person = persons.value.find(s => s.handlerId === handlerId);
+  return person ? person.empName : '';
 };
 
-//图片显示
+//图片资源保存
 const onImageShow =  async function () {
   const res = await modal.confirm(ImageShow, {
-    width: 600,
-    height:100,
+    width: 650,
+    height:400,
     title: "弹框",
   }, {
     versionId: versionInfo.id
   })
-  console.log(res);
+  if(res.imageIds.length>0){
+    formImages = res.imageIds
+  }
   return false;
   
 };
 //查询当前版本的所有节点
 const fetchNodeInfo = async () => {
   try {
-    console.log('2222');
+    nodes.value = await api.task.getTaskInfoNodeById(versionId);
+    console.log('node.............');
     
-    console.log(versionId);
-    
-    persons.value = await api.task.getTaskInfoPersonById(versionId,1);
-    console.log(persons.value);
-    
+    console.log(nodes.value);
+    if(nodes.value.length==0){
+      message.error('当前任务还未配置流程节点，请联系PM进行配置')
+      
+    }
+    console.log(nodes.value[0].id);
+    fetchPersonInfo(nodes.value[0].id);
   } catch (error) {
     console.error("Failed to fetch language:", error);
   }
 };
-fetchNodeInfo();
+
 //初始化人员
-const fetchPersonInfo = async () => {
+const fetchPersonInfo = async (nodeId) => {
   try {
-    console.log('2222');
+   
     
-    console.log(versionId);
+    persons.value = await api.task.getTaskInfoPersonById(versionId,nodeId);
+    console.log('persons');
     
-    persons.value = await api.task.getTaskInfoPersonById(versionId,1);
     console.log(persons.value);
-    
   } catch (error) {
     console.error("Failed to fetch language:", error);
   }
@@ -83,6 +104,7 @@ const fetchLanguageInfo = async () => {
     console.error("Failed to fetch language:", error);
   }
 };
+
 fetchLanguageInfo()
 const changePariLanguage = (source: string) => {
   const [sourceLang, targetLang] = source.split("->");
@@ -100,24 +122,16 @@ const changePariLanguage = (source: string) => {
 
 export const onCreate =async function (param1:number) {
   versionId = param1
-  console.log('33333');
   
-  console.log(versionId);
-  fetchPersonInfo()
+  fetchNodeInfo();
   versionInfo = await api.version.geVersionInfoById(param1)
   return modal.form([
-  //  [
-    //   {
-    //   key: "taskType",
-    //   label: "任务类型",
-    //   component: Input,
-    // },
+
     {
       key: "taskName",
       label: "任务名称",
       component: Input,
     }
-//  ]
   ,
     [
       {
@@ -127,11 +141,6 @@ export const onCreate =async function (param1:number) {
         value:changePariLanguage(versionInfo.languagePair),
         props:{
           disabled:true
-          // fieldNames: { label: "label", value: "value" },
-          // options: [
-          //   { value: "zhangsan@mail.com", label: "zhangsan@mail.com" },
-          //   { value: "lisi@mail.com", label: "lisi@mail.com" },
-          // ]
         }
       },
       {
@@ -142,7 +151,8 @@ export const onCreate =async function (param1:number) {
         props:{
           disabled:true
         }
-      },
+      }
+        
     ],
     {
       
@@ -159,7 +169,7 @@ export const onCreate =async function (param1:number) {
         component: Select,
         props:{
           fieldNames: { label: "empName", value: "handlerId" },
-          options: persons.value
+          options: persons
         }
       },
       {
@@ -179,17 +189,14 @@ export const onCreate =async function (param1:number) {
       label: "备注",
       component: Input.TextArea,
     },
-    {
-      label: "图片资源",
-      component: Input,
-    }
+   
   ], {
     title: "新建任务",
     width: 480,
-    buttonClassName: ["pb-5"],
+    buttonClassName: ["pb-5 "],
     okText: "Submit",
     onOk: onSubmit,
-    otherText : "Image Select",
+    otherText : "图片资源",
     otherOk: onImageShow,
   });
 }

@@ -62,9 +62,14 @@ const columns = [
 
 <template>
   <div>
+
     <Breadcrumb>
       <BreadcrumbItem>Home</BreadcrumbItem>
-      <BreadcrumbItem><a href="">任务列表</a></BreadcrumbItem>
+      <BreadcrumbItem>
+        
+          <a href="">任务列表</a>
+        
+      </BreadcrumbItem>
       <BreadcrumbItem>任务明细</BreadcrumbItem>
     </Breadcrumb>
 

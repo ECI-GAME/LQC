@@ -7,7 +7,9 @@
  import {RouterLink, useRoute} from "vue-router";
  import * as alias from "src/router/alias";
  import {Table, Button, Card, Space,Breadcrumb,BreadcrumbItem,Row,Col, Tag, Tabs,TabPane  } from "ant-design-vue";
-
+import fileInfo from './file.vue'
+import textFile from './text.vue'
+import ImageFile from './image.vue'
 
 const route = useRoute();
 console.log('Project ID = "%s"', route.params.projectId);
@@ -36,9 +38,9 @@ const activeKey = ref('1');
       <BreadcrumbItem>知识库</BreadcrumbItem>
     </Breadcrumb>
     <Tabs v-model:activeKey="activeKey">
-      <TabPane key="1" tab="文件资源">文件资源</TabPane>
-      <TabPane key="2" tab="文本资源">文本资源</TabPane>
-      <TabPane key="3" tab="图片资源">图片资源</TabPane>
+      <TabPane key="1" tab="文件资源"><fileInfo/></TabPane>
+      <TabPane key="2" tab="文本资源"><textFile/></TabPane>
+      <TabPane key="3" tab="图片资源"><ImageFile/></TabPane>
     </Tabs>
   </div>
 </template>

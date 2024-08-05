@@ -9,7 +9,7 @@ import {Icon} from "@ue/icon";
 import {onCreate} from "./config";
 import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
-import {Table, Button, Card, Form, FormItem, Input, Space, Select,message} from "ant-design-vue";
+import {Table, Button, Card, Form, FormItem, Input, Space, Select,message,Breadcrumb,BreadcrumbItem} from "ant-design-vue";
 import Upload from "src/components/upload/index.vue";
 import { FileData } from "src/utils/upload/common";
 
@@ -17,9 +17,32 @@ import { FileData } from "src/utils/upload/common";
 const route = useRoute();
 console.log('Project ID = "%s"', route.params.projectId);
 
+const versionInfos = ref([]);
+let versionInfo = {};
+const initVersioInfos = async () => {
+  try {
+    versionInfos.value = await api.version.geVersionInfoByPId(route.params.projectId);
+    console.log(versionInfos.value);
+    
+    versionInfos.value.forEach(element => {
+      if(element.versionStatus==1){
+        versionInfo = element
+      }
+    });
+    console.log('version');
+    console.log(versionInfo);
+    console.log('version');
+    
+  } catch (error) {
+    console.error("Failed to fetch task status:", error);
+  }
+};
+
+initVersioInfos()
+
 const columns = [
   {title: "图片名称", dataIndex: 'imageName', key: 'imageName'},
-  {title: "关联画册", dataIndex: 'versionId', key: 'versionId'},
+  {title: "关联画册", dataIndex: 'versionName', key: 'versionName'},
   {title: "状态", dataIndex: 'imageStatus', key: 'imageStatus', align: "center"},
   {title: "当前处理人", dataIndex: 'handlerName', key: 'handlerName', align: "center"},
   {title: "原图", dataIndex: 'originalImagePath', key: 'originalImagePath', align: "center"},
@@ -38,7 +61,11 @@ const isOnloading = ref<boolean>(false);
 const {state, execute: onLoad, isLoading} = model.list<object>(
 
   function () {
-    return api.version.geVersionImageDeailByVId(1);
+    console.log('versionid');
+    console.log(versionInfo.id);
+    
+    
+    return api.version.geVersionImageDeailByVId(versionInfo.id);
   },
   new model.PageResult<object>([]),  
   true
@@ -55,14 +82,12 @@ const onSuccess = async function (files: FileData[]) {
       'imageSize':s.size,
       'originalImagePath':s.src,
       'imageType':s.type,
-      'projectNum': 'C24071700002',
-      'versionId':'1'
+      'projectNum':versionInfo.projectNum,
+      'versionId':versionInfo.id
   
     })
    
   })
-  console.log(fileInfo);
-  console.log('------');
   message.success("上传成功")
   api.version.addVersionImage(fileInfo);
   onLoad(100)
@@ -77,11 +102,30 @@ const onCreateTask = async function () {
   const res = await onCreate();
   console.log(res);
 }
+const searchImage = async function () {
+  onLoad(100)
+}
+
+
+
+
+
 
 </script>
 
 <template>
+   
   <div >
+    <Breadcrumb>
+      <BreadcrumbItem>Home</BreadcrumbItem>
+      <BreadcrumbItem>
+        <RouterLink :to="{ name: alias.ProjectDetails.name, params: { projectId: projectId } }">
+          <a href="">项目中心</a>
+        </RouterLink>
+      </BreadcrumbItem>
+      <BreadcrumbItem>节点配置页面</BreadcrumbItem>
+    </Breadcrumb>
+    <br/>
     <Card >
       <Form layout="inline">
         <FormItem label="画册">
@@ -93,7 +137,7 @@ const onCreateTask = async function () {
         
         <FormItem>
           <Space>
-            <Button>搜索</Button>
+            <Button type="primary" @click="searchImage">搜索</Button>
             <Button>重置</Button>
           </Space>
         </FormItem>

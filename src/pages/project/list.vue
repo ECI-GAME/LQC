@@ -30,8 +30,12 @@ const {state, execute: onLoad, isLoading} = model.list<object>(
 
 const onCreateProject = async function () {
   const status = await onCreate();
+  console.log('-----');
+  
+  console.log(status);
+  console.log('-----');
   if (status) {
-    await onLoad(100);
+    onLoad(100);
   }
 }
 const languageInfos = ref([]);

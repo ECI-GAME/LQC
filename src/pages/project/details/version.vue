@@ -80,7 +80,7 @@ const changeProcess = function(doneCount: number,allCount: number){
     <Table :data-source="state.results" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'versionName'">
-          <RouterLink :to="{ name: alias.TaskList.name, params: { versionId: record.id } }">
+          <RouterLink :to="{ name: alias.TaskList.name, params: { projectId:projectId,versionId: record.id } }">
             <Button type="link">{{ record.versionName }}</Button>
           </RouterLink>
         </template>
