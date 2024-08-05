@@ -2,16 +2,16 @@
 import {ref} from "vue";
 import api from "src/api";
 import {Icon} from "@ue/icon";
-import Cropper from "src/utils/cropper";
 import {DotData} from "./config";
 import BigNumber from "bignumber.js";
+import Cropper from "src/utils/cropper";
 import Screen from "../screen/index.vue";
-import safeGet from "@fengqiaogang/safe-get";
-import * as image from "src/utils/brower/image";
-import {downloadFile} from "src/utils/brower/download";
 import Upload from "src/utils/upload/file";
+import safeGet from "@fengqiaogang/safe-get";
 import * as ImageUtil from "src/utils/image";
 import {format} from "src/utils/upload/common";
+import * as image from "src/utils/brower/image";
+import {downloadFile} from "src/utils/brower/download";
 import {Badge, Layout, LayoutContent, LayoutHeader, Slider, Space, Button} from "ant-design-vue";
 
 import type {PropType} from "vue";
@@ -95,7 +95,7 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
     try {
       const cropper = new Cropper(imageRef.value);
       // 裁剪获取 base64 图片数据
-      const value = await cropper.cutXY(res.x1, res.y1, res.x2, res.y2);
+      const value = await cropper.cutXY(res.xCorrdinate1, res.yCorrdinate1, res.xCorrdinate2, res.yCorrdinate2);
       if (value) {
         // base64 数据转换为 File 对象
         const img = ImageUtil.base64ToImage(value);
@@ -107,10 +107,10 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
         ]);
         if (data && data[0]) {
           const image = format(data[0]);
-          res.image = image.src;
+          res.imagePath = image.src;
         }
         if (text) {
-          res.translatedText = text;
+          res.originalText = text;
         }
       }
     } catch (e) {

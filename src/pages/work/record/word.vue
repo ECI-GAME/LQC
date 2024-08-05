@@ -1,17 +1,22 @@
 <script setup lang="ts">
+
+import {DotType} from "src/components/preview/config";
+import { Descriptions, DescriptionsItem } from "ant-design-vue";
+import type {PropType} from "vue";
+import type {DotData} from "src/components/preview/config";
+
+defineProps({
+  data: {
+    required: true,
+    type: Object as PropType<DotData>,
+  }
+});
 </script>
 
 <template>
-
-  <div>
-    <p>类别: 框内</p>
-    <p>
-      <span class="inline-block">原文: </span>
-      <span class="inline">我的音乐没有逆转时空的魔力</span>
-    </p>
-    <p>
-      <span class="inline-block">译文: </span>
-      <span class="inline">いいえ、それができない場合. は忘れてください。</span>
-    </p>
-  </div>
+  <Descriptions class="deep-[th]:whitespace-nowrap" :column="1" :bordered="true" size="small">
+    <DescriptionsItem label="类别">{{ DotType[data.imageFlag] }}</DescriptionsItem>
+    <DescriptionsItem label="原文">{{ data.originalText }}</DescriptionsItem>
+    <DescriptionsItem label="译文">{{ data.translatedText }}</DescriptionsItem>
+  </Descriptions>
 </template>

@@ -1,3 +1,4 @@
+import URL from "url";
 import * as _ from "lodash-es";
 
 /**
@@ -46,3 +47,21 @@ export const canvasToImage = function (canvas: HTMLCanvasElement, mimeType = "im
   }
 }
 
+// 获取图片名称
+export const basename = function (src?: string): string | undefined {
+  if (src) {
+    const url = URL.parse(src, true);
+    if (url.search) {
+      const params = new URLSearchParams(url.search);
+      const value = params.get("filename")
+      if (value) {
+        return value;
+      }
+    }
+    const list = (url.pathname || "").split("/");
+    const name = list[list.length - 1];
+    if (name) {
+      return name;
+    }
+  }
+}

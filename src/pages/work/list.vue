@@ -1,33 +1,38 @@
 <script setup lang="ts">
 import {ref, onMounted} from "vue";
 import BigNumber from "bignumber.js";
+import safeGet from "@fengqiaogang/safe-get";
 import BoxScale from "src/components/box/scale.vue";
 
-const $emit = defineEmits(["update:active", "change"]);
-defineProps({
+const $emit = defineEmits(["change"]);
+const props = defineProps({
+  list: {
+    type: Array,
+    required: true
+  },
   active: {
-    type: String,
+    type: [String, Number],
     required: false
   }
 })
 
-const list = [
-  "https://assets.vuejs.com/208e0972-71b8-5be4-a5c0-4d29ad1f6261/2987d30fc481516b82d3e976beb342e5.png",
-  "https://assets.vuejs.com/09879b95-ffc1-5b25-8b24-5a820b49b334/aca2ab0c46205c39bd289eb1ff0f0e6c.png",
-  "https://assets.vuejs.com/0f5719a3-3b94-5e67-925d-0c52ea5e0832/126911f0d8ee5700a1b798021648b3e3.jpg",
-  "https://assets.svon.org/39056396-fdac-5d2e-be45-766571ad1c2f/38a5d95d68a258a4bde958261266722f.png",
-  "https://assets.vuejs.com/528fad00-f3ab-51f2-9277-d34c63233544/46da701a47d854f4b81bdbf799a6d5a8.png",
-  "https://assets.vuejs.com/49342ba8-be2c-566c-983e-502caee14057/1ef191c4264f58e09ee15c80ecde19be.png",
-  "https://assets.vuejs.com/3fd73a4a-315e-5d25-acaa-5af23ff95573/ca3cae6a145950f899b548ca76cb1c6b.png"
-];
-
 const boxRef = ref();
 const top = ref<number>(0);
 
-const onChange = function (src: string) {
-  $emit("change", src);
-  $emit("update:active", src);
-  const index = list.indexOf(src);
+const indexOf = function (id: string | number) {
+  for (let i = 0; i < props.list.length; i++) {
+    const item = props.list[i] as object;
+    const value = safeGet<string>(item, "id");
+    if (value && String(value) === String(id)) {
+      return i;
+    }
+  }
+  return 0;
+}
+
+const onChange = function (fileId: string | number) {
+  $emit("change", fileId);
+  const index = indexOf(fileId);
   const width = boxRef.value.clientWidth;
   const height = new BigNumber(width).times(1.2).toNumber();
   const value = new BigNumber(height).times(index + 1).minus(height).times(-1).toNumber();
@@ -36,20 +41,25 @@ const onChange = function (src: string) {
 }
 
 onMounted(function () {
-  setTimeout(function () {
-    onChange(list[2]);
-  }, 0);
+  if (props.active) {
+    onChange(props.active);
+  } else {
+    const value = safeGet<string>(props.list, "[0].id");
+    if (value) {
+      onChange(value)
+    }
+  }
 });
-
 </script>
 
 <template>
   <div class="overflow-hidden relative" ref="boxRef" :style="`--box-top: ${top}px;`">
     <div class="absolute left-0 top-0 w-full translate-y-[var(--box-top)] ease-in-out duration-500">
-      <BoxScale v-for="src in list" :key="src" :scale="120">
-        <div class="h-full pb-1 cursor-pointer" @click="onChange(src)">
-          <div class="h-full bg-cover bg-no-repeat bg-center hover:blur-none ease-in-out"
-               :class="{'blur-sm': active !== src}" :style="`background-image: url(${src});`"></div>
+      <BoxScale v-for="data in list" :key="data.id" :scale="120">
+        <div class="h-full pb-1 cursor-pointer" @click="onChange(data.id)">
+          <div class="h-full bg-cover bg-no-repeat bg-top hover:blur-none ease-in-out"
+               :class="{'blur-sm': String(active) !== String(data.id)}"
+               :style="`background-image: url(${data.originalImagePath});`"></div>
         </div>
       </BoxScale>
     </div>

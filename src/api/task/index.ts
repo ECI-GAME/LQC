@@ -68,4 +68,32 @@ export default class {
     // @ts-ignore
     return {data, params};
   }
+
+
+  /**
+   * 根据任务ID查询任务明细
+   * @param taskId 任务ID
+   */
+  @tryError([])
+  @Gql("graphql")
+  @validate
+  getTaskFiles(@required taskId: number | string): Promise<PageResult<object>> {
+    const funName: string = "getProjectVersionImagesList";
+    const data = `{
+      ${funName} (input: { taskId: ${taskId}, pageNum:1, pageSize: 1000 }) {
+        code
+        rows
+        msg
+      }
+    }`;
+    const callback = function (res: object) {
+      const value = safeGet<object>(res, funName);
+      if (value) {
+        return new PageResult(value as any);
+      }
+      return new PageResult<object>();
+    };
+    // @ts-ignore
+    return {data, callback}
+  }
 }

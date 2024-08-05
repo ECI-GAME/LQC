@@ -4,8 +4,8 @@
  */
 
 import * as _ from "lodash-es";
-import { useAsyncState } from "@vueuse/core";
-import type { UseAsyncStateReturn } from "@vueuse/core";
+import {useAsyncState} from "@vueuse/core";
+import type {UseAsyncStateReturn} from "@vueuse/core";
 
 /**
  * 分页查询统一结果
@@ -19,7 +19,15 @@ export class PageResult<T = object> {
       this.results = Array.isArray(res) ? res : [res];
       this.total = Math.max(this.results.length, total);
     } else if (res && typeof res === "object") {
-      this.results = res["rows"] || [res];
+      if (_.hasIn(res, "rows")) {
+        this.results = _.get(res, "rows");
+      } else if (_.hasIn(res, "results")) {
+        this.results = _.get(res, "results");
+      } else if (_.hasIn(res, "items")) {
+        this.results = _.get(res, "items");
+      } else {
+        this.results = [res];
+      }
       this.total = Math.max(res["total"] || 0, this.results.length, total);
     } else {
       this.results = [];
@@ -38,7 +46,7 @@ export type UsePageResult<T = object> = UseAsyncStateReturn<PageResult<T>, any, 
  * @param initialState  初始值
  * @param execute       是否默认加载, 默认不加载
  * @param callback      回调方法, 对数据进行校验或者转换
- * @returns 
+ * @returns
  */
 export const result = function <T>(api: (...args: any[]) => T | Promise<T>, initialState?: T, execute?: boolean, callback?: (value: any) => T) {
   const app = async function (...args: any[]) {
@@ -61,7 +69,7 @@ export const result = function <T>(api: (...args: any[]) => T | Promise<T>, init
  * @param api           请求逻辑
  * @param initialState  初始值
  * @param execute       是否默认加载, 默认不加载
- * @returns 
+ * @returns
  */
 export const list = function <T = object>(api: (...args: any[]) => PageResult<T> | Promise<PageResult<T>>, initialState?: PageResult<T>, execute?: boolean) {
   const callback = function (value: any) {
