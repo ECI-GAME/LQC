@@ -1,4 +1,4 @@
-import {Get, Gql, post, tryError, validate} from "@js-lion/api";
+import {Get, Gql, post, tryError, validate, required} from "@js-lion/api";
 import {$error, $success} from "@ue/message"
 
 import {PageResult} from "src/utils/model";
@@ -37,29 +37,23 @@ export default class {
   }
 
   //根据ID查询画册信息
+  @tryError(new PageResult<object>())
   @Get("/project/task/relations/tasks/:id")
   @validate
-  getTaskInfoDetailById(data: number) {
-    const params = {id: data};
+  getTaskInfoDetailById(@required taskId: number | string): Promise<PageResult<object>> {
+    const params = {id: taskId};
     // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
-    // @ts-ignore
-    return {data, params};
+    return {params};
   }
 
   //根据ID查询画册信息
+  @tryError({})
   @Get("/project/tasks/:id")
   @validate
-  getTaskInfoById(data: number) {
-    const params = {id: data};
+  getTaskInfoById(@required taskId: number | string): Promise<object> {
+    const params = {id: taskId};
     // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
-    // @ts-ignore
-    return {data, params};
+    return {params};
   }
 
   //根据ID查询画册信息

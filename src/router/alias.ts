@@ -64,7 +64,7 @@ export const RemarkTypeConfig: RouteRecordBase = {
 
 export const Work: RouteRecordBase = {
   name: "Project Work",
-  path: "/work/:workId",
+  path: "/work/:taskId/:workId",
   meta: {
     type: PageType.work
   }
