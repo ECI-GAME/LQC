@@ -34,10 +34,10 @@ const onShowDetail = function (data: DotData) {
 
 <template>
   <div>
-    <Card class="mt-2 first:mt-0" size="small" v-for="item in list" :key="item.imageId">
+    <Card class="mt-2 first:mt-0" size="small" v-for="(item, index) in list" :key="item.imageId">
       <template #title>
         <div class="flex items-center justify-between">
-          <span>序号: {{ item.id }}</span>
+          <span>序号: {{ index + 1 }}</span>
           <Button class="p-0" type="link" @click="onShowDetail(item)">详情</Button>
         </div>
       </template>

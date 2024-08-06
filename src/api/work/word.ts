@@ -8,8 +8,9 @@ export default class {
   @Post("/project/image/translations")
   @validate
   add(@required data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
   @tryError(false)
@@ -18,7 +19,8 @@ export default class {
   @Put("/project/image/translations")
   @validate
   update(@required data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 }
