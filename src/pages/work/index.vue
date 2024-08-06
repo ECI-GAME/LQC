@@ -7,15 +7,18 @@
 import api from "src/api";
 import List from "./list.vue";
 import * as _ from "lodash-es";
-import {ref, computed} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
 import Record from "./record/index.vue";
 import * as model from "src/utils/model";
 import {RecordType} from "./record/config";
 import Preview from "src/components/preview/index.vue";
 import RegisterWord from "./register/word.vue";
+import RegisterComment from "./register/comment.vue";
 import safeGet from "@fengqiaogang/safe-get";
-import {Layout, LayoutContent, LayoutSider, LayoutHeader, Segmented} from "ant-design-vue";
+import Tab from "src/components/tab/index.vue";
+import {ProcessNode} from "./config";
+import {Layout, LayoutContent, LayoutHeader, LayoutSider} from "ant-design-vue";
 
 import type {DotData} from "src/components/preview/config";
 
@@ -23,6 +26,16 @@ const previewRef = ref();
 const route = useRoute();
 const recordActive = ref<string>(RecordType[0]);
 const dotAddTempValue = ref<DotData>();
+const processNode = ref<ProcessNode>();
+
+onMounted(function () {
+  const id = String(route.params.workId);
+  if (id === "8") {
+    processNode.value = ProcessNode.DTP;
+  } else {
+    processNode.value = ProcessNode.TEP;
+  }
+});
 
 const workId = ref<string>(route.params.workId as string);
 
@@ -34,7 +47,10 @@ const {state} = model.list<object>(function () {
 
 // 记录点
 const {state: dots, execute: onReloadDots, isLoading} = model.list<DotData>(function () {
-  return api.work.getDotList<DotData>(workId.value);
+  if (recordActive.value === RecordType[0]) {
+    return api.work.getDotList<DotData>(workId.value);
+  }
+  return new model.PageResult<DotData>();
 }, new model.PageResult<DotData>(), true);
 
 const onUpDataDots = function () {
@@ -61,6 +77,11 @@ const onChangeImage = function (value: string) {
 
 // 打点（描点）
 const onChangeDot = function (data: DotData) {
+  if (processNode.value === ProcessNode.DTP) {
+    recordActive.value = RecordType[1];
+  } else if (processNode.value === ProcessNode.TEP) {
+    recordActive.value = RecordType[0];
+  }
   dotAddTempValue.value = data;
 }
 
@@ -84,6 +105,10 @@ const onCancelDot = function () {
 }
 
 
+const onChangeTabValue = function () {
+  onUpDataDots();
+}
+
 </script>
 
 <template>
@@ -105,12 +130,25 @@ const onCancelDot = function () {
     <LayoutSider class="!w-80 !max-w-80 !flex-auto bg-[#fff]">
       <Layout class="h-full">
         <LayoutHeader class="bg-white h-[initial] leading-[initial] p-2 border-b border-solid border-slate-300">
-          <Segmented v-model:value="recordActive" :options="RecordType" :block="true" size="large"></Segmented>
+          <Tab v-model:value="recordActive" :list="RecordType" @change="onChangeTabValue"
+               :disabled="!!dotAddTempValue"></Tab>
         </LayoutHeader>
         <LayoutContent class="p-2 overflow-y-auto">
           <template v-if="!!dotAddTempValue">
-            <RegisterWord :data="dotAddTempValue" :file="currentFile" @save="onUpDataDots"
-                          @cancel="onCancelDot"></RegisterWord>
+            <template v-if="processNode === ProcessNode.TEP">
+              <RegisterWord
+                  :data="dotAddTempValue"
+                  :file="currentFile"
+                  @save="onUpDataDots"
+                  @cancel="onCancelDot"></RegisterWord>
+            </template>
+            <template v-else-if="processNode === ProcessNode.DTP">
+              <RegisterComment
+                  :data="dotAddTempValue"
+                  :file="currentFile"
+                  @save="onUpDataDots"
+                  @cancel="onCancelDot"></RegisterComment>
+            </template>
           </template>
           <template v-else>
             <Record @position="onPosition" :active="recordActive" :key="recordActive" :list="dots.results"></Record>

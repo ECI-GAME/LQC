@@ -69,7 +69,7 @@ const onCancel = function() {
 </script>
 
 <template>
-  <Card>
+  <Card size="small">
     <Form layout="vertical" ref="formRef" :model="model">
       <FormItem label="类别">
         <Select v-model:value="model.imageFlag">

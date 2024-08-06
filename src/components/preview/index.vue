@@ -12,6 +12,7 @@ import * as ImageUtil from "src/utils/image";
 import {format} from "src/utils/upload/common";
 import * as image from "src/utils/brower/image";
 import {downloadFile} from "src/utils/brower/download";
+import {ElLoading} from 'element-plus';
 import {Badge, Layout, LayoutContent, LayoutHeader, Slider, Space, Button} from "ant-design-vue";
 
 import type {PropType} from "vue";
@@ -83,7 +84,8 @@ const onRemoveScreen = function () {
 
 // 添加标记
 const onAddDot = async function (data: ScreenValue, type: DotType) {
-  onRemoveScreen();
+
+
   const scale = getScale(ratio.value);
   const res = new DotData(
     Number(new BigNumber(data.x1).plus(boxRef.value.scrollLeft).div(scale).toFixed(2)),
@@ -92,6 +94,11 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
     Number(new BigNumber(data.y2).plus(boxRef.value.scrollTop).div(scale).toFixed(2))
   );
   if (type === DotType.ocr) {
+    const loading = ElLoading.service({
+      lock: true,
+      text: 'Loading',
+      background: 'rgba(0, 0, 0, 0.7)',
+    })
     try {
       const cropper = new Cropper(imageRef.value);
       // 裁剪获取 base64 图片数据
@@ -115,9 +122,17 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
       }
     } catch (e) {
       // todo
+    } finally {
+      setTimeout(() => {
+        loading.close();
+      }, 500);
     }
   }
   $emit("dot", res);
+
+  onRemoveScreen();
+
+
 }
 
 const setPosition = function (x: number, y: number) {
