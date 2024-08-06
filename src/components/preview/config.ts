@@ -6,6 +6,7 @@ export const DotType = {
 }
 
 export class DotData {
+  public id!: string | number;
   public taskId?: string;
   public imageId?: string;
   public imageName?: string;

@@ -21,8 +21,8 @@ import type {DotData} from "src/components/preview/config";
 
 const previewRef = ref();
 const route = useRoute();
-const disabled = ref<boolean>();
 const recordActive = ref<string>(RecordType[0]);
+const dotAddTempValue = ref<DotData>();
 
 const workId = ref<string>(route.params.workId as string);
 
@@ -33,9 +33,14 @@ const {state} = model.list<object>(function () {
 
 
 // 记录点
-const {state: dots} = model.list<DotData>(function () {
+const {state: dots, execute: onReloadDots, isLoading} = model.list<DotData>(function () {
   return api.work.getDotList<DotData>(workId.value);
 }, new model.PageResult<DotData>(), true);
+
+const onUpDataDots = function () {
+  onReloadDots(100);
+  dotAddTempValue.value = void 0;
+}
 
 // 当前选中对象详细数据
 const currentFile = computed<object | undefined>(function () {
@@ -56,15 +61,26 @@ const onChangeImage = function (value: string) {
 
 // 打点（描点）
 const onChangeDot = function (data: DotData) {
-  // disabled.value = true;
-  // dots.value.push(data);
+  dotAddTempValue.value = data;
 }
 
-const onPosition = function (x: number, y: number) {
+// 详情展示
+const onPosition = function (id: string | number) {
   const image = previewRef.value;
   if (image && image.setPosition) {
-    image.setPosition(x, y);
+    const list = dots.value.results;
+    const data = _.find(list, function (item: DotData) {
+      return item.id === id;
+    });
+    if (data) {
+      image.setPosition(data.xCorrdinate1 || 0, data.yCorrdinate1 || 0);
+      dotAddTempValue.value = data;
+    }
   }
+}
+
+const onCancelDot = function () {
+  dotAddTempValue.value = void 0;
 }
 
 
@@ -82,19 +98,19 @@ const onPosition = function (x: number, y: number) {
                ref="previewRef"
                class="h-full"
                :src="safeGet(currentFile, 'originalImagePath')"
-               :dots="dots" :disabled="disabled"
+               :dots="dots.results" :disabled="!!dotAddTempValue"
                :key="workId"
                @dot="onChangeDot"></Preview>
     </LayoutContent>
     <LayoutSider class="!w-80 !max-w-80 !flex-auto bg-[#fff]">
       <Layout class="h-full">
         <LayoutHeader class="bg-white h-[initial] leading-[initial] p-2 border-b border-solid border-slate-300">
-          <Segmented v-model:value="recordActive" :options="RecordType" :block="true" size="large"
-                     :disabled="true"></Segmented>
+          <Segmented v-model:value="recordActive" :options="RecordType" :block="true" size="large"></Segmented>
         </LayoutHeader>
         <LayoutContent class="p-2 overflow-y-auto">
-          <template v-if="disabled">
-            <RegisterWord :data="dots[0]" :file="currentFile"></RegisterWord>
+          <template v-if="!!dotAddTempValue">
+            <RegisterWord :data="dotAddTempValue" :file="currentFile" @save="onUpDataDots"
+                          @cancel="onCancelDot"></RegisterWord>
           </template>
           <template v-else>
             <Record @position="onPosition" :active="recordActive" :key="recordActive" :list="dots.results"></Record>

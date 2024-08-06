@@ -12,7 +12,7 @@ import {Card, Form, FormItem, Select, SelectOption, Textarea, Button} from "ant-
 import type {PropType} from "vue";
 import type {DotData} from "src/components/preview/config";
 
-const $emit = defineEmits(["save"]);
+const $emit = defineEmits(["save", "cancel"]);
 const props = defineProps({
   data: {
     type: Object as PropType<DotData>,
@@ -51,11 +51,19 @@ const onSave = async function () {
   let status = await validate();
   if (status) {
     const value = getResult();
-    status = await api.work.word.add(value);
+    if (props.data.id) {
+      status = await api.work.word.update({ ...value, id: props.data.id });
+    } else {
+      status = await api.work.word.add(value);
+    }
   }
   if (status) {
     $emit("save");
   }
+}
+
+const onCancel = function() {
+  $emit("cancel");
 }
 
 </script>
@@ -93,7 +101,8 @@ const onSave = async function () {
       <FormItem label="译文">
         <Textarea :rows="4" v-model:value="model.translatedText"></Textarea>
       </FormItem>
-      <div class="text-right">
+      <div class="flex items-center justify-between">
+        <Button type="primary" danger @click="onCancel">取消</Button>
         <Button type="primary" @click="onSave">保存</Button>
       </div>
     </Form>

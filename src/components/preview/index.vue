@@ -184,8 +184,8 @@ defineExpose({setPosition});
               <template v-for="(item, index) in dots" :key="index">
                   <span
                       class="inline-block cursor-pointer absolute left-[var(--dot-x)] top-[var(--dot-y)]"
-                      :style="`--dot-x: ${item.x1}px; --dot-y: ${item.y1}px;`">
-                    <Badge :count="index + 1" color="blue"></Badge>
+                      :style="`--dot-x: ${item.xCorrdinate1 || 0}px; --dot-y: ${item.yCorrdinate1 || 0}px;`">
+                    <Badge :count="item.id" color="blue"></Badge>
                   </span>
               </template>
             </div>

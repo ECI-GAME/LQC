@@ -9,6 +9,9 @@ import Comment from "./comment.vue";
 import {RecordType} from "./config";
 import {Card, Button} from "ant-design-vue";
 
+import type {PropType} from "vue";
+import type {DotData} from "src/components/preview/config";
+
 const $emit = defineEmits(["position"]);
 defineProps({
   active: {
@@ -16,15 +19,15 @@ defineProps({
     required: true
   },
   list: {
-    type: Array,
+    type: Array as PropType<DotData[]>,
     default: () => []
   }
 });
 
 
 // 查看图片描点位置
-const onShowDetail = function (data: object) {
-  $emit("position", 200, 500)
+const onShowDetail = function (data: DotData) {
+  $emit("position", data.id);
 }
 
 </script>
