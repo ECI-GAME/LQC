@@ -5,16 +5,16 @@
 
 import api from "src/api";
 import {defineStore} from "pinia";
-import {UserIfno} from "types/user";
+import {UserInfo} from "types/user";
 
 interface State {
-  info: UserIfno
+  info: UserInfo
 }
 
 export const userStore = defineStore("user", {
   state(): State {
     return {
-      info: new UserIfno()
+      info: new UserInfo()
     };
   },
   getters: {},
@@ -22,8 +22,15 @@ export const userStore = defineStore("user", {
     // 获取用户信息
     async loadUserInfo() {
       const res = await api.user.info();
-      console.log(res);
-      console.log("加载用户数据");
+      if (res) {
+        this.$patch({
+          info: res
+        });
+      } else {
+        this.$patch({
+          info: new UserInfo()
+        });
+      }
     }
   }
 });

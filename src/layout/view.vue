@@ -1,0 +1,12 @@
+<template>
+  <div class="layout-view h-screen-f">
+    <slot></slot>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.layout-view {
+  --header-value: 60px;
+  --border-color: rgba(5, 5, 5, 0.06);
+}
+</style>

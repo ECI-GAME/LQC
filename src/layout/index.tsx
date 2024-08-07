@@ -1,10 +1,9 @@
+import View from "./view.vue";
 import Menu from "./menu/index.vue";
 import Content from "./content.vue";
 import {useRoute} from "vue-router";
 import * as alias from "src/router/alias";
 import {defineComponent, ref, h} from "vue";
-
-import type {VNode} from "vue";
 
 const fullPage = function () {
   return (<Content></Content>);
@@ -12,7 +11,7 @@ const fullPage = function () {
 
 const autoPage = function () {
   return [
-    <div className="float-left h-screen w-[var(--layout-menu-width)]">
+    <div className="float-left h-full w-[var(--layout-menu-width)]">
       <Menu class="h-full w-full"></Menu>
     </div>,
     fullPage(),
@@ -25,7 +24,7 @@ export default defineComponent({
     const route = useRoute();
     const menuWidth = ref(260);
     return () => {
-      let style;
+      let style: any;
       let value;
       if (route.name === alias.NotFount.name) {
         style = `--layout-menu-width: 0px`;
@@ -34,7 +33,9 @@ export default defineComponent({
         style = `--layout-menu-width: ${menuWidth.value}px`;
         value = autoPage();
       }
-      return h("div", {style}, value as VNode[]);
+      return (<View style={style}>
+        {value}
+      </View>);
     }
   }
 });

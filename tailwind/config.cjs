@@ -1,7 +1,7 @@
 const BigNumber = require("bignumber.js");
 const colors = require("./style.cjs");
 
-const tailWind = function(length = 400, fontSize = 16) {
+const tailWind = function (length = 400, fontSize = 16) {
   const chunk = 8;
   const unit = new BigNumber(1).div(chunk);
   const value = new BigNumber(fontSize).div(4).div(chunk);
@@ -14,9 +14,9 @@ const tailWind = function(length = 400, fontSize = 16) {
   return spacing;
 }
 
-const opacity = function() {
+const opacity = function () {
   const value = {};
-  for(let i = 0; i <= 100; i++) {
+  for (let i = 0; i <= 100; i++) {
     const key = String(i);
     value[key] = String(i / 100);
   }
@@ -25,10 +25,14 @@ const opacity = function() {
 
 const tailwindValue = tailWind();
 
-module.exports = { 
+module.exports = {
   opacity: opacity(),
   spacing: tailwindValue,
-  height: tailwindValue, 
-  width: Object.assign({ fit: "fit-content" }, tailwindValue), 
+  height: {
+    ...tailwindValue,
+    screen: "var(--screen-value)",
+    "screen-f": "100vh",
+  },
+  width: Object.assign({fit: "fit-content"}, tailwindValue),
   colors
 };
