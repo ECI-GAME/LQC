@@ -4,7 +4,11 @@ import * as alias from "src/router/alias";
 
 
 const CreateIcon = function (name: string) {
-  return h(Icon, {className: "!text-2xl mr-2 ease-in-out duration-300", type: name});
+  return h("span", {
+    "class": "mr-2 inline-block"
+  }, [
+    h(Icon, {"class": "flex !text-2xl ease-in-out duration-300", type: name})
+  ]);
 }
 
 export const items = [

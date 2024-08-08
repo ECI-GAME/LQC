@@ -6,7 +6,7 @@
 const colors = {
   black: "#000000",
   primary: "rgb(14,165,233)",
-  white: "rgb(245,245,245)"
+  white: "#fff"
 };
 
 module.exports = colors;

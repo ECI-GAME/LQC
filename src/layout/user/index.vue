@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { Icon } from "@ue/icon";
+import {Icon} from "@ue/icon";
 import {userStore} from "src/store";
-import { Badge } from "ant-design-vue";
+import {Badge} from "ant-design-vue";
 
 const user = userStore();
-
 </script>
 
 <template>
