@@ -8,5 +8,6 @@
 .layout-view {
   --header-value: 60px;
   --border-color: rgba(5, 5, 5, 0.06);
+  --screen-value: calc(100vh - 60px);
 }
 </style>
