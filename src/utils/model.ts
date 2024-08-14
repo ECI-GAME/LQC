@@ -12,15 +12,12 @@ import type {UseAsyncStateReturn} from "@vueuse/core";
  */
 export class PageResult<T = object> {
   results: T[];   // 列表数据
-  items: T[];     // 列表数据
   total: number;  // 总数量
   constructor(res: T[] = [], total: number = 0) {
     if (res && Array.isArray(res)) {
       this.results = Array.isArray(res) ? res : [res];
       this.total = Math.max(this.results.length, total);
     } else if (res && typeof res === "object") {
-      console.log('obj');
-      
       if (_.hasIn(res, "rows")) {
         this.results = _.get(res, "rows");
       } else if (_.hasIn(res, "results")) {
@@ -30,22 +27,19 @@ export class PageResult<T = object> {
       } else {
         this.results = [res];
       }
-      console.log('res',res);
-      
       if (_.hasIn(res, "total")) {
-        this.total =  _.get(res, "total");
-      }else{
+        this.total = _.get(res, "total");
+      } else {
         this.total = Math.max(res["total"] || 0, this.results.length, total);
       }
-      
     } else {
       this.results = [];
       this.total = 0;
     }
-    this.items = this.results;
-    console.log('item:'+this.items);
-    console.log('total:'+this.total);
-    
+  }
+
+  get items(): T[] {
+    return this.results;
   }
 }
 
