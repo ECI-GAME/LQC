@@ -120,15 +120,8 @@ const changeProcess = function (doneCount: number, allCount: number) {
           <template v-else-if="column.key === 'taskStatus'">
             <span>{{ changeStatus(record.taskStatus) }}</span>
           </template>
-          <template v-else-if="column.key === 'image'">
-            <Button v-if="text" type="link">预览</Button>
-            <span v-else>待生成</span>
-          </template>
-          <template v-else-if="column.key === 'image'">
-            <Button v-if="text" type="link">预览</Button>
-            <span v-else>待生成</span>
-          </template>
-          <template v-else-if="column.key === 'totalCnt'">
+        
+          <template v-else-if="column.key === 'doneCnt'">
             <Progress :percent="changeProcess(record.doneCnt,record.totalCnt)" status="active" :showInfo="true"
                       :format="percent => `${record.doneCnt} /${record.totalCnt}`"/>
           </template>

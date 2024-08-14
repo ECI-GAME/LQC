@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {Icon} from "@ue/icon";
 import {userStore} from "src/store";
-import {Badge} from "ant-design-vue";
+import {Badge,Divider} from "ant-design-vue";
 
 const user = userStore();
 </script>
@@ -16,5 +16,8 @@ const user = userStore();
       </Badge>
     </div>
     <div>{{ user.info.user_name }}</div>
+    
+    
   </div>
+  
 </template>

@@ -20,7 +20,6 @@ const initMethod = async () => {
     psConfigList.value = await api.project.getProjectPSConfig(projectId);
     psConfigList.value.forEach(s=>{
       psTitleConfigList.value.forEach(e=>{
-        console.log(e.dictValue == s.category);
         if(e.dictValue == s.category){
          s.titleTxt = e.dictLabel
         }
@@ -35,15 +34,12 @@ const initMethod = async () => {
 };
 let psFontList = ref([]);
 let psFontConfigList = ref([]);
-let psTextConfigList = ref([]);
 let psTitleConfigList = ref([]);
 const initDictData = async()=>{
   try {
     psFontList.value =  await api.system.getDictData('sys_ps_font');
     psFontConfigList.value =  await api.system.getDictData('comic_ps_font_direction');
-    psTextConfigList.value =  await api.system.getDictData('comic_ps_font_config');
     psTitleConfigList.value =  await api.system.getDictData('comic_ps_title_config');
-    console.log(111);
     
     initMethod();
     console.log(psFontList.value);
@@ -52,23 +48,8 @@ const initDictData = async()=>{
     console.error("Failed to fetch language:", error);    
   }
 }
-const filterOption= (input: string, option: any)=>{
-  return option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-}
-const changeText = function(input: string){
-  console.log("input:"+input);
-  console.log(psTitleConfigList.value);
-  
-  psTitleConfigList.value.forEach(e=>{
-    console.log(e.dictValue == input);
-    
-    if(e.dictValue == input){
-      console.log('result:'+e.dictLabel);
-      
-      return e.dictLabel
-    }
-  })
-}
+
+
 onMounted(() => {
   initDictData()
   
@@ -76,6 +57,14 @@ onMounted(() => {
 
 let word = ''
 let fontNum =0
+
+const sumbitFrom =async function(){
+  console.log(psConfigList.value);
+  
+  await api.project.updateProjectPSErrorData(psConfigList.value)
+  
+  initMethod()
+}
 </script>
 
 <template>
@@ -92,12 +81,12 @@ let fontNum =0
     <br/><br/>
     <div  v-for="item in psConfigList" >
     <Card :title="item.titleTxt" bodyStyle="color:black;width:100%;">
-      <ElRow>
+      <ElRow class="mt-2 mb-2">
         <ElCol :span="2"class="text-center">
           文字方向：
         </ElCol>
         <ElCol :span="5">
-          <ElSelect v-model="item.lineSpacing" size="small" filterable placeholder="请选择">
+          <ElSelect v-model="item.textDirection" size="small" filterable placeholder="请选择">
             <ElOption
               v-for="item in psFontConfigList"
               :key="item.dictLabel"
@@ -107,8 +96,8 @@ let fontNum =0
           </ElSelect>
         </ElCol>
       </ElRow>
-      <br/>
-    <ElRow>
+      
+    <ElRow class="mt-2 mb-2">
         <ElCol :span="2" class="text-center">
           字 体：
         </ElCol>
@@ -122,35 +111,26 @@ let fontNum =0
             </ElOption>
           </ElSelect>
         </ElCol>
-        <ElCol :span="3">
-          <ElSelect v-model="item.extraField1" size="small" filterable placeholder="请选择">
-            <ElOption
-              v-for="item in psTextConfigList"
-              :key="item.dictLabel"
-              :label="item.dictLabel"
-              :value="item.dictValue">
-            </ElOption>
-          </ElSelect>
-        </ElCol>
+      
         <ElCol :span="2">
           <InputNumber v-model:value="item.fontSize" :min="1"   size = "small"/>pt
         </ElCol>
       </ElRow>
    
   
-    <br/>
+    
     <ElRow>
         <ElCol :span="2"  class="text-center">
           <label>行  距：</label>
         </ElCol>
         <ElCol :span="5">
-          <InputNumber v-model:value="item.textDirection" :min="1"   size = "small"/>%
+          <InputNumber v-model:value="item.lineSpacing" :min="1"   size = "small"/>%
         </ElCol>
       </ElRow>
 
     </Card>
     <br/>
   </div>
-  <ElButton type="primary" style="position: fixed;top: 95%;left: 95%;">保存</ElButton>
+  <ElButton type="primary" @click="sumbitFrom" class="fixed top-208 left-400">保存</ElButton>
   </div>
 </template>

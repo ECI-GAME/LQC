@@ -61,6 +61,10 @@ export const RemarkTypeConfig: RouteRecordBase = {
   path: "/remarkTypeConfig/:projectId"
 }
 
+export const Psd: RouteRecordBase = {
+  name: "Image psd",
+  path: "/psd"
+}
 
 export const Work: RouteRecordBase = {
   name: "Project Work",

@@ -2,6 +2,8 @@
 import User from "./user/index.vue";
 import {RouterView} from "vue-router";
 // import Search from "./search/index.vue";
+import {Divider} from "ant-design-vue";
+
 </script>
 
 <template>
@@ -10,8 +12,11 @@ import {RouterView} from "vue-router";
       <div class="flex-1 mr-5">
 <!--        <Search class="max-w-2/3 min-w-1/2 w-150"></Search>-->
       </div>
+      
       <User></User>
+      
     </div>
+    <Divider class="flex-1 mt-0 mb-0 sticky"/>
     <RouterView v-slot="scope">
       <component :is="scope.Component" class="p-4 md:p-6"/>
     </RouterView>

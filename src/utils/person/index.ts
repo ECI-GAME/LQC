@@ -31,6 +31,29 @@ const onSubmit = async function (formData: object) {
   return true
   
 };
+const openNewUser = function(){
+  return modal.form([
+    {
+      key: "userName",
+      label: "用户名",
+      component: Input,
+      
+    },
+    {
+      key: "handlerId",
+      label: "邮箱",
+      component: Input,
+      
+    },
+  ], {
+    title: "邀请人员",
+    width: 300,
+    buttonClassName: ["pb-5"],
+    okText: "邀请",
+    onOk: onSubmit,
+  });
+}
+
 let nodeId =0
 
 /**
@@ -58,6 +81,6 @@ export const onCreatePerson = async function (param1:number) {
     okText: "Submit",
     onOk: onSubmit,
     otherText:  "邀请",
-    
+    otherOk: openNewUser,
   });
 }
