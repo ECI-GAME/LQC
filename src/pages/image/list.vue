@@ -6,7 +6,6 @@
  import * as model from "src/utils/model";
 import { ref } from "vue";
 import {Icon} from "@ue/icon";
-import {onCreate} from "./config";
 import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
 import {Table, Button, Card, Form, FormItem, Input, Space, Select,message,Breadcrumb,BreadcrumbItem} from "ant-design-vue";
@@ -98,10 +97,6 @@ const openImage = function(data:string){
   
   window.open(data)
 }
-const onCreateTask = async function () {
-  const res = await onCreate();
-  console.log(res);
-}
 const searchImage = async function () {
   onLoad(100)
 }
@@ -123,7 +118,7 @@ const searchImage = async function () {
           <a href="">项目中心</a>
         </RouterLink>
       </BreadcrumbItem>
-      <BreadcrumbItem>节点配置页面</BreadcrumbItem>
+      <BreadcrumbItem>图片管理</BreadcrumbItem>
     </Breadcrumb>
     <br/>
     <Card >

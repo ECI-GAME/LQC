@@ -4,20 +4,32 @@ import api from "src/api";
 import { message } from 'ant-design-vue';
 import { ref } from 'vue';
 
-
+const projectInfo = ref({})
 // 处理表单数据，传给接口完成项目创建逻辑
 const onSubmit = async function (formData: object) {
-
+  console.log(formData);
+  
   if(formData.sourceLanguage===formData.targetLanguage){
     message.error('源语言和目标语言不能相同！')
     return
   }
-  const code = await api.project.addProject(formData);
-  if(code===false){
-    return false
+  if(formData.id){
+    const code = await api.project.updateProject(formData);
+    if(code===false){
+      return false
+    }else{
+      return true
+    }
   }else{
-    return true
+    const code = await api.project.addProject(formData);
+    if(code===false){
+      return false
+    }else{
+      return true
+    }
   }
+  
+  
   
   
   
@@ -36,22 +48,35 @@ fetchLanguageInfo()
  * @file 项目创建
  * @author svon.me@gmail.com
  */
-export const onCreate = async function () {
-  const projectInfo= await api.project.projectInit()
-
+export const onCreate = async function (data) {
+  if(data==undefined||data==null){
+    projectInfo.value= await api.project.projectInit()
+  }else{
+    projectInfo.value = data
+  }
+  console.log(projectInfo.value);
+  
   return modal.form([
+    {
+      key: "id",
+      value:projectInfo.value.id,
+      component: Input,
+      className:"hidden",
+      props:{
+        class:'hidden'
+      }
+    },
     [
       {
         key: "projectNum",
         label: "项目编号",
-        value:projectInfo.projectNum,
+        value:projectInfo.value.projectNum,
         component: Input,
-        props:{
-          disabled:true
-        }
+        
       },
       {
         key: "projectName",
+        value:projectInfo.value.projectName,
         label: "项目名称",
         component: Input,
       }
@@ -60,6 +85,7 @@ export const onCreate = async function () {
       {
         key: "sourceLanguage",
         label: "源语言",
+        value:projectInfo.value.sourceLanguage,
         component: Select,
         props:{
           fieldNames: { label: "dictLabel", value: "code" },
@@ -69,6 +95,7 @@ export const onCreate = async function () {
       {
         key: "targetLanguage",
         label: "目标语言",
+        value:projectInfo.value.targetLanguage,
         component: Select,
         props:{
           fieldNames: { label: "dictLabel", value: "code" },
@@ -80,11 +107,13 @@ export const onCreate = async function () {
     [
       {
         key: "comicPublisher",
+        value:projectInfo.value.comicPublisher,
         label: "发行商",
         component: Input,
       },
       {
         key: "imageType",
+        value:projectInfo.value.imageType,
         label: "交付图片格式",
         component: Input,
       },
@@ -93,6 +122,7 @@ export const onCreate = async function () {
     [
       {
         key: "planStartTime",
+        //value:projectInfo.value.planStartTime,
         label: "计划开始时间",
         component: DatePicker,
         props:{
@@ -104,6 +134,7 @@ export const onCreate = async function () {
       {
         key: "planEndTime",
         label: "计划完成时间",
+        //value:projectInfo.value.planEndTime,
         component: DatePicker,
         props:{
           style:{
@@ -113,12 +144,13 @@ export const onCreate = async function () {
       },
     ],
     {
-      key: "projectExplain",
+      key: "remarks",
+      value:projectInfo.value.remarks,
       label: "备注",
       component: Input.TextArea,
     },
   ], {
-    title: "新建项目",
+    title: (projectInfo.value.id || "新建项目","修改项目"),
     width: 480,
     buttonClassName: ["pb-5"],
     okText: "Submit",

@@ -37,6 +37,8 @@ const {state: taskStatus} = model.list<object>(() => {
   true
 );
 
+
+
 //状态映射
 const changeStatus = function (dict: string) {
   const res = taskStatus.value;
@@ -48,6 +50,26 @@ const changeStatus = function (dict: string) {
   return '-';
 }
 
+
+
+const {state: Langs} = model.list<object>(() => {
+    return api.system.getDictData('comic_language_type');
+  },
+  // 默认值，为空时自动创建
+  new model.PageResult<object>([]),
+  // 是否默认执行，默认为 false
+  true
+);
+//语言映射
+const changeLang = function (dict: string) {
+  const res = Langs.value;
+  for (const element of res.results) {
+    if (dict === element.code) {
+      return element.dictLabel;
+    }
+  }
+  return '-';
+}
 const columns = [
   {title: "图片名称", dataIndex: 'imageName', key: 'imageName'},
   {title: "状态", dataIndex: 'imageStatus', key: 'imageStatus', align: "center"},
@@ -75,16 +97,16 @@ const columns = [
 
     <Card>
       <Row :gutter="16">
-        <Col class="gutter-row" :span="10">
+        <Col class="gutter-row" :span="12">
           <div class="gutter-box text-base">
             <label class="text-black">{{ taskInfo.taskName }}</label>
             [<label class="text-red-600">{{ taskInfo.estimatedStartDate }}-{{ taskInfo.estimatedEndDate }}</label>]
-            [<label class="text-blue-600">{{ taskInfo.sourceLanguage }}->{{ taskInfo.targetLanguage }}</label>]
+            [<label class="text-blue-600">{{ changeLang(taskInfo.sourceLanguage) }}->{{ changeLang(taskInfo.targetLanguage) }}</label>]
             [<label class="text-green-600">{{ taskInfo.handlerName }}</label>]
           </div>
         </Col>
 
-        <Col class="gutter-row" :span="8">
+        <Col class="gutter-row" :span="6">
 
         </Col>
         <Col class="gutter-row" :span="6">

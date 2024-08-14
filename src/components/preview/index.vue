@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {ref,onMounted } from "vue";
 import api from "src/api";
 import {Icon} from "@ue/icon";
 import {DotData} from "./config";
@@ -48,7 +48,8 @@ const ratio = ref<number>(100);
 const screenStatus = ref<boolean>(false);
 const screenX = ref<number>(0);
 const screenY = ref<number>(0);
-
+const imageWidth = ref(0);
+const imageHeight = ref(0);
 const getScale = function (value: number) {
   let scale = 1;
   if (value > 100) {
@@ -82,17 +83,23 @@ const onRemoveScreen = function () {
   screenStatus.value = false
 }
 
+const img = ref.image
 // 添加标记
 const onAddDot = async function (data: ScreenValue, type: DotType) {
 
 
   const scale = getScale(ratio.value);
+  
   const res = new DotData(
     Number(new BigNumber(data.x1).plus(boxRef.value.scrollLeft).div(scale).toFixed(2)),
     Number(new BigNumber(data.y1).plus(boxRef.value.scrollTop).div(scale).toFixed(2)),
     Number(new BigNumber(data.x2).plus(boxRef.value.scrollLeft).div(scale).toFixed(2)),
-    Number(new BigNumber(data.y2).plus(boxRef.value.scrollTop).div(scale).toFixed(2))
+    Number(new BigNumber(data.y2).plus(boxRef.value.scrollTop).div(scale).toFixed(2)),
+    Number(imageWidth.value),
+    Number(imageHeight.value)
   );
+  console.log(res);
+  
   if (type === DotType.ocr) {
     const loading = ElLoading.service({
       lock: true,
@@ -156,6 +163,25 @@ const setPosition = function (x: number, y: number) {
     }
   }
 }
+
+onMounted(() => {
+  // Ensure the image is loaded before getting dimensions
+  const img = imageRef.value;
+  if (img.complete) {
+    getImageDimensions();
+  } else {
+    img.onload = getImageDimensions;
+  }
+});
+
+const getImageDimensions = () => {
+  const img = imageRef.value;
+  if (img) {
+    imageWidth.value = img.width;
+    imageHeight.value = img.height;
+    
+  }
+};
 
 defineExpose({setPosition});
 

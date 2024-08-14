@@ -12,10 +12,10 @@ export default class {
    */
   @tryError([])
   @Gql("/graphql")
-  async list(pageNum: number, typeId:number ,pageSize: number = 20): Promise<PageResult<object>> {
+  async list(pageNum: number, typeId:number,versionId:number = 0,searchValue:string = "",resourceType:string ,pageSize: number = 20): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
-      knowledgeList (input: { pageNum: ${pageNum},typeId: ${typeId}, pageSize: ${pageSize} }) {
+      knowledgeList (input: { pageNum: ${pageNum},projectId: ${typeId},versionId:${versionId},searchValue:"${searchValue}",resourceType:"${resourceType}", pageSize: ${pageSize} }) {
         code
         rows
         msg
@@ -34,10 +34,10 @@ export default class {
    */
   @tryError([])
   @Gql("/graphql")
-  async textList(pageNum: number, projectId:number ,pageSize: number = 20): Promise<PageResult<object>> {
+  async textList(pageNum: number, projectId:number,versionId:number=0,searchValue:string = ""  ,pageSize: number = 20): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
-      getProjectTextResourcePage (input: { pageNum: ${pageNum},projectId: ${projectId}, pageSize: ${pageSize} }) {
+      getProjectTextResourcePage (input: { pageNum: ${pageNum},projectId: ${projectId},versionId:${versionId},searchValue:"${searchValue}", pageSize: ${pageSize} }) {
         code
         rows
         msg

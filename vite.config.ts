@@ -30,7 +30,7 @@ const Config = defineConfig(function ({mode}: UserConfig) {
       vue(),
       jsx(),
       htmlPlugin({headScripts}),
-      ElementPlus(),
+      ElementPlus()
     ],
     server: {
       port: 9090,

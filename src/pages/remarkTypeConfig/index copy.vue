@@ -6,7 +6,7 @@
  import api from "src/api";
  import { ref, reactive, nextTick } from 'vue';
  import {RouterLink, useRoute} from "vue-router";
- import {Table, Button, Card, Space,Breadcrumb,BreadcrumbItem,Row,Col, Tag,Divider,Input, Empty, message  } from "ant-design-vue";
+ import {Table, Button, Card, Space,Breadcrumb,BreadcrumbItem,Row,Col, Tag,Divider,Input  } from "ant-design-vue";
  import * as alias from "src/router/alias";
 
 const route = useRoute();
@@ -19,12 +19,6 @@ const fetchErrorInfo = async () => {
     console.log('tep');
     
    console.log(state.value);
-   let i = 0;
-   state.value.forEach(e=>{
-    i= i +1;
-    e.inputValue = ''
-    e.inputVisible = false
-   })
    
     
   } catch (error) {
@@ -34,44 +28,43 @@ const fetchErrorInfo = async () => {
 
 fetchErrorInfo()
 const projectId = route.params.projectId
-
+const inputRef = ref();
 let inputValue = '';
-const data = reactive({
-  inputVisible: false,
-  inputValue: '',
-});
+let inputVisible = false;
+// const state = reactive({
+//   tags:  tepError.value.value.map(obj => obj.dictLabel),
+//   inputVisible: false,
+//   inputValue: '',
+// });
 
-const handleClose =async function(removedTag: object) {
-  
-  
-  await api.project.delProjectPSErrorData(removedTag.id)
-  message.success('操作成功')
-  fetchErrorInfo()
- 
+const handleClose = (removedTag: string) => {
+  const tags = state.value.filter(tag => tag !== removedTag);
+  console.log(tags);
+  state.tags = tags;
 };
 
-const showInput = (item:object) => {
-  item.inputVisible = true;
-  item.inputVisible
-  console.log(state);
+const showInput = () => {
+  inputVisible = true;
+  console.log(inputVisible);
   
+  
+  // nextTick(() => {
+  //   inputRef.value.focus();
+  // });
 };
 
-const handleInputConfirm =async function(item) {
-  console.log('失去焦点事件......');
-  const lastSort = item.childrenList[item.childrenList.length-1].errorTypeSort
-  console.log(item);
-  const fromData = {
-    "errorTypeName":item.inputValue,
-    "errorTypeParent":item.id,
-    "errorTypeSort":lastSort+1,
-    "projectId":projectId
+const handleInputConfirm = () => {
+  const inputValue = state.inputValue;
+  let tags = state.tags;
+  if (inputValue && tags.indexOf(inputValue) === -1) {
+    tags = [...tags, inputValue];
   }
-  
-  console.log(fromData);
-  await api.project.addProjectPSErrorData(fromData)
-  item.inputVisible = false
-  fetchErrorInfo()
+  console.log(tags);
+  Object.assign(state, {
+    tags,
+    inputVisible: false,
+    inputValue: '',
+  });
 };
 
 
@@ -107,15 +100,16 @@ const handleInputConfirm =async function(item) {
                 </Tag>
             </template>
             <Input
-                v-if="item.inputVisible"
-                v-model:value="item.inputValue"
+                v-if="inputVisible"
+                ref="inputRef"
+                v-model:value="inputValue"
                 type="text"
                 size="small"
                 :style="{ width: '78px' }"
-                
-                @keyup.enter="handleInputConfirm(item)"
+                @blur="handleInputConfirm"
+                @keyup.enter="handleInputConfirm"
             />
-            <Tag v-else style="background: #fff; border-style: dashed" @click="showInput(item)">
+            <Tag v-else v-if="!inputVisible" style="background: #fff; border-style: dashed" @click="showInput">
                 <plus-outlined />
                 + 新增类别
             </Tag>

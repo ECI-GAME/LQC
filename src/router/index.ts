@@ -44,6 +44,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import("src/pages/task/detail/details.vue"),
       },
       
+      // 任务明细
+      {
+        ...alias.Psd,
+        component: () => import("src/pages/psd/index.vue"),
+      },
       
       // 人员节点配置
       {

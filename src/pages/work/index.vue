@@ -30,7 +30,7 @@ const processNode = ref<ProcessNode>();
 
 onMounted(function () {
   const id = String(route.params.workId);
-  if (id === "8") {
+  if (id === "26") {
     processNode.value = ProcessNode.DTP;
   } else {
     processNode.value = ProcessNode.TEP;

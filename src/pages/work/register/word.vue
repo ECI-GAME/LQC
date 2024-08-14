@@ -44,6 +44,8 @@ const getResult = function () {
     yCorrdinate1: props.data.yCorrdinate1,
     xCorrdinate2: props.data.xCorrdinate2,
     yCorrdinate2: props.data.yCorrdinate2,
+    imageWidth : props.data.imageWidth,
+    imageHeight : props.data.imageHeight,
   };
 };
 

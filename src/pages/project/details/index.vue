@@ -78,7 +78,7 @@ const changeLanguage = function(source:String){
         <DescriptionsItem label="语言对">{{ changeLanguage(projectInfo.sourceLanguage) }} - {{ changeLanguage(projectInfo.targetLanguage) }}</DescriptionsItem>
         <DescriptionsItem label="发行商">{{ projectInfo.comicPublisher }}</DescriptionsItem>
         <DescriptionsItem label="开始/结束日期">{{ projectInfo.planStartTime }}-{{ projectInfo.planEndTime }}</DescriptionsItem>
-        <DescriptionsItem label="状态">{{ projectInfo.projectStatus }}</DescriptionsItem>
+        <DescriptionsItem label="状态">进行中</DescriptionsItem>
         <DescriptionsItem label="交付图片类型">{{ projectInfo.imageType }}</DescriptionsItem>
         <DescriptionsItem label="备注" :span="3">{{ projectInfo.projectExplain }}</DescriptionsItem>
       </Descriptions>

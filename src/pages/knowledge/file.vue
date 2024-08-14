@@ -4,19 +4,30 @@
 /**
  * @file 知识库
  */
-import { ref } from "vue"
+import { onMounted, computed, ref } from 'vue';
 import api from "src/api";
-import { RouterLink, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import * as alias from "src/router/alias";
 import * as model from "src/utils/model";
-import { Table, Form, InputSearch, Button, FormProps } from "ant-design-vue";
-import fileInfo from './file.vue'
+import { Table, Form, InputSearch, Button, FormProps,Select, message } from "ant-design-vue";
 import {Icon} from "@ue/icon";
 import { reactive } from 'vue';
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
+import Upload from "src/components/upload/index.vue";
+import { FileData } from "src/utils/upload/common";
+import {ElSelect,ElOption} from "element-plus"
+
+
 
 const route = useRoute();
 console.log('Project ID = "%s"', route.params.projectId);
+const isOnloading = ref<boolean>(false);
+const versionOption =ref([])
+const versionInfo = ref({})
+const fromData = ref({
+    searchValue : "",
+})
+let fileInfo: any[] = [];
 interface FormState {
     typeId: number
     fileName: string;
@@ -38,6 +49,7 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
 
 const columns = [
     { title: "关联项目", dataIndex: 'projectName', key: 'projectName' },
+    { title: "关联版本", dataIndex: 'versionName', key: 'versionName' },
     { title: "文件名称", dataIndex: 'fileName', key: 'fileName' },
     { title: "文件大小", dataIndex: 'fileSize', key: 'fileSize' },
     { title: "文件类型", dataIndex: 'fileType', key: 'fileType', align: "center" },
@@ -54,23 +66,72 @@ const { state, execute: onLoad, isLoading } = model.list<object>(
     function () {
 
         //return api.knowLedge.list(1, formState.typeId);
-        return api.knowLedge.list(1, 2);
+        console.log(fromData.value);
+        return api.knowLedge.list(1, route.params.projectId,fromData.value.versionId,fromData.value.searchValue,"1");
     },
     new model.PageResult<object>([]),
     true
 );
+//文件上传
+const onSuccess = async function (files: FileData[]) {
+  console.log('------');
+  
+  console.log(files);
+  
+  files.forEach( s=>{
+    fileInfo.push({
+      'fileName':s.fileName,
+      'fileSize':s.size,
+      'filePath':s.src,
+      'fileType':s.type,
+      'projectId':route.params.projectId,
+      'versionId':versionInfo.value.versionId || 0,
+      "resourceType":'1'
+    })
+   
+  })
+  message.success("上传成功")
+  api.project.addKnowLedgeInfo(fileInfo);
+  fileInfo = []
 
+  onLoad(100)
+
+}
+
+
+onMounted(async () => {
+  try {
+    versionOption.value = await api.project.getVersionDict(route.params.projectId);
+    console.log(versionOption.value);
+  } catch (error) {
+    console.error('Error fetching project info:', error);
+  }
+});
 </script>
 <template>
     <div>
         <Form layout="inline" :model="formState" @finish="handleFinish" @finishFailed="handleFinishFailed">
             <FromItem>
+                
+                <ElSelect v-model="fromData.versionId" placeholder="请选择画册" class="w-50" clearable >
+                    <ElOption
+                    v-for="item in versionOption"
+                    :key="item.versionId"
+                    :label="item.verisonName"
+                    :value="item.versionId">
+                    </ElOption>
+                </ElSelect>
+            </FromItem>
+            <FromItem>
 
-                <InputSearch v-model:value="formState.searchValue" placeholder="请输入条件" enter-button @search="onSearch"
+                <InputSearch v-model:value="fromData.searchValue" placeholder="请输入条件" enter-button allow-clear @search="onSearch"
                     class="w-100 float-left" />
             </FromItem>
             <FromItem>
-                <Button type="primary" class="ml-3">上传</Button>
+                
+            <Upload :multiple="true" @success="onSuccess" class="ml-3" v-model:loading="isOnloading">
+                  <Button :loading="isOnloading">资源上传</Button>
+            </Upload>
             </FromItem>
        
         </Form>

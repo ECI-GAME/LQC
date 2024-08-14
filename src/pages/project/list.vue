@@ -30,10 +30,15 @@ const {state, execute: onLoad, isLoading} = model.list<object>(
 
 const onCreateProject = async function () {
   const status = await onCreate();
-  console.log('-----');
-  
-  console.log(status);
-  console.log('-----');
+
+  if (status) {
+    onLoad(100);
+  }
+}
+
+const editFrom = async function (data:object) {
+  const status = await onCreate(data);
+
   if (status) {
     onLoad(100);
   }
@@ -89,7 +94,7 @@ const searchValue = ref<string>('');
         </template>
         <template v-else-if="column.key === 'action'">
           <span class="inline-block">
-            <Icon class="text-xl text-primary cursor-pointer" type="edit-square"></Icon>
+            <Icon class="text-xl text-primary cursor-pointer" type="edit-square" @click="editFrom(record)"></Icon>
           </span>
         </template>
       </template>

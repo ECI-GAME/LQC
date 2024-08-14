@@ -1,22 +1,35 @@
-<!--图片资源-->
+<!--附件-->
 
 <script setup lang="ts">
 /**
  * @file 知识库
  */
-import { ref } from "vue"
+import { onMounted, computed, ref } from 'vue';
 import api from "src/api";
-import { RouterLink, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import * as alias from "src/router/alias";
 import * as model from "src/utils/model";
-import { Table, Form, InputSearch, Button, FormProps } from "ant-design-vue";
-import fileInfo from './file.vue'
-import {Icon} from "@ue/icon";
+
+import { Table, Form, InputSearch, Button, FormProps, message, Card, Image, Row, Col } from "ant-design-vue";
+
+import { Icon } from "@ue/icon";
 import { reactive } from 'vue';
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
+import Upload from "src/components/upload/index.vue";
+import { FileData } from "src/utils/upload/common";
+import { ElSelect, ElOption } from "element-plus"
+
+
 
 const route = useRoute();
 console.log('Project ID = "%s"', route.params.projectId);
+const isOnloading = ref<boolean>(false);
+const versionOption = ref([])
+const versionInfo = ref({})
+const fromData = ref({
+    searchValue: "",
+})
+let fileInfo: any[] = [];
 interface FormState {
     typeId: number
     fileName: string;
@@ -36,56 +49,97 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
 };
 
 
-const columns = [
-    { title: "关联项目", dataIndex: 'projectName', key: 'projectName' },
-    { title: "文件名称", dataIndex: 'fileName', key: 'fileName' },
-    { title: "文件大小", dataIndex: 'fileSize', key: 'fileSize' },
-    { title: "文件类型", dataIndex: 'fileType', key: 'fileType', align: "center" },
-    { title: "创建人", dataIndex: 'createByName', key: 'createByName', align: "center" },
-    { title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center" },
-    { title: "操作", dataIndex: 'id', key: 'action', align: "center" },
-];
-const onSearch = ()=>{
+const onSearch = () => {
     onLoad()
     console.log(state.value);
-    
+
 }
 const { state, execute: onLoad, isLoading } = model.list<object>(
     function () {
 
         //return api.knowLedge.list(1, formState.typeId);
-        return api.knowLedge.list(1, 2);
+        console.log(fromData.value);
+        return api.knowLedge.list(1, route.params.projectId, fromData.value.versionId, fromData.value.searchValue, "2");
     },
     new model.PageResult<object>([]),
     true
 );
+//文件上传
+const onSuccess = async function (files: FileData[]) {
+    console.log('------');
 
+    console.log(files);
+
+    files.forEach(s => {
+        fileInfo.push({
+            'fileName': s.fileName,
+            'fileSize': s.size,
+            'filePath': s.src,
+            'fileType': s.type,
+            'projectId': route.params.projectId,
+            'versionId': versionInfo.value.versionId || 0,
+            "resourceType": '2'
+        })
+
+    })
+    message.success("上传成功")
+    api.project.addKnowLedgeInfo(fileInfo);
+    fileInfo = []
+
+    onLoad(100)
+
+}
+const formatImageName = (imageName: string) => {
+  return imageName.length > 10 ? imageName.substring(0, 10) + '...' : imageName;
+};
+
+
+onMounted(async () => {
+    try {
+        versionOption.value = await api.project.getVersionDict(route.params.projectId);
+        console.log(versionOption.value);
+    } catch (error) {
+        console.error('Error fetching project info:', error);
+    }
+});
 </script>
 <template>
     <div>
         <Form layout="inline" :model="formState" @finish="handleFinish" @finishFailed="handleFinishFailed">
             <FromItem>
 
-                <InputSearch v-model:value="formState.searchValue" placeholder="请输入条件" enter-button @search="onSearch"
-                    class="w-100 float-left" />
+                <ElSelect v-model="fromData.versionId" placeholder="请选择画册" class="w-50" clearable>
+                    <ElOption v-for="item in versionOption" :key="item.versionId" :label="item.verisonName"
+                        :value="item.versionId">
+                    </ElOption>
+                </ElSelect>
             </FromItem>
             <FromItem>
-                <Button type="primary" class="ml-3">上传</Button>
+
+                <InputSearch v-model:value="fromData.searchValue" placeholder="请输入条件" enter-button allow-clear
+                    @search="onSearch" class="w-100 float-left" />
             </FromItem>
-       
+            <FromItem>
+
+                <Upload :multiple="true" @success="onSuccess" class="ml-3" v-model:loading="isOnloading">
+                    <Button :loading="isOnloading">图片上传</Button>
+                </Upload>
+            </FromItem>
+
         </Form>
 
-        <Table class="mt-5" :loading="isLoading" :data-source="state.results" :columns="columns" :bordered="true">
-            <template #bodyCell="{ column, text, record }">
+        <Card>
+            <Row>
+                <Col :span="3" v-for="item in state.results">
+                <Card style="width:150px" class="mb-5">
+                    <Image style="margin-left:5px ;height: 150px; width: auto; display: flex;flex-wrap: wrap;justify-content: flex-start;"
+                        :src="item.filePath" />
+                    <span>{{formatImageName(item.fileName)}}</span>
+                </Card>
+                </Col>
                
-              
-                <template v-if="column.key === 'action'">
-                    <span class="inline-block">
-                        <Icon class="text-xl text-primary cursor-pointer" type="download"></Icon>
-                    </span>
-                </template>
-            </template>
-        </Table>
+            </Row>
+        </Card>
     </div>
 
 </template>
