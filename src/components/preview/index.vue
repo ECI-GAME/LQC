@@ -2,7 +2,7 @@
 import {ref, onMounted} from "vue";
 import api from "src/api";
 import {Icon} from "@ue/icon";
-import {DotData, scaleTipFormatter} from "./config";
+import {DotData, DotButton, scaleTipFormatter, getDotButtons} from "./config";
 import BigNumber from "bignumber.js";
 import Cropper from "src/utils/cropper";
 import Screen from "../screen/index.vue";
@@ -17,19 +17,15 @@ import {ElLoading} from 'element-plus';
 import {Badge, Layout, LayoutContent, LayoutHeader, Slider, Space, Button, Result} from "ant-design-vue";
 
 import type {PropType} from "vue";
+import type {ImageData} from "src/types/image";
 import type {Screen as ScreenValue} from "../screen/config";
-
-enum DotType {
-  ocr = "ocr",
-  location = "location",
-}
 
 const $emit = defineEmits(["dot", "switch"]);
 
 const props = defineProps({
-  src: {
-    type: String,
+  data: {
     required: true,
+    type: Object as PropType<ImageData>,
   },
   dots: {
     required: false,
@@ -88,13 +84,13 @@ const onRemoveScreen = function () {
   screenStatus.value = false
 }
 
-// 添加标记
-const onAddDot = async function (data: ScreenValue, type: DotType) {
-
+// 添加标记, 处理打点事件
+const onClickDotButton = async function (res: object) {
+  const type = safeGet<DotButton>(res, "type")!;
+  const data = safeGet<ScreenValue>(res, "value")!;
 
   const scale = getScale(ratio.value);
-
-  const res = new DotData(
+  const result = new DotData(
     Number(new BigNumber(data.x1).plus(boxRef.value.scrollLeft).div(scale).toFixed(2)),
     Number(new BigNumber(data.y1).plus(boxRef.value.scrollTop).div(scale).toFixed(2)),
     Number(new BigNumber(data.x2).plus(boxRef.value.scrollLeft).div(scale).toFixed(2)),
@@ -103,7 +99,7 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
     Number(imageHeight.value)
   );
 
-  if (type === DotType.ocr) {
+  if (type === DotButton.Crop) {
     const loading = ElLoading.service({
       lock: true,
       text: 'Loading',
@@ -112,7 +108,7 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
     try {
       const cropper = new Cropper(imageRef.value);
       // 裁剪获取 base64 图片数据
-      const value = await cropper.cutXY(res.xCorrdinate1, res.yCorrdinate1, res.xCorrdinate2, res.yCorrdinate2);
+      const value = await cropper.cutXY(result.xCorrdinate1, result.yCorrdinate1, result.xCorrdinate2, result.yCorrdinate2);
       if (value) {
         // base64 数据转换为 File 对象
         const img = ImageUtil.base64ToImage(value);
@@ -124,10 +120,10 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
         ]);
         if (data && data[0]) {
           const image = format(data[0]);
-          res.imagePath = image.src;
+          result.imagePath = image.src;
         }
         if (text) {
-          res.originalText = text;
+          result.originalText = text;
         }
       }
     } catch (e) {
@@ -138,11 +134,8 @@ const onAddDot = async function (data: ScreenValue, type: DotType) {
       }, 500);
     }
   }
-  $emit("dot", res);
-
+  $emit("dot", result);
   onRemoveScreen();
-
-
 }
 
 const setPosition = function (x: number, y: number) {
@@ -202,13 +195,13 @@ defineExpose({setPosition});
       <LayoutHeader class="bg-white h-[initial] leading-[initial] px-2 border-b border-gray border-solid">
         <div class="flex items-center">
           <Space>
-            <Button class="px-0" type="link" @click="downloadFile(src)" :disabled="isLoading || isLoadError">
+            <Button class="px-0" type="link" @click="downloadFile(data.imagePath)" :disabled="isLoading || isLoadError">
               <Space :size="4">
                 <Icon class="text-xl flex" type="download"></Icon>
                 <span>下载</span>
               </Space>
             </Button>
-            <a class="inline-block" :href="image.preview(src)" target="_blank">
+            <a class="inline-block" :href="image.preview(data.imagePath)" target="_blank">
               <Button class="px-0" type="link" :disabled="isLoading || isLoadError">
                 <Space :size="4">
                   <Icon class="text-xl flex" type="expend"></Icon>
@@ -247,7 +240,7 @@ defineExpose({setPosition});
           <div ref="boxRef" class="h-full overflow-auto w-full select-none ease-in-out"
                :style="`--image-scale: ${getScale(ratio)};`">
             <div class="relative inline-block origin-top-left scale-[var(--image-scale)]">
-              <img ref="imageRef" class="inline-block max-w-[initial]" :src="src" alt=""
+              <img ref="imageRef" class="inline-block max-w-[initial]" :src="data.imagePath" alt=""
                    crossorigin="anonymous" :key="`${ratio}-${key}`"
                    @click="onCaptureLocation" @load="onLoad" @error="onError"/>
               <div>
@@ -261,9 +254,12 @@ defineExpose({setPosition});
               </div>
             </div>
           </div>
-          <Screen v-if="!disabled && screenStatus" :left="screenX" :top="screenY" @remove="onRemoveScreen"
-                  @cropper="onAddDot($event, DotType.ocr)"
-                  @location="onAddDot($event, DotType.location)"/>
+          <Screen v-if="!disabled && screenStatus"
+                  :left="screenX"
+                  :top="screenY"
+                  :buttons="getDotButtons(data)"
+                  @remove="onRemoveScreen"
+                  @click="onClickDotButton"/>
         </div>
       </LayoutContent>
     </Layout>

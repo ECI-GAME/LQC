@@ -1,8 +1,32 @@
 import {basename} from "src/utils/image";
+import type {ImageData} from "src/types/image";
 
 export const DotType = {
   "1": "框内",
   "2": "框外"
+}
+
+export const TaskStatus = {
+  // 进行中，处理中
+  RUN: ["2", "3", "4", "5", "6", "7"],
+  // 校对中，审核中
+  CHECK: ["15", "16", "17"],
+}
+
+export enum DotButton {
+  Crop = "font-size",
+  Location = "location-fill"
+}
+
+export const getDotButtons = function (data: ImageData): string[] {
+  const status: string = String(data.imageStatus);
+  const list: string[] = [];
+  if (TaskStatus.RUN.includes(status)) {
+    list.push(DotButton.Crop, DotButton.Location);
+  } else if (TaskStatus.RUN.includes(status)) {
+    list.push(DotButton.Location);
+  }
+  return list;
 }
 
 export const scaleTipFormatter = function (value: string | number): string {

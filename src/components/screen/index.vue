@@ -4,9 +4,9 @@ import BigNumber from "bignumber.js";
 import {ref, computed, onMounted} from "vue";
 import safeGet from "@fengqiaogang/safe-get";
 
-import type { Screen } from "./config";
+import type {Screen} from "./config";
 
-const $emit = defineEmits(["location", "cropper", "remove"]);
+const $emit = defineEmits(["click", "remove"]);
 const props = defineProps({
   left: {
     type: Number,
@@ -15,6 +15,11 @@ const props = defineProps({
   top: {
     type: Number,
     required: true
+  },
+  buttons: {
+    type: Array,
+    required: false,
+    default: () => [],
   }
 });
 
@@ -173,11 +178,6 @@ const stopDrag = () => {
   document.removeEventListener('mouseup', stopDrag);
 };
 
-
-const onRemove = function () {
-  $emit("remove");
-}
-
 const getValue = function (): Screen {
   return {
     x1: x.value,
@@ -187,26 +187,28 @@ const getValue = function (): Screen {
   };
 }
 
-const onCropper = function () {
-  $emit("cropper", getValue());
+const onClickButton = function (name: string) {
+  $emit("click", {
+    type: name,
+    value: getValue()
+  });
 }
 
-const onLocation = function () {
-  $emit("location", getValue());
+const onRemove = function () {
+  $emit("remove");
 }
-
 </script>
 
 <template>
   <div class="absolute z-10 top-[var(--screen-y)] left-[var(--screen-x)] " :style="screenStyle">
     <div class="text-xl absolute left-full top-0 pl-2 -translate-y-1">
-      <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary">
-        <Icon class="text-primary cursor-pointer" type="font-size" @click.stop.prevent="onCropper"></Icon>
-      </div>
-      <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary mt-1">
-        <Icon class="text-primary cursor-pointer" type="location-fill" @click.stop.prevent="onLocation"></Icon>
-      </div>
-      <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary mt-1" @click.stop.prevent="onRemove">
+      <template v-for="name in buttons" :key="name">
+        <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary mt-1 first:mt-0">
+          <Icon class="text-primary cursor-pointer" :type="name" @click.stop.prevent="onClickButton(name)"></Icon>
+        </div>
+      </template>
+      <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary mt-1 first:mt-0"
+           @click.stop.prevent="onRemove">
         <Icon class="text-red-500 cursor-pointer" type="close-circle-fill"></Icon>
       </div>
     </div>
