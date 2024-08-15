@@ -111,10 +111,14 @@ const onChangeTabValue = function () {
 
 <template>
   <Layout class="!p-0 h-screen">
-    <LayoutHeader class="p-2 h-[initial] leading-[initial] bg-white">
+    <LayoutHeader class="p-2 h-[initial] leading-[initial] bg-white flex items-center justify-between">
       <TaskTitle :task-id="route.params.taskId">
         <span>[{{ filterSuccess(state.results).length }} / {{ state.total }}]</span>
       </TaskTitle>
+      <Space>
+        <Button type="primary">提交</Button>
+        <Button type="primary" danger>返回</Button>
+      </Space>
     </LayoutHeader>
     <LayoutContent class="border-t border-gray border-solid">
       <Layout class="h-full">

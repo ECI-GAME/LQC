@@ -197,8 +197,8 @@ defineExpose({setPosition});
 </script>
 
 <template>
-  <Loading :status="isLoading">
-    <Layout>
+  <Loading class="h-full" :status="isLoading">
+    <Layout class="h-full">
       <LayoutHeader class="bg-white h-[initial] leading-[initial] px-2 border-b border-gray border-solid">
         <div class="flex items-center">
           <Space>
@@ -217,7 +217,7 @@ defineExpose({setPosition});
               </Button>
             </a>
           </Space>
-          <div class="flex-1 flex justify-end px-10">
+          <div class="w-20 flex-1 flex justify-end px-10">
             <Slider class="w-100 max-w-full"
                     :min="30"
                     :max="300"
@@ -232,7 +232,7 @@ defineExpose({setPosition});
           </div>
         </div>
       </LayoutHeader>
-      <LayoutContent class="px-2 overflow-hidden">
+      <LayoutContent class="overflow-hidden">
         <div class="h-full flex items-center justify-center" v-if="isLoadError">
           <Result status="500">
             <template #subTitle>
