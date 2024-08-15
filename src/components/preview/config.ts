@@ -5,6 +5,10 @@ export const DotType = {
   "2": "框外"
 }
 
+export const scaleTipFormatter = function (value: string | number): string {
+  return `${value}%`;
+}
+
 export class DotData {
   public id!: string | number;
   public taskId?: string;

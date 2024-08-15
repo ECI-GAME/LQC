@@ -4,6 +4,10 @@ import {RouterView} from "vue-router";
 // import Search from "./search/index.vue";
 import {Divider} from "ant-design-vue";
 
+const getKey = function(scope: any) {
+  return scope.route.fullPath;
+}
+
 </script>
 
 <template>
@@ -18,7 +22,7 @@ import {Divider} from "ant-design-vue";
     </div>
     <Divider class="flex-1 mt-0 mb-0 sticky"/>
     <RouterView v-slot="scope">
-      <component :is="scope.Component" class="p-4 md:p-6"/>
+      <component :is="scope.Component" :key="getKey(scope)" class="p-4 md:p-6"/>
     </RouterView>
   </div>
 </template>

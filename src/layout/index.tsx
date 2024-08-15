@@ -19,19 +19,25 @@ const autoPage = function (status: boolean, change: (off: boolean) => void) {
   ];
 }
 
+
+const MenuWidth = {
+  on: 260,
+  off: 50,
+}
+
 export default defineComponent({
   name: "Layout",
   setup: function () {
     const route = useRoute();
-    const menuWidth = ref(50);
-    const menuOff = ref<boolean>(true);
+    const menuWidth = ref(MenuWidth.on);
+    const menuOff = ref<boolean>(false);
     const onChangeMenuWidth = function (off: boolean) {
       if (menuOff.value !== off) {
         menuOff.value = off;
         if (off) {
-          menuWidth.value = 50;
+          menuWidth.value = MenuWidth.off;
         } else {
-          menuWidth.value = 260;
+          menuWidth.value = MenuWidth.on;
         }
       }
     }

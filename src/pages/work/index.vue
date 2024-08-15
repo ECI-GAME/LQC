@@ -5,8 +5,8 @@
  */
 
 import api from "src/api";
-import List from "./list.vue";
 import * as _ from "lodash-es";
+
 import {computed, onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
 import Record from "./record/index.vue";
@@ -17,9 +17,11 @@ import RegisterWord from "./register/word.vue";
 import RegisterComment from "./register/comment.vue";
 import safeGet from "@fengqiaogang/safe-get";
 import Tab from "src/components/tab/index.vue";
-import {ProcessNode} from "./config";
-import {Layout, LayoutContent, LayoutHeader, LayoutSider} from "ant-design-vue";
+import Switch from "./switch.vue";
+import {ProcessNode, pickImage, getPrevRoute, getNextRoute} from "./config";
+import {Layout, LayoutContent, Space, Button, LayoutSider} from "ant-design-vue";
 
+import type {ImageData} from "src/types/image";
 import type {DotData} from "src/components/preview/config";
 
 const previewRef = ref();
@@ -37,42 +39,38 @@ onMounted(function () {
   }
 });
 
-const workId = ref<string>(route.params.workId as string);
-
+const currentFile = ref<ImageData>();
 // 任务明细列表
-const {state} = model.list<object>(function () {
-  return api.task.getTaskFiles(route.params.taskId as string);
-}, new model.PageResult<object>(), true);
+const {state} = model.list<ImageData>(async function () {
+  const res = await api.work.getImages<ImageData>(route.params.taskId as string);
+  if (res.total > 0) {
+    currentFile.value = pickImage(res.results, route.params.workId as string);
+    setTimeout(onUpDataDots);
+  }
+  return res;
+}, new model.PageResult<ImageData>(), true);
 
 
 // 记录点
 const {state: dots, execute: onReloadDots, isLoading} = model.list<DotData>(function () {
-  if (recordActive.value === RecordType[0]) {
-    return api.work.getDotList<DotData>(workId.value);
+  if (recordActive.value === RecordType[0] && currentFile.value) {
+    return api.work.getDotList<DotData>(currentFile.value.id);
   }
   return new model.PageResult<DotData>();
-}, new model.PageResult<DotData>(), true);
+}, new model.PageResult<DotData>(), false);
 
 const onUpDataDots = function () {
   onReloadDots(100);
   dotAddTempValue.value = void 0;
 }
 
-// 当前选中对象详细数据
-const currentFile = computed<object | undefined>(function () {
-  const list = state.value.results;
-  return _.find(list, function (item: object) {
-    const id = safeGet<string | number>(item, "id")!;
-    return String(id) === String(workId.value);
-  });
-})
 
 // 切换左侧图片
 const onChangeImage = function (value: string) {
-  if (workId.value !== value) {
-    workId.value = value;
-    // dots.value = [];
-  }
+  // if (workId.value !== value) {
+  //   workId.value = value;
+  //   // dots.value = [];
+  // }
 };
 
 // 打点（描点）
@@ -113,48 +111,44 @@ const onChangeTabValue = function () {
 
 <template>
   <Layout class="!p-0 h-screen">
-    <LayoutSider class="bg-white !w-80 !max-w-80 !flex-auto">
-      <template v-if="state.total > 0">
-        <List class="h-full" :active="workId" @change="onChangeImage" :list="state.results"></List>
-      </template>
-    </LayoutSider>
-    <LayoutContent class="border-x border-slate-600 border-solid">
+    <LayoutContent class="border-r border-gray border-solid bg-white">
       <Preview v-if="currentFile"
                ref="previewRef"
                class="h-full"
-               :src="safeGet(currentFile, 'originalImagePath')"
-               :dots="dots.results" :disabled="!!dotAddTempValue"
-               :key="workId"
-               @dot="onChangeDot"></Preview>
+               :disabled="!!dotAddTempValue"
+               :src="currentFile.imagePath"
+               :dots="dots.results"
+               :key="currentFile.id"
+               @dot="onChangeDot">
+        <template #operate>
+          <Switch :current="currentFile" :list="state.results"></Switch>
+        </template>
+      </Preview>
     </LayoutContent>
     <LayoutSider class="!w-80 !max-w-80 !flex-auto bg-[#fff]">
-      <Layout class="h-full">
-        <LayoutHeader class="bg-white h-[initial] leading-[initial] p-2 border-b border-solid border-slate-300">
-          <Tab v-model:value="recordActive" :list="RecordType" @change="onChangeTabValue"
-               :disabled="!!dotAddTempValue"></Tab>
-        </LayoutHeader>
-        <LayoutContent class="p-2 overflow-y-auto">
-          <template v-if="!!dotAddTempValue">
-            <template v-if="processNode === ProcessNode.TEP">
-              <RegisterWord
-                  :data="dotAddTempValue"
-                  :file="currentFile"
-                  @save="onUpDataDots"
-                  @cancel="onCancelDot"></RegisterWord>
-            </template>
-            <template v-else-if="processNode === ProcessNode.DTP">
-              <RegisterComment
-                  :data="dotAddTempValue"
-                  :file="currentFile"
-                  @save="onUpDataDots"
-                  @cancel="onCancelDot"></RegisterComment>
-            </template>
-          </template>
-          <template v-else>
-            <Record @position="onPosition" :active="recordActive" :key="recordActive" :list="dots.results"></Record>
-          </template>
-        </LayoutContent>
-      </Layout>
+      <div class="p-2">
+        <Tab v-model:value="recordActive" :list="RecordType" @change="onChangeTabValue"
+             :disabled="!!dotAddTempValue"></Tab>
+      </div>
+      <template v-if="!!dotAddTempValue">
+        <template v-if="processNode === ProcessNode.TEP">
+          <RegisterWord
+              :data="dotAddTempValue"
+              :file="currentFile"
+              @save="onUpDataDots"
+              @cancel="onCancelDot"></RegisterWord>
+        </template>
+        <template v-else-if="processNode === ProcessNode.DTP">
+          <RegisterComment
+              :data="dotAddTempValue"
+              :file="currentFile"
+              @save="onUpDataDots"
+              @cancel="onCancelDot"></RegisterComment>
+        </template>
+      </template>
+      <template v-else>
+        <Record @position="onPosition" :active="recordActive" :key="recordActive" :list="dots.results"></Record>
+      </template>
     </LayoutSider>
   </Layout>
 </template>

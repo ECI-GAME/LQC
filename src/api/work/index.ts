@@ -1,15 +1,27 @@
 import Word from "./word";
 import GraphQL from "../graphql";
 import {PageResult} from "src/utils/model";
+import {validate, required} from "@js-lion/api";
 
 
 export default class extends GraphQL {
   word: Word = new Word();
 
+  @validate
+  async getImages<T>(@required versionId: string | number): Promise<PageResult<T>> {
+    const name: string = "getProjectTaskImageRelationsList";
+    const query = {
+      "input": `{ id: ${versionId}, pageNum: 1, pageSize: 10000 }`
+    };
+    const res = await this.graphQL<{ rows: T[] }>(name, [query], ["rows"]);
+    return new PageResult<T>(res.rows);
+  }
+
   /**
    * 根据图片ID查询文字记录点列表
    */
-  async getDotList<T>(imageId: string | number): Promise<PageResult<T>> {
+  @validate
+  async getDotList<T>(@required imageId: string | number): Promise<PageResult<T>> {
     const name: string = "getProjectImageTranslationsList";
     const query = {
       "input": `{ imageId: ${imageId} }`
