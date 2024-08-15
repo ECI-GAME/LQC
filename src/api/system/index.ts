@@ -1,17 +1,18 @@
 import {validate, required, Get, Post, tryError} from "@js-lion/api";
-import type {PageResult} from "src/utils/model";
+import {PageResult} from "src/utils/model";
+import type {LanguageData} from "src/types";
 
 export default class {
 
+  @tryError(new PageResult<LanguageData>())
   @Get("/system/dict/data/type/:lang")
   @validate
-  getDictData(@required key: string): Promise<PageResult<object>> {
+  getDictData(@required key: string): Promise<PageResult<LanguageData>> {
     const params = {lang: key};
     // @ts-ignore
     return {params};
   }
 
-  
 
   @tryError(void 0)
   @Post("/ocrutil/identify", {responseType: "text"})

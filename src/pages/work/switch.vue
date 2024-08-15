@@ -24,7 +24,7 @@ defineProps({
   <Space>
     <template v-if="getPrevRoute(list, current)">
       <router-link class="flex" :to="getPrevRoute(list, current)">
-        <Button size="small">
+        <Button size="small" title="上一张">
           <Icon class="text-xl flex" type="caret-left"></Icon>
         </Button>
       </router-link>
@@ -37,7 +37,7 @@ defineProps({
 
     <template v-if="getNextRoute(list, current)">
       <router-link class="flex" :to="getNextRoute(list, current)">
-        <Button size="small">
+        <Button size="small" title="下一张">
           <Icon class="text-xl flex" type="caret-right"></Icon>
         </Button>
       </router-link>

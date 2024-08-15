@@ -1,5 +1,6 @@
 import * as _ from "lodash-es";
 import * as alias from "src/router/alias";
+import {DBList} from "@fengqiaogang/dblist";
 import type {ImageData} from "src/types/image";
 
 export enum ProcessNode {
@@ -52,4 +53,10 @@ export const getNextRoute = function (list: ImageData[], value: ImageData) {
       },
     };
   }
+}
+
+export const filterSuccess = function (list: ImageData[]): ImageData[] {
+  const db = new DBList([]);
+  db.insert(list);
+  return db.select({isFinish: ["1", 1]});
 }

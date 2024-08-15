@@ -43,7 +43,8 @@
       "@js-lion/upload",
       "@ue/modal",
       "@ue/form",
-      "element-plus/global"
+      "element-plus/global",
+      "@fengqiaogang/dblist"
     ],
     "typeRoots": [
       "./node_modules/@types",

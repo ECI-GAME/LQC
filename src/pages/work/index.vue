@@ -15,11 +15,11 @@ import {RecordType} from "./record/config";
 import Preview from "src/components/preview/index.vue";
 import RegisterWord from "./register/word.vue";
 import RegisterComment from "./register/comment.vue";
-import safeGet from "@fengqiaogang/safe-get";
 import Tab from "src/components/tab/index.vue";
 import Switch from "./switch.vue";
-import {ProcessNode, pickImage, getPrevRoute, getNextRoute} from "./config";
-import {Layout, LayoutContent, Space, Button, LayoutSider} from "ant-design-vue";
+import TaskTitle from "src/components/task/title.vue";
+import {ProcessNode, pickImage, filterSuccess} from "./config";
+import {Layout, LayoutContent, LayoutHeader, Space, Button, LayoutSider} from "ant-design-vue";
 
 import type {ImageData} from "src/types/image";
 import type {DotData} from "src/components/preview/config";
@@ -111,45 +111,54 @@ const onChangeTabValue = function () {
 
 <template>
   <Layout class="!p-0 h-screen">
-    <LayoutContent class="border-r border-gray border-solid bg-white">
-      <Preview v-if="currentFile"
-               ref="previewRef"
-               class="h-full"
-               :disabled="!!dotAddTempValue"
-               :src="currentFile.imagePath"
-               :dots="dots.results"
-               :key="currentFile.id"
-               @dot="onChangeDot">
-        <template #operate>
-          <Switch :current="currentFile" :list="state.results"></Switch>
-        </template>
-      </Preview>
+    <LayoutHeader class="p-2 h-[initial] leading-[initial] bg-white">
+      <TaskTitle :task-id="route.params.taskId">
+        <span>[{{ filterSuccess(state.results).length }} / {{ state.total }}]</span>
+      </TaskTitle>
+    </LayoutHeader>
+    <LayoutContent class="border-t border-gray border-solid">
+      <Layout class="h-full">
+        <LayoutContent class="border-r border-gray border-solid bg-white">
+          <Preview v-if="currentFile"
+                   ref="previewRef"
+                   class="h-full"
+                   :disabled="!!dotAddTempValue"
+                   :src="currentFile.imagePath"
+                   :dots="dots.results"
+                   :key="currentFile.id"
+                   @dot="onChangeDot">
+            <template #operate>
+              <Switch :current="currentFile" :list="state.results"></Switch>
+            </template>
+          </Preview>
+        </LayoutContent>
+        <LayoutSider class="!w-80 !max-w-80 !flex-auto bg-[#fff]">
+          <div class="p-2">
+            <Tab v-model:value="recordActive" :list="RecordType" @change="onChangeTabValue"
+                 :disabled="!!dotAddTempValue"></Tab>
+          </div>
+          <template v-if="!!dotAddTempValue">
+            <template v-if="processNode === ProcessNode.TEP">
+              <RegisterWord
+                  :data="dotAddTempValue"
+                  :file="currentFile"
+                  @save="onUpDataDots"
+                  @cancel="onCancelDot"></RegisterWord>
+            </template>
+            <template v-else-if="processNode === ProcessNode.DTP">
+              <RegisterComment
+                  :data="dotAddTempValue"
+                  :file="currentFile"
+                  @save="onUpDataDots"
+                  @cancel="onCancelDot"></RegisterComment>
+            </template>
+          </template>
+          <template v-else>
+            <Record @position="onPosition" :active="recordActive" :key="recordActive" :list="dots.results"></Record>
+          </template>
+        </LayoutSider>
+      </Layout>
     </LayoutContent>
-    <LayoutSider class="!w-80 !max-w-80 !flex-auto bg-[#fff]">
-      <div class="p-2">
-        <Tab v-model:value="recordActive" :list="RecordType" @change="onChangeTabValue"
-             :disabled="!!dotAddTempValue"></Tab>
-      </div>
-      <template v-if="!!dotAddTempValue">
-        <template v-if="processNode === ProcessNode.TEP">
-          <RegisterWord
-              :data="dotAddTempValue"
-              :file="currentFile"
-              @save="onUpDataDots"
-              @cancel="onCancelDot"></RegisterWord>
-        </template>
-        <template v-else-if="processNode === ProcessNode.DTP">
-          <RegisterComment
-              :data="dotAddTempValue"
-              :file="currentFile"
-              @save="onUpDataDots"
-              @cancel="onCancelDot"></RegisterComment>
-        </template>
-      </template>
-      <template v-else>
-        <Record @position="onPosition" :active="recordActive" :key="recordActive" :list="dots.results"></Record>
-      </template>
-    </LayoutSider>
   </Layout>
 </template>
 
