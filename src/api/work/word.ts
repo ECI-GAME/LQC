@@ -1,5 +1,5 @@
-import {Post, Put, validate, required, tryError} from "@js-lion/api";
 import * as message from "@ue/message";
+import {Post, Put, validate, required, tryError} from "@js-lion/api";
 
 export default class {
   @tryError(false)

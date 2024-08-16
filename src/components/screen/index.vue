@@ -16,6 +16,16 @@ const props = defineProps({
     type: Number,
     required: true
   },
+  width: {
+    type: Number,
+    required: false,
+    default: () => 200
+  },
+  height: {
+    type: Number,
+    required: false,
+    default: () => 120
+  },
   buttons: {
     type: Array,
     required: false,
@@ -25,8 +35,8 @@ const props = defineProps({
 
 const x = ref<number>(0);
 const y = ref<number>(0);
-const width = ref<number>(200);
-const height = ref<number>(120);
+const width = ref<number>(props.width);
+const height = ref<number>(props.height);
 
 onMounted(function () {
   if (props.left > 0) {
@@ -217,7 +227,6 @@ const onRemove = function () {
         <div class="screen-dot" :class="name" @mousedown="onResize($event, name)"></div>
       </template>
     </div>
-
   </div>
 </template>
 

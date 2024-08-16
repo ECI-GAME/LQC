@@ -31,5 +31,12 @@ const active = computed({
 </script>
 
 <template>
-  <Segmented v-model:value="active" :options="list" :disabled="disabled" :block="true" size="large"></Segmented>
+  <div>
+    <Segmented v-if="list && list.length > 0"
+               v-model:value="active"
+               :options="list"
+               :disabled="disabled"
+               :block="true"
+               size="large"></Segmented>
+  </div>
 </template>

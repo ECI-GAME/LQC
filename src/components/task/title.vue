@@ -42,19 +42,24 @@ const findLanguageValue = function (dict: string) {
 </script>
 
 <template>
-  <Space class="text-base" v-if="isReady">
-    <label class="text-black">{{ state.taskName }}</label>
-    <span>
+  <div class="flex items-center justify-between">
+    <Space class="text-base" v-if="isReady">
+      <label class="text-black">{{ state.taskName }}</label>
+      <span>
         [<label class="text-red-600">{{ state.estimatedStartDate }} ~ {{ state.estimatedEndDate }}</label>]
       </span>
-    <span>
+      <span>
         [<label class="text-blue-600">
           {{ findLanguageValue(state.sourceLanguage) }}->{{ findLanguageValue(state.targetLanguage) }}
         </label>]
       </span>
-    <span>
+      <span>
         [<label class="text-green-600">{{ state.handlerName }}</label>]
       </span>
-    <slot></slot>
-  </Space>
+      <slot></slot>
+    </Space>
+    <div v-if="isReady">
+      <slot name="operate" :task="state"></slot>
+    </div>
+  </div>
 </template>

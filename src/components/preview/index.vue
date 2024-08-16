@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {ref, onMounted} from "vue";
+import {ref, nextTick} from "vue";
 import api from "src/api";
 import {Icon} from "@ue/icon";
-import {DotData, DotButton, scaleTipFormatter, getDotButtons} from "./config";
+import {DotButton, DotData, DotDataType, getDotButtons, isCheckStatus, scaleTipFormatter} from "./config";
 import BigNumber from "bignumber.js";
 import Cropper from "src/utils/cropper";
 import Screen from "../screen/index.vue";
@@ -14,7 +14,7 @@ import * as image from "src/utils/brower/image";
 import {downloadFile} from "src/utils/brower/download";
 import Loading from "src/components/loading/index.vue";
 import {ElLoading} from 'element-plus';
-import {Badge, Layout, LayoutContent, LayoutHeader, Slider, Space, Button, Result} from "ant-design-vue";
+import {Badge, Button, Layout, LayoutContent, LayoutHeader, Result, Slider, Space} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import type {ImageData} from "src/types/image";
@@ -51,6 +51,8 @@ const ratio = ref<number>(100);
 const screenStatus = ref<boolean>(false);
 const screenX = ref<number>(0);
 const screenY = ref<number>(0);
+const screenWidth = ref<number>();
+const screenHeight = ref<number>();
 const getScale = function (value: number) {
   let scale = 1;
   if (value > 100) {
@@ -76,6 +78,8 @@ const onCaptureLocation = function (e: Event) {
   // 计算相对于容器的坐标
   screenX.value = clickX - rect.left - boxRef.value.scrollLeft;
   screenY.value = clickY - rect.top - boxRef.value.scrollTop;
+  screenWidth.value = void 0;
+  screenHeight.value = void 0;
   screenStatus.value = true;
 }
 
@@ -100,6 +104,7 @@ const onClickDotButton = async function (res: object) {
   );
 
   if (type === DotButton.Crop) {
+    result.coordinateType = DotDataType.Ocr;
     const loading = ElLoading.service({
       lock: true,
       text: 'Loading',
@@ -133,17 +138,21 @@ const onClickDotButton = async function (res: object) {
         loading.close();
       }, 500);
     }
+  } else if (isCheckStatus(props.data)) {
+    result.coordinateType = DotDataType.Comment;
+  } else {
+    result.coordinateType = DotDataType.Word;
   }
   $emit("dot", result);
   onRemoveScreen();
 }
 
-const setPosition = function (x: number, y: number) {
+const setBoxScroll = function (dot: DotData) {
   const dom: HTMLDivElement = boxRef.value;
   if (dom) {
     const scale = getScale(ratio.value);
-    const left = new BigNumber(x).times(scale).toNumber();
-    const top = new BigNumber(y).times(scale).toNumber();
+    const left = new BigNumber(dot.xCorrdinate1).times(scale).minus(20).toNumber();
+    const top = new BigNumber(dot.yCorrdinate1).times(scale).minus(20).toNumber();
     if (top <= 0) {
       dom.scrollTop = 0;
     } else {
@@ -159,6 +168,12 @@ const setPosition = function (x: number, y: number) {
     }
   }
 }
+
+const setBoxDot = function (data: DotData) {
+  screenStatus.value = false;
+  setBoxScroll(data);
+}
+
 
 // 图片加载完成
 const onLoad = function (e: Event) {
@@ -185,7 +200,7 @@ const onReload = function () {
 }
 
 
-defineExpose({setPosition});
+defineExpose({setBoxScroll, setBoxDot});
 
 </script>
 
@@ -257,6 +272,8 @@ defineExpose({setPosition});
           <Screen v-if="!disabled && screenStatus"
                   :left="screenX"
                   :top="screenY"
+                  :width="screenWidth"
+                  :height="screenHeight"
                   :buttons="getDotButtons(data)"
                   @remove="onRemoveScreen"
                   @click="onClickDotButton"/>

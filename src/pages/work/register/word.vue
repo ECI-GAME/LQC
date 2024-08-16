@@ -28,9 +28,9 @@ const props = defineProps({
 
 const {formRef, validate} = useValidate();
 const model = ref({
-  imageFlag: 1,                     // 类型
-  translatedText: "",               // 译文
-  originalText: props.data.originalText, // 原文
+  imageFlag: String(props.data.imageFlag || 1), // 类型
+  translatedText: props.data.translatedText,          // 译文
+  originalText: props.data.originalText,              // 原文
 });
 
 const getResult = function () {
@@ -38,14 +38,15 @@ const getResult = function () {
     ...model.value,
     taskId: safeGet<string | number>(props.file, "taskId"),  //任务ID
     imageId: safeGet<string | number>(props.file, "id"),     //图片ID
-    imageName: basename(props.data.imagePath),    //图片名称
+    imageName: props.data.imageName || basename(props.data.imagePath),    //图片名称
     imagePath: props.data.imagePath,              //图片路径
     xCorrdinate1: props.data.xCorrdinate1,
     yCorrdinate1: props.data.yCorrdinate1,
     xCorrdinate2: props.data.xCorrdinate2,
     yCorrdinate2: props.data.yCorrdinate2,
-    imageWidth : props.data.imageWidth,
-    imageHeight : props.data.imageHeight,
+    imageWidth: props.data.imageWidth,
+    imageHeight: props.data.imageHeight,
+    coordinateType: props.data.coordinateType,
   };
 };
 
@@ -54,7 +55,7 @@ const onSave = async function () {
   if (status) {
     const value = getResult();
     if (props.data.id) {
-      status = await api.work.word.update({ ...value, id: props.data.id });
+      status = await api.work.word.update({...value, id: props.data.id});
     } else {
       status = await api.work.word.add(value);
     }
@@ -64,7 +65,7 @@ const onSave = async function () {
   }
 }
 
-const onCancel = function() {
+const onCancel = function () {
   $emit("cancel");
 }
 
@@ -75,8 +76,8 @@ const onCancel = function() {
     <Form layout="vertical" ref="formRef" :model="model">
       <FormItem label="类别">
         <Select v-model:value="model.imageFlag">
-          <SelectOption :value="1">框内</SelectOption>
-          <SelectOption :value="2">框外</SelectOption>
+          <SelectOption value="1">框内</SelectOption>
+          <SelectOption value="2">框外</SelectOption>
         </Select>
       </FormItem>
       <FormItem v-if="data.imagePath">

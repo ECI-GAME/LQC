@@ -2,16 +2,13 @@ import * as _ from "lodash-es";
 import * as alias from "src/router/alias";
 import {DBList} from "@fengqiaogang/dblist";
 import type {ImageData} from "src/types/image";
-
-export enum ProcessNode {
-  TEP = 1,
-  DTP,
-}
+import safeGet from "@fengqiaogang/safe-get";
 
 
-export const pickImage = function (list: ImageData[], id: string | number): ImageData | undefined {
-  return _.find(list, function (item: ImageData) {
-    return String(item.id) === String(id);
+export const pickImage = function <T = ImageData>(list: T[], id: string | number): T | undefined {
+  return _.find(list, function (item: T) {
+    const key = safeGet<string | number>(item, "id")!;
+    return String(key) === String(id);
   });
 }
 

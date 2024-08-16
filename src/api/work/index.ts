@@ -1,7 +1,8 @@
 import Word from "./word";
 import GraphQL from "../graphql";
+import * as message from "@ue/message";
 import {PageResult} from "src/utils/model";
-import {validate, required} from "@js-lion/api";
+import {validate, required, Put, tryError} from "@js-lion/api";
 
 
 export default class extends GraphQL {
@@ -28,5 +29,20 @@ export default class extends GraphQL {
     };
     const res = await this.graphQL<{ data: T[] }>(name, [query], ["data"]);
     return new PageResult<T>(res.data);
+  }
+
+  @tryError(false)
+  @message.$error()
+  @message.$success("已保存")
+  @Put("/project/task/relations")
+  @validate
+  onSave(@required workId: string | number): Promise<boolean> {
+    const callback = () => true;
+    const data = {
+      id: workId,
+      isFinish: 1
+    };
+    // @ts-ignore
+    return {data, callback};
   }
 }

@@ -36,6 +36,7 @@ const getResult = function () {
     yCorrdinate1: props.data.yCorrdinate1,
     xCorrdinate2: props.data.xCorrdinate2,
     yCorrdinate2: props.data.yCorrdinate2,
+    coordinateType: props.data.coordinateType,
   };
 };
 
