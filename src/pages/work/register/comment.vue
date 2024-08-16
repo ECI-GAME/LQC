@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import api from "src/api";
+import * as _ from "lodash-es";
 import {ref, toRaw} from "vue";
-import {useValidate} from "@ue/form";
+import {useValidate, rules} from "@ue/form";
+import * as model from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
-import {Form, FormItem, Select, SelectOption, Textarea, Button, Card} from "ant-design-vue";
+import {Form, FormItem, Cascader, Textarea, Button, Card} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import type {DotData} from "src/components/preview/config";
@@ -18,34 +21,56 @@ const props = defineProps({
   file: {
     type: Object,
     required: true,
-  }
+  },
+  projectId: {
+    type: [String, Number],
+    required: true,
+  },
 });
 
+
 const {formRef, validate} = useValidate();
-const model = ref({
-  imageFlag: 1,             // 类型
+const formData = ref({
+  imageFlag: void 0,        // 类型
   remark: "",               // 备注
 });
 
+const fieldNames = ref({
+  value: "id",
+  label: "errorTypeName",
+  children: "childrenList"
+})
+// 任务明细列表
+const {state: typeList} = model.list<object>(function () {
+  return api.project.projectErrorType(props.projectId);
+}, new model.PageResult<object>(), true);
+
 const getResult = function () {
-  return {
-    ...model.value,
+  const data = {
+    ...formData.value,
     taskId: safeGet<string | number>(props.file, "taskId"),  //任务ID
     imageId: safeGet<string | number>(props.file, "id"),     //图片ID
     xCorrdinate1: props.data.xCorrdinate1,
     yCorrdinate1: props.data.yCorrdinate1,
     xCorrdinate2: props.data.xCorrdinate2,
     yCorrdinate2: props.data.yCorrdinate2,
+    imageWidth: props.data.imageWidth,
+    imageHeight: props.data.imageHeight,
     coordinateType: props.data.coordinateType,
   };
+  return {...data, imageFlag: _.last(data.imageFlag)};
 };
 
 
 const onSave = async function () {
   let status = await validate();
   if (status) {
-    const value = toRaw(model.value);
-    console.log(value);
+    const value = getResult();
+    if (props.data.id) {
+      status = await api.work.word.update({...value, id: props.data.id});
+    } else {
+      status = await api.work.word.add(value);
+    }
   }
   if (status) {
     $emit("save");
@@ -60,15 +85,18 @@ const onCancel = function () {
 
 <template>
   <Card size="small">
-    <Form layout="vertical" ref="formRef" :model="model">
-      <FormItem label="类别">
-        <Select v-model:value="model.imageFlag">
-          <SelectOption :value="1">漏译</SelectOption>
-          <SelectOption :value="2">翻译错误</SelectOption>
-        </Select>
+    <Form layout="vertical" ref="formRef" :model="formData">
+      <FormItem label="类别" name="imageFlag" :rules="rules.array('请选择类别！')">
+        <Cascader
+            v-model:value="formData.imageFlag"
+            placeholder="请选择类别"
+            :options="typeList.results"
+            :multiple="false"
+            :allow-clear="false"
+            :field-names="fieldNames"></Cascader>
       </FormItem>
       <FormItem label="备注">
-        <Textarea :rows="4" v-model:value="model.remark"></Textarea>
+        <Textarea :rows="4" v-model:value="formData.remark"></Textarea>
       </FormItem>
       <div class="flex items-center justify-between">
         <Button type="primary" danger @click="onCancel">取消</Button>

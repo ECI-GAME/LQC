@@ -18,10 +18,10 @@ import RegisterComment from "./register/comment.vue";
 import Tab from "src/components/tab/index.vue";
 import Switch from "./switch.vue";
 import TaskTitle from "src/components/task/title.vue";
-import {filterSuccess, pickImage} from "./config";
+import {filterSuccess, pickImage, RecordTabs} from "./config";
 import {DotDataType} from "src/components/preview/config";
 import Loading from "src/components/loading/index.vue";
-
+import {TaskStatus} from "src/types";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space} from "ant-design-vue";
 
 import type {ImageData, TaskData} from "src/types";
@@ -35,6 +35,19 @@ const dotAddTempValue = ref<DotData>();
 
 
 const currentFile = ref<ImageData>();
+
+// 任务详情
+const {state: taskInfo} = model.result<TaskData>(async () => {
+  const data = await api.task.getTaskInfoById(route.params.taskId as string);
+  if (data && data.taskStatus && TaskStatus.CHECK.includes(String(data.taskStatus))) {
+    recordTabs.value = [...RecordTabs];
+  } else {
+    recordTabs.value = [RecordTabs[0]];
+  }
+  recordActive.value = recordTabs.value[0];
+  return data;
+}, void 0, true);
+
 // 任务明细列表
 const {state, execute: _reloadList} = model.list<ImageData>(async function () {
   const res = await api.work.getImages<ImageData>(route.params.taskId as string);
@@ -47,7 +60,10 @@ const {state, execute: _reloadList} = model.list<ImageData>(async function () {
 
 // 记录点
 const {state: dots, execute: _reloadDots, isLoading} = model.list<DotData>(function () {
-  if (recordActive.value === RecordType[0] && currentFile.value) {
+  if (currentFile.value) {
+    if (recordActive.value === RecordType[1]) {
+      return api.work.getDotList<DotData>(currentFile.value.id, DotDataType.Comment);
+    }
     return api.work.getDotList<DotData>(currentFile.value.id);
   }
   return new model.PageResult<DotData>();
@@ -103,22 +119,22 @@ const onChangeTabValue = function () {
   onUpDataDots();
 }
 
-const onSubmit = function (task: TaskData) {
-  console.log(task);
+const onSubmit = function () {
+  console.log(taskInfo);
 }
 
 </script>
 
 <template>
   <Layout class="!p-0 h-screen">
-    <LayoutHeader class="p-2 h-[initial] leading-[initial] bg-white">
-      <TaskTitle :task-id="route.params.taskId">
+    <LayoutHeader class="p-2 h-[initial] leading-[initial] bg-white min-h-12">
+      <TaskTitle v-if="taskInfo && taskInfo.id" :task-id="taskInfo.id" :data="taskInfo">
         <span>[{{ filterSuccess(state.results).length }} / {{ state.total }}]</span>
         <!-- 右侧操作按钮 -->
         <template #operate="{ task }">
           <Space>
             <template v-if="state.total > 0 && filterSuccess(state.results).length===state.total">
-              <Button type="primary" @click="onSubmit(task)">提交</Button>
+              <Button type="primary" @click="onSubmit">提交</Button>
             </template>
             <template v-else>
               <Button type="primary" :disabled="true">提交</Button>
@@ -150,10 +166,11 @@ const onSubmit = function (task: TaskData) {
           <Loading class="h-full p-2" :status="isLoading">
             <Tab class="mb-2" v-model:value="recordActive" :list="recordTabs" @change="onChangeTabValue"
                  :disabled="!!dotAddTempValue"></Tab>
-            <template v-if="dotAddTempValue">
+            <template v-if="dotAddTempValue && taskInfo.projectId">
               <RegisterComment v-if="dotAddTempValue.coordinateType === DotDataType.Comment"
                                :data="dotAddTempValue"
                                :file="currentFile"
+                               :projectId="taskInfo.projectId"
                                @save="onUpDataDots"
                                @cancel="onCancelDot"></RegisterComment>
               <RegisterWord v-else
@@ -162,13 +179,14 @@ const onSubmit = function (task: TaskData) {
                             @save="onUpDataDots"
                             @cancel="onCancelDot"></RegisterWord>
             </template>
-            <template v-else>
+            <template v-else-if="taskInfo && taskInfo.projectId">
               <Record
                   @view="onViewLocation"
                   @edit="onEditLocation"
                   @success="onReloadList"
                   :work-id="route.params.workId"
                   :active="recordActive"
+                  :projectId="taskInfo.projectId"
                   :key="recordActive"
                   :list="dots.results"></Record>
             </template>

@@ -3,13 +3,14 @@
  * @author svon.me@gmail.com
  */
 
-import { Delete, Get, Gql, Put, post, tryError, validate } from "@js-lion/api";
-import { $error, $success } from "@ue/message"
+import Graphql from "../graphql";
+import {Delete, Get, Gql, post, tryError, validate, required} from "@js-lion/api";
+import {$error, $success} from "@ue/message"
 
-import { PageResult } from "src/utils/model";
+import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 
-export default class {
+export default class extends Graphql {
   /**
    * 用户详情
    * @returns UserIfno
@@ -30,7 +31,7 @@ export default class {
       return safeGet<object>(res, "qeuryComicProjectInfo");
     }
     // @ts-ignore
-    return { data, callback };
+    return {data, callback};
   }
 
   //初始化项目
@@ -42,7 +43,6 @@ export default class {
   }
 
 
-
   //提交项目
   @tryError(false)
   @$error()
@@ -51,32 +51,32 @@ export default class {
   @validate
   addProject(data: object) {
     // @ts-ignore
-    return { data };
+    return {data};
   }
-    //提交项目
-    @tryError(false)
-    @$error()
-    @$success("操作成功")
-    @post("/project/update")
-    @validate
-    updateProject(data: object) {
-      // @ts-ignore
-      return { data };
-    }
-  
-   
+
+  //提交项目
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
+  @post("/project/update")
+  @validate
+  updateProject(data: object) {
+    // @ts-ignore
+    return {data};
+  }
+
 
   //根据ID查询项目信息
   @Get("project/:projectId")
   @validate
   getProjectInfoById(data: number) {
-    const params = { projectId: data };
+    const params = {projectId: data};
     // @ts-ignore
     const callback = function (res: object) {
       return safeGet<object>(res, "data");
     }
     // @ts-ignore
-    return { data, params };
+    return {data, params};
   }
 
   //根据ID查询项目信息
@@ -88,8 +88,6 @@ export default class {
   }
 
 
-
-
   //提交项目关联人员
   @tryError(false)
   @$error()
@@ -98,7 +96,7 @@ export default class {
   @validate
   addProjectUserInfoBy(data: object) {
     // @ts-ignore
-    return { data };
+    return {data};
   }
 
 
@@ -110,9 +108,8 @@ export default class {
   @validate
   addProjecMethodInfoBy(data: object) {
     // @ts-ignore
-    return { data };
+    return {data};
   }
-
 
 
   //删除节点信息
@@ -122,42 +119,40 @@ export default class {
   @Delete("project/methods/:ids")
   @validate
   deleteNode(data: number) {
-    const params = { ids: data };
+    const params = {ids: data};
     // @ts-ignore
     const callback = function (res: object) {
       return safeGet<object>(res, "data");
     }
     // @ts-ignore
-    return { data, params };
+    return {data, params};
   }
 
   //根据ID查询项目关联方法
   @Get("project/methods/projectId/:id")
   @validate
   getProjectMethodById(data: number) {
-    const params = { id: data };
+    const params = {id: data};
     // @ts-ignore
     const callback = function (res: object) {
       return safeGet<object>(res, "data");
     }
     // @ts-ignore
-    return { data, params };
+    return {data, params};
   }
-
-
 
 
   //根据节点ID查询项目关联人员
   @Get("project/task/person/nodeId/:id")
   @validate
   getProjectPersonById(data: number) {
-    const params = { id: data };
+    const params = {id: data};
     // @ts-ignore
     const callback = function (res: object) {
       return safeGet<object>(res, "data");
     }
     // @ts-ignore
-    return { data, params };
+    return {data, params};
   }
 
   //删除人员信息
@@ -167,36 +162,28 @@ export default class {
   @Delete("project/task/person/:ids")
   @validate
   deletePerson(data: number) {
-    const params = { ids: data };
+    const params = {ids: data};
     // @ts-ignore
     const callback = function (res: object) {
       return safeGet<object>(res, "data");
     }
     // @ts-ignore
-    return { data, params };
+    return {data, params};
   }
 
   /**
-* 查询项目错误类型
-* @returns UserIfno
-*/
+   * 查询项目错误类型
+   * @returns UserIfno
+   */
   @tryError([])
-  @Gql("/graphql")
-  async projectErrorType(projectId: string): Promise<PageResult<object>> {
-    // 查询用户信息
-    const data: string = `{
-      getProjectErrorTypeList (input: { projectId: ${projectId}}) {
-        code
-        data
-        msg
-      }
-    }`;
-    const callback = function (res: object) {
-      const data = safeGet<object>(res, "getProjectErrorTypeList")
-      return safeGet<object>(data, "data");
-    }
-    // @ts-ignore
-    return { data, callback };
+  @validate
+  async projectErrorType(@required projectId: string | number): Promise<PageResult<object>> {
+    const name: string = "getProjectErrorTypeList";
+    const query = {
+      "input": `{ projectId: ${projectId} }`
+    };
+    const res = await this.graphQL<{ data: object[] }>(name, [query], ["data"]);
+    return new PageResult<object>(res.data);
   }
 
 
@@ -204,13 +191,13 @@ export default class {
   @Get("system/psconfig/projectId/:id")
   @validate
   getProjectPSConfig(data: number) {
-    const params = { id: data };
+    const params = {id: data};
     // @ts-ignore
     const callback = function (res: object) {
       return safeGet<object>(res, "data");
     }
     // @ts-ignore
-    return { data, params };
+    return {data, params};
   }
 
 
@@ -218,11 +205,9 @@ export default class {
   @Get("game/common/ocr")
   @validate
   ocrResult(data: string) {
-    const params = { message: data };
-    return { data, params };
+    const params = {message: data};
+    return {data, params};
   }
-
-
 
 
   //提交项目关联方法
@@ -233,7 +218,7 @@ export default class {
   @validate
   addProjectPSErrorData(data: object) {
     // @ts-ignore
-    return { data };
+    return {data};
   }
 
 
@@ -244,15 +229,14 @@ export default class {
   @Delete("project/error/type/:ids")
   @validate
   delProjectPSErrorData(data: number) {
-    const params = { ids: data };
+    const params = {ids: data};
     // @ts-ignore
     const callback = function (res: object) {
       return safeGet<object>(res, "data");
     }
     // @ts-ignore
-    return { data, params };
+    return {data, params};
   }
-
 
 
   //提交项目关联方法
@@ -263,17 +247,16 @@ export default class {
   @validate
   updateProjectPSErrorData(data: object) {
     // @ts-ignore
-    return { data };
+    return {data};
   }
-
 
 
   //删除人员信息
   @Get("project/getVersionDict/:projectId")
   @validate
   getVersionDict(data: number) {
-    const params = { projectId: data };
-    return { data, params };
+    const params = {projectId: data};
+    return {data, params};
   }
 
 
@@ -285,48 +268,46 @@ export default class {
   @validate
   addKnowLedgeInfo(data: object) {
     // @ts-ignore
-    return { data };
+    return {data};
   }
 
 
+  //模板导出
+  @Get("project/text/export/textTmp")
+  @validate
+  exportTextResource() {
 
-
-    //模板导出
-    @Get("project/text/export/textTmp")
-    @validate
-    exportTextResource() {
-    
-      // @ts-ignore
-      const callback = function (res: object) {
-        return safeGet<object>(res, "data");
-      }
-      // @ts-ignore
-      return { };
+    // @ts-ignore
+    const callback = function (res: object) {
+      return safeGet<object>(res, "data");
     }
+    // @ts-ignore
+    return {};
+  }
 
 
-     //模板导入
-     @Get("project/text/upload/textResource")
-     @validate
-     importTextResource(data: number) {
-       const params = { projectId: data };
-       // @ts-ignore
-       const callback = function (res: object) {
-         return safeGet<object>(res, "data");
-       }
-       // @ts-ignore
-       return { data, params };
-     }
-
-      //提交语言内容
-    @tryError(false)
-    @$error()
-    @$success("操作成功")
-    @post("/project/text")
-    @validate
-    addTextReource(data: object) {
-      // @ts-ignore
-      return { data };
+  //模板导入
+  @Get("project/text/upload/textResource")
+  @validate
+  importTextResource(data: number) {
+    const params = {projectId: data};
+    // @ts-ignore
+    const callback = function (res: object) {
+      return safeGet<object>(res, "data");
     }
-  
+    // @ts-ignore
+    return {data, params};
+  }
+
+  //提交语言内容
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
+  @post("/project/text")
+  @validate
+  addTextReource(data: object) {
+    // @ts-ignore
+    return {data};
+  }
+
 }

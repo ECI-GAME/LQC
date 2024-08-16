@@ -1,8 +1,10 @@
 import * as _ from "lodash-es";
 import * as alias from "src/router/alias";
 import {DBList} from "@fengqiaogang/dblist";
-import type {ImageData} from "src/types/image";
 import safeGet from "@fengqiaogang/safe-get";
+import type {ImageData} from "src/types/image";
+
+export const RecordTabs: string[] = ["文字翻译", "批注"];
 
 
 export const pickImage = function <T = ImageData>(list: T[], id: string | number): T | undefined {

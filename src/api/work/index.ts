@@ -22,10 +22,10 @@ export default class extends GraphQL {
    * 根据图片ID查询文字记录点列表
    */
   @validate
-  async getDotList<T>(@required imageId: string | number): Promise<PageResult<T>> {
+  async getDotList<T>(@required imageId: string | number, coordinateType?: string | number): Promise<PageResult<T>> {
     const name: string = "getProjectImageTranslationsList";
     const query = {
-      "input": `{ imageId: ${imageId} }`
+      "input": coordinateType ? `{ imageId: ${imageId}, coordinateType: ${coordinateType} }` : `{ imageId: ${imageId}, coordinateType: 0 }`
     };
     const res = await this.graphQL<{ data: T[] }>(name, [query], ["data"]);
     return new PageResult<T>(res.data);

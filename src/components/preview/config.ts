@@ -1,3 +1,4 @@
+import {TaskStatus} from "src/types";
 import {basename} from "src/utils/image";
 import type {ImageData} from "src/types/image";
 
@@ -6,12 +7,6 @@ export const DotType = {
   "2": "框外"
 }
 
-export const TaskStatus = {
-  // 进行中，处理中
-  RUN: ["2", "3", "4", "5", "6", "7"],
-  // 校对中，审核中
-  CHECK: ["15", "16", "17"],
-}
 
 export enum DotButton {
   Crop = "font-size",
@@ -52,6 +47,7 @@ export class DotData {
   public imageFlag: string | number = "1"; // 类型， 默认框内
   public translatedText: string = "";      // 译文
   public coordinateType!: DotDataType;     // 标注类型 1: 带 OCR 翻译的文字录入， 2: 普通的文字录入, 3: 标注
+  public remark: string = "";              // 备注
   constructor(
     public xCorrdinate1: number,
     public yCorrdinate1: number,

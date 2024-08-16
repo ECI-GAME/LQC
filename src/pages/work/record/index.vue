@@ -27,7 +27,11 @@ const props = defineProps({
   list: {
     type: Array as PropType<DotData[]>,
     default: () => []
-  }
+  },
+  projectId: {
+    type: [String, Number],
+    required: true,
+  },
 });
 
 
@@ -65,7 +69,7 @@ const onSave = async function () {
         <Word :data="item"></Word>
       </template>
       <template v-else-if="active === RecordType[1]">
-        <Comment :data="item"></Comment>
+        <Comment :data="item" :project-id="projectId"></Comment>
       </template>
     </Card>
     <div v-if="list.length > 0 && active === RecordType[0]" class="mt-2 first:mt-0 sticky bottom-0">

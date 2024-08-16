@@ -1,5 +1,14 @@
+export const TaskStatus = {
+  // 进行中，处理中
+  RUN: ["2", "3", "4", "5", "6", "7"],
+  // 校对中，审核中
+  CHECK: ["15", "16", "17"],
+}
+
+
 export interface TaskData {
   id: number;
+  projectId: number;
   projectNum: string;
   versionId: number;
   taskType: string;
