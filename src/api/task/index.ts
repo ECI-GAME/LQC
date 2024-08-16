@@ -1,4 +1,4 @@
-import { Get, Gql, post, tryError, validate, required } from "@js-lion/api";
+import { Get, Gql, post, tryError, validate, required, Put } from "@js-lion/api";
 import { $error, $success } from "@ue/message"
 
 import { PageResult } from "src/utils/model";
@@ -15,6 +15,7 @@ export default class {
         code
         rows
         msg
+        total
       }
     }`;
     const callback = function (res: object) {
@@ -36,6 +37,16 @@ export default class {
     return { data };
   }
 
+  //提交任务
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
+  @Put("/project/tasks/")
+  @validate
+  updateTask(data: object) {
+    // @ts-ignore
+    return { data };
+  }
   //根据ID查询画册信息
   @tryError(new PageResult<object>())
   @Get("/project/task/relations/tasks/:id")
@@ -109,4 +120,16 @@ export default class {
     }
     return { params };
   }
+
+  
+   //更新图片信息
+   @tryError(false)
+   @$error()
+   @$success("操作成功")
+   @post("/project/images/changeImage")
+   @validate
+   updateImageInfo(data: object) {
+     // @ts-ignore
+     return { data };
+   }
 }

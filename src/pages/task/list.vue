@@ -10,6 +10,7 @@ import {onCreate, columns} from "./config";
 import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
 import {Table, Button, Card, Form, FormItem, Input, Space, Progress, Breadcrumb, BreadcrumbItem} from "ant-design-vue";
+import {Icon} from "@ue/icon";
 
 
 const route = useRoute();
@@ -40,10 +41,18 @@ const searchInfo = ()=>{
 }
 const onCreateTask = async function () {
   console.log(versionId);
-  const res = await onCreate(versionId);
+  const res = await onCreate(versionId,1);
   console.log(res);
   if (res) {
     await onLoad(100); // 100 毫秒后刷新列表
+  }
+}
+
+const editFrom = async function (id:number) {
+  const status = await onCreate(id,2);
+
+  if (status) {
+    onLoad(100);
   }
 }
 //状态映射
@@ -58,8 +67,12 @@ const changeStatus = function (dict: String) {
   }
   return '-';
 }
+const changePage = function(page){
+  pageNumber.value = page
+  onLoad()
+}
 
-
+const pageNumber = ref(1)
 //进度计算
 const changeProcess = function (doneCount: number, allCount: number) {
   return (doneCount / allCount) * 100;
@@ -112,8 +125,10 @@ const changeProcess = function (doneCount: number, allCount: number) {
       <Table :data-source="state.results" :columns="columns" :bordered="true" :loading="isLoading">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'taskName'">
-            <RouterLink
-                :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }">
+            <!-- <RouterLink
+                :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }"> -->
+                <RouterLink
+                :to="{ name: alias.Work.name, params:{ taskId: record.id,workId:0 } }">
               <Button type="link">{{ text }}</Button>
             </RouterLink>
           </template>
@@ -125,8 +140,17 @@ const changeProcess = function (doneCount: number, allCount: number) {
             <Progress :percent="changeProcess(record.doneCnt,record.totalCnt)" status="active" :showInfo="true"
                       :format="percent => `${record.doneCnt} /${record.totalCnt}`"/>
           </template>
+
+          <template v-else-if="column.key === 'action'">
+            <span class="inline-block">
+              <Icon class="text-xl text-primary cursor-pointer" type="edit-square" @click="editFrom(record.id)"></Icon>
+            </span>
+          </template>
         </template>
+        
       </Table>
+      <br/>
+      <Pagination v-model:current="pageNumber" :defaultPageSize="3" class="float-right" :total="state.total" show-less-items @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
     </Card>
   </div>
 </template>

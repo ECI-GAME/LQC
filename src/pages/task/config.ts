@@ -20,8 +20,11 @@ export const columns = [
 let versionInfo=ref([]);
 let persons=ref([]);
 let nodes=ref([]);
+let taskInfo=ref([]);
 const languageInfos = ref([]);
-let versionId =0
+const taskStatusOption = ref([]);
+
+let versionId =ref(0)
 let formImages = [];
 //提交
 const onSubmit =async function (formData: object) {
@@ -31,13 +34,23 @@ const onSubmit =async function (formData: object) {
   }
   formData.taskType = 1
   formData.projectVersionImages = formImages
-  formData.projectNum = versionInfo.projectNum
-  formData.versionId = versionInfo.id
-  formData.sourceLanguage = versionInfo.languagePair.split("->")[0]
-  formData.targetLanguage = versionInfo.languagePair.split("->")[1]
+  formData.projectNum = versionInfo.value.projectNum
+  formData.versionId = versionInfo.value.id
+  formData.sourceLanguage = versionInfo.value.languagePair.split("->")[0]
+  formData.targetLanguage = versionInfo.value.languagePair.split("->")[1]
   formData.handlerName = gethandlerName(formData.handlerId)
   
   const code = await api.task.submitTask(formData);  
+  if(code===false){
+    return false
+  }else{
+    return true
+  }
+};
+//更新
+const onUpdate =async function (formData: object) {
+  formData.id = taskInfo.value.id
+  const code = await api.task.updateTask(formData);  
   if(code===false){
     return false
   }else{
@@ -54,9 +67,11 @@ const onImageShow =  async function () {
   const res = await modal.confirm(ImageShow, {
     width: 650,
     height:400,
-    title: "弹框",
+    title: "图片选择",
   }, {
-    versionId: versionInfo.id
+    versionId: versionInfo.value.id,
+    projectNum: versionInfo.value.projectNum,
+    taskId: taskInfo.value.id||0
   })
   if(res.imageIds.length>0){
     formImages = res.imageIds
@@ -67,7 +82,7 @@ const onImageShow =  async function () {
 //查询当前版本的所有节点
 const fetchNodeInfo = async () => {
   try {
-    nodes.value = await api.task.getTaskInfoNodeById(versionId);
+    nodes.value = await api.task.getTaskInfoNodeById(versionId.value);
     console.log('node.............');
     
     console.log(nodes.value);
@@ -87,7 +102,7 @@ const fetchPersonInfo = async (nodeId) => {
   try {
    
     
-    persons.value = await api.task.getTaskInfoPersonById(versionId,nodeId);
+    persons.value = await api.task.getTaskInfoPersonById(versionId.value,nodeId);
     console.log('persons');
     
     console.log(persons.value);
@@ -121,16 +136,55 @@ const changePariLanguage = (source: string) => {
 };
 //---语言字典结束
 
-export const onCreate =async function (param1:number) {
-  versionId = param1
+
+
+const fetchTaskStatusInfo = async () => {
+  try {
+    taskStatusOption.value = await api.system.getDictData('comic_task_status');
+  } catch (error) {
+    console.error("Failed to fetch language:", error);
+  }
+};
+
+fetchTaskStatusInfo()
+
+const changeLabel = function(value:string){
+  console.log(value);
+  console.log(taskStatusOption.value);
+  let dictLabel = ''
+  taskStatusOption.value.forEach(e=>{
+  
+    if(value == Number(e.dictValue)){
+      dictLabel = e.dictLabel
+    }
+    
+  })
+  console.log(dictLabel);
+  
+  return dictLabel
+}
+export const onCreate =async function (param1:number,type:number) {
+  
+  if(type==1){
+    versionId.value = param1
+    taskInfo.value = []
+  }else{
+    taskInfo.value =await api.task.getTaskInfoById(param1)
+    versionId.value = taskInfo.value.versionId
+    console.log(taskInfo.value);
+    console.log(versionId.value);
+  }
+  
+  
   
   fetchNodeInfo();
-  versionInfo = await api.version.geVersionInfoById(param1)
+  versionInfo.value = await api.version.geVersionInfoById(versionId.value)
   return modal.form([
 
     {
       key: "taskName",
       label: "任务名称",
+      value:taskInfo.value.taskName,
       component: Input,
     }
   ,
@@ -139,18 +193,19 @@ export const onCreate =async function (param1:number) {
         key:"taskLanguage",
         label: "语言对",
         component: Select,
-        value:changePariLanguage(versionInfo.languagePair),
+        value:changePariLanguage(versionInfo.value.languagePair),
         props:{
           disabled:true
         }
       },
       {
-        key:"taskStatus",
+        key:"taskLabel",
         label: "任务状态",
         component: Input,
-        value:"草稿",
+        value:taskInfo.value.taskStatus?changeLabel(taskInfo.value.taskStatus):'草稿',
         props:{
           disabled:true
+
         }
       }
         
@@ -168,6 +223,7 @@ export const onCreate =async function (param1:number) {
         key:"handlerId",
         label: "处理人",
         component: Select,
+        value: taskInfo.value.handlerId,
         props:{
           fieldNames: { label: "empName", value: "handlerId" },
           options: persons
@@ -176,6 +232,7 @@ export const onCreate =async function (param1:number) {
       {
         key:"taskOrder",
         label: "任务顺序",
+        value: taskInfo.value.taskOrder,
         component: InputNumber,
         
         props:{
@@ -188,6 +245,7 @@ export const onCreate =async function (param1:number) {
     {
       key:"remarks",
       label: "备注",
+      value: taskInfo.value.remarks,
       component: Input.TextArea,
     },
    
@@ -195,8 +253,8 @@ export const onCreate =async function (param1:number) {
     title: "新建任务",
     width: 480,
     buttonClassName: ["pb-5 "],
-    okText: "Submit",
-    onOk: onSubmit,
+    okText: type==1?"提交":"更新",
+    onOk: type==1?onSubmit:onUpdate,
     otherText : "图片资源",
     otherOk: onImageShow,
   });

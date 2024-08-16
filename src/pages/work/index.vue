@@ -23,10 +23,17 @@ import {Layout, LayoutContent, LayoutHeader, LayoutSider} from "ant-design-vue";
 import type {DotData} from "src/components/preview/config";
 
 const previewRef = ref();
+const projectInfo = ref({});
 const route = useRoute();
 const recordActive = ref<string>(RecordType[0]);
 const dotAddTempValue = ref<DotData>();
 const processNode = ref<ProcessNode>();
+  const taskId = ref<string>(route.params.taskId as string);
+const initProject = async function (){
+  projectInfo.value = await api.project.getProjectInfoByTId(taskId.value)
+}
+
+initProject()
 
 onMounted(function () {
   const id = String(route.params.workId);
@@ -105,6 +112,7 @@ const onCancelDot = function () {
 }
 
 
+
 const onChangeTabValue = function () {
   onUpDataDots();
 }
@@ -124,6 +132,7 @@ const onChangeTabValue = function () {
                class="h-full"
                :src="safeGet(currentFile, 'originalImagePath')"
                :dots="dots.results" :disabled="!!dotAddTempValue"
+               :readOrder="projectInfo.readOrder"
                :key="workId"
                @dot="onChangeDot"></Preview>
     </LayoutContent>

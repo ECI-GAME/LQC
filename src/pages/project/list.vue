@@ -4,10 +4,12 @@ import {Icon} from "@ue/icon";
 import {RouterLink} from "vue-router";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
-import {Table, Button,InputSearch} from "ant-design-vue";
+import {Table, Button,InputSearch,Pagination} from "ant-design-vue";
 import {onCreate} from "src/utils/project";
 import { ref } from 'vue';
 
+
+const pageNumber = ref(1)
 const columns = [
   {title: "项目名称", dataIndex: 'projectName', key: 'projectName'},
   {title: "项目编号", dataIndex: 'projectNum', key: 'projectNum'},
@@ -22,7 +24,7 @@ const columns = [
 const {state, execute: onLoad, isLoading} = model.list<object>(
   function () {
     
-    return  api.project.list(1,searchValue.value);
+    return  api.project.list(pageNumber.value,searchValue.value);
   },
   new model.PageResult<object>([]),
   true
@@ -67,6 +69,11 @@ const onSearch = function(){
   onLoad()
 }
 const searchValue = ref<string>('');
+
+const changePage = function(page){
+  pageNumber.value = page
+  onLoad()
+}
 </script>
 
 <template>
@@ -81,7 +88,7 @@ const searchValue = ref<string>('');
     />
       <Button @click="onCreateProject">新建</Button>
     </div>
-    <Table class="mt-5" :loading="isLoading" :data-source="state.results" :columns="columns" :bordered="true">
+    <Table class="mt-5" :loading="isLoading" :pagination="false" :data-source="state.results" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'projectName'">
           <RouterLink :to="{ name: alias.ProjectDetails.name, params: { projectId: record.id } }"> 
@@ -99,5 +106,7 @@ const searchValue = ref<string>('');
         </template>
       </template>
     </Table>
+    <br/>
+    <Pagination v-model:current="pageNumber" class="float-right" :total="state.total" show-less-items @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
   </div>
 </template>

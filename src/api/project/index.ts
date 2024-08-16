@@ -59,7 +59,7 @@ export default class {
     @$success("操作成功")
     @post("/project/update")
     @validate
-    updateProject(data: object) {
+    updateProject(data: Array) {
       // @ts-ignore
       return { data };
     }
@@ -78,6 +78,20 @@ export default class {
     // @ts-ignore
     return { data, params };
   }
+
+    //根TaskID查询项目信息
+    @Get("project/taskId/:taskId")
+    @validate
+    getProjectInfoByTId(data: number) {
+      const params = { taskId: data };
+      // @ts-ignore
+      const callback = function (res: object) {
+        return safeGet<object>(res, "data");
+      }
+      // @ts-ignore
+      return { data, params };
+    }
+  
 
   //根据ID查询项目信息
   @Get("project/getProjectUser")

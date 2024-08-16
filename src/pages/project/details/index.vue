@@ -109,9 +109,9 @@ const changeLanguage = function(source:String){
         <RouterLink :to="{ name: alias.VersionImage.name, params: { projectId: projectId } }">
           <Button type="primary" class="ml-2" >图片管理</Button>
         </RouterLink>
-        <Button type="primary" class="ml-2">任务中心</Button>
+        <!-- <Button type="primary" class="ml-2">任务中心</Button> -->
       </div>
-      <br/>
+      <br/><br/>
       <Version></Version>
     </Card>
   </div>

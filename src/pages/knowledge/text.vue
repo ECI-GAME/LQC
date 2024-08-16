@@ -15,6 +15,7 @@ import {Icon} from "@ue/icon";
 import { reactive } from 'vue';
 import {ElSelect,ElOption} from "element-plus"
 import {onCreate} from "src/utils/textResource";
+import { API_BASE} from "../../config";
 
 
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
@@ -48,7 +49,7 @@ const columns = [
     { title: "关联版本", dataIndex: 'versionName', key: 'versionName' },
     { title: "原文", dataIndex: 'originalText', key: 'originalText' },
     { title: "建议译文", dataIndex: 'translationText', key: 'translationText' },
-    { title: " 类别", dataIndex: 'textName', key: 'textName' },
+    { title: " 类别", dataIndex: 'typeName', key: 'textName' },
     { title: " 备注", dataIndex: 'remark', key: 'remark' },
     { title: "创建人", dataIndex: 'createBy', key: 'createBy', align: "center" },
     { title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center" },
@@ -60,7 +61,8 @@ const onSearch = ()=>{
     
 }
 const exportTemple = ()=>{
-    api.project.exportTextResource()
+    //api.project.exportTextResource()
+    window.open(API_BASE + '/project/text/export/textTmp')
 }
 
 const importTemple = ()=>{
@@ -94,26 +96,43 @@ const nweTextRource = async function () {
     onLoad(100);
   }
 }
-
-
+const fileList = ref([]);
+const  uploadData = {'projectId':route.params.projectId}
 const headers = {'Authorization':'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlaWQiOiIwMDAwMHJhMnp4bTUwc3BjNnEzMXdqOW9iZ2Z5NzRuZCIsInVzZXJfbmFtZSI6InJvb3QiLCJ0eiI6Ik1hcnF1ZXNhcyBTdGFuZGFyZCBUaW1lIiwicGlkIjotMSwib2lkIjotMSwib2xkaWQiOm51bGwsImNsaWVudF9pZCI6ImxxYV9nYW1lIiwiYXR0YWNocyI6IiIsImVuYW1lIjoiTFFBIiwiaHBpZCI6bnVsbCwiYXR5cGUiOiIxIiwic2NvcGUiOlsiYWxsIl0sImRuYW1lIjoiRUNJW-i2heeuoV0iLCJleHAiOjE3MjM4NjA3MjcsInF5d3giOm51bGwsImFpZCI6IjAwMDAwMDA1eHY2ZTkwb3RkbjdobWYyYjR1c3pqcGljIiwianRpIjoiNmM1YzY5N2YtYmFjMS00ZjM4LTk0NWYtM2Y2YmEyZjNhYTg0IiwiZGlkIjotMX0.XTx4E1JkqSByfJgWA-R5fmDnemadocrCeW8UHdADuufX5JnHuCXUDra9v4lqhZ1011xbU38nLs5mNxMkZ6YOD_IdHSBDtNRSYSJXaSCn45tsBfLinvBMZl_uoGWUFmrXs4up36UoDJtNIA9042iIQz65FFMwHZDJUtwp-L6FgVbe0ToM13c9W9BECV73dCfxth5LiZ-xtYU0MrMSyaUAApV5oQh0RfcyH6NiP7kL6_RKaU7Qdw7P9BR7WwCLiLJOsjfGqhp5kBE_e6ZRSnCmine9QI8aQjYGkkziDCSoit6_Xu-AouXn40ozV-VajVmDDHh4bWB9xXB7xd-FdPCizA'}
 const handleChange = (info: UploadChangeParam) => {
+    console.log(info);
+    
     if(info.code!=200){
         message.error(info.msg);    
     }
-    
-  if (info.file.status !== 'uploading') {
-    console.log(info.file, info.fileList);
-  }
-  if (info.file.status === 'done') {
-    message.success(`${info.file.name} file uploaded successfully`);
-    onLoad(100);
-  } else if (info.file.status === 'error') {
-    message.error(`${info.file.name} file upload failed.`);
-  }
+    else{
+        message.success(info.msg);    
+        onLoad(100);
+    }
+    fileList.value = []
+    return
 };
 
-
+const beforeUpload = (file: UploadProps['fileList'][number]) => {
+    console.log(file.name);
+    console.log(file.name.indexOf('xlsx')>-1);
+    console.log(file.name.indexOf('xlsx'));
+    
+    
+  const isJpgOrPng = file.name.indexOf('xlsx')>-1;
+  if (!isJpgOrPng) {
+    fileList.value = []
+    message.error('仅支持xlsx格式文件上传!');
+    return false
+  }
+  const isLt2M = file.size / 1024 / 1024 < 200;
+  if (!isLt2M) {
+    fileList.value = []
+    message.error('上传附件必须小于200MB!');
+    return false
+  }
+  return isJpgOrPng && isLt2M;
+};
 </script>
 <template>
     <div>
@@ -144,6 +163,9 @@ const handleChange = (info: UploadChangeParam) => {
                     name="file"
                     action="http://192.168.15.30:9999/eci-comic/project/text/upload/textResource"
                     :headers="headers"
+                    :data="uploadData"
+                     :show-upload-list="false"
+                    :before-upload="beforeUpload"
                     @success="handleChange"
                 >
                 <Button type="primary" class="bg-violet-600">导入</Button>
