@@ -1,10 +1,10 @@
 import * as modal from "@ue/modal";
 import {Input,InputNumber, RangePicker, Select,Link, message} from "ant-design-vue";
-import api from "src/api";
-import { ref, } from "vue";
-import ImageShow  from "./imageShow.vue";
-import { log } from "console";
 
+
+import api from "src/api";
+import { ref,onMounted } from "vue";
+import ImageShow  from "./imageShow.vue";
 export const columns = [
   {title: "任务名称", dataIndex: 'taskName', key: 'taskName'},
   {title: "状态", dataIndex: 'taskStatus', key: 'taskStatus', align: "center"},
@@ -13,7 +13,7 @@ export const columns = [
   {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
   {title: "更新时间", dataIndex: 'lastDealTime', key: 'lastDealTime', align: "center"},
   {title: "进度", dataIndex: 'doneCnt', key: 'doneCnt', align: "center"},
-  {title: "操作", dataIndex: 'action', key: 'action', align: "right"},
+  {title: "操作", dataIndex: 'action', key: 'action', align: "center"},
 ];
 
 
@@ -32,6 +32,13 @@ const onSubmit =async function (formData: object) {
     message.error('请至少选择一张图片后提交!')
     return
   }
+  const date = new Date(formData.timeDay[0].$d);
+  const formattedDate1 = formatDate(date);
+  const date1 = new Date(formData.timeDay[1].$d);
+  const formattedDate2 = formatDate(date1);
+  formData.estimatedStartDate = formattedDate1
+  formData.estimatedEndDate = formattedDate2
+
   formData.taskType = 1
   formData.projectVersionImages = formImages
   formData.projectNum = versionInfo.value.projectNum
@@ -49,7 +56,15 @@ const onSubmit =async function (formData: object) {
 };
 //更新
 const onUpdate =async function (formData: object) {
+ 
+  const date = new Date(formData.timeDay[0].$d);
+  const formattedDate1 = formatDate(date);
+  const date1 = new Date(formData.timeDay[1].$d);
+  const formattedDate2 = formatDate(date1);
+  formData.estimatedStartDate = formattedDate1
+  formData.estimatedEndDate = formattedDate2
   formData.id = taskInfo.value.id
+  console.log('2');
   const code = await api.task.updateTask(formData);  
   if(code===false){
     return false
@@ -83,9 +98,6 @@ const onImageShow =  async function () {
 const fetchNodeInfo = async () => {
   try {
     nodes.value = await api.task.getTaskInfoNodeById(versionId.value);
-    console.log('node.............');
-    
-    console.log(nodes.value);
     if(nodes.value.length==0){
       message.error('当前任务还未配置流程节点，请联系PM进行配置')
       
@@ -100,12 +112,7 @@ const fetchNodeInfo = async () => {
 //初始化人员
 const fetchPersonInfo = async (nodeId) => {
   try {
-   
-    
     persons.value = await api.task.getTaskInfoPersonById(versionId.value,nodeId);
-    console.log('persons');
-    
-    console.log(persons.value);
   } catch (error) {
     console.error("Failed to fetch language:", error);
   }
@@ -146,11 +153,9 @@ const fetchTaskStatusInfo = async () => {
   }
 };
 
-fetchTaskStatusInfo()
+
 
 const changeLabel = function(value:string){
-  console.log(value);
-  console.log(taskStatusOption.value);
   let dictLabel = ''
   taskStatusOption.value.forEach(e=>{
   
@@ -163,6 +168,21 @@ const changeLabel = function(value:string){
   
   return dictLabel
 }
+
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份是从0开始的，所以要加1
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+onMounted(function () {
+ fetchTaskStatusInfo()
+});
 export const onCreate =async function (param1:number,type:number) {
   
   if(type==1){
@@ -170,9 +190,12 @@ export const onCreate =async function (param1:number,type:number) {
     taskInfo.value = []
   }else{
     taskInfo.value =await api.task.getTaskInfoById(param1)
-    versionId.value = taskInfo.value.versionId
+    console.log('-----------');
     console.log(taskInfo.value);
-    console.log(versionId.value);
+    console.log(persons.value);
+    console.log('-----------');
+    versionId.value = taskInfo.value.versionId
+    
   }
   
   
@@ -211,10 +234,12 @@ export const onCreate =async function (param1:number,type:number) {
         
     ],
     {
-      
+      key: "timeDay",
       label: "日期",
       component: RangePicker,
+      //value: taskInfo.value.timeDay,
       props: {
+        "format": 'YYYY/MM/DD',
         "class": "w-full"
       }
     },

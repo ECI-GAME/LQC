@@ -131,6 +131,6 @@ const sumbitFrom =async function(){
     </Card>
     <br/>
   </div>
-  <ElButton type="primary" @click="sumbitFrom" class="fixed top-208 left-400">保存</ElButton>
+  <ElButton type="primary" @click="sumbitFrom" class="fixed top-190 left-400">保存</ElButton>
   </div>
 </template>

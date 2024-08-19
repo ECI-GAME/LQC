@@ -83,7 +83,9 @@ export const onCreate = async function (data) {
         label: "项目编号",
         value:projectInfo.value.projectNum,
         component: Input,
-        
+        props:{
+          disabled:true
+        }
       },
       {
         key: "projectName",
@@ -132,7 +134,7 @@ export const onCreate = async function (data) {
         //comic_image_read_order
         key: "readOrder",
         value:projectInfo.value.readOrder,
-        label: "阅读顺序",
+        label: "漫画阅读顺序",
         component: Select,
         props:{
           fieldNames: { label: "dictLabel", value: "dictValue" },

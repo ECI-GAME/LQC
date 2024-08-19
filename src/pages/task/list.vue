@@ -128,8 +128,10 @@ const changeProcess = function (doneCount: number, allCount: number) {
             <!-- <RouterLink
                 :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }"> -->
                 <RouterLink
-                :to="{ name: alias.Work.name, params:{ taskId: record.id,workId:0 } }">
-              <Button type="link">{{ text }}</Button>
+                
+                :to="{ name: alias.Work.name, params:{ taskId: record.id,workId:record.relationId } }">
+                
+              <Button type="link">{{ record.taskName }}</Button>
             </RouterLink>
           </template>
           <template v-else-if="column.key === 'taskStatus'">
@@ -144,8 +146,16 @@ const changeProcess = function (doneCount: number, allCount: number) {
           <template v-else-if="column.key === 'action'">
             <span class="inline-block">
               <Icon class="text-xl text-primary cursor-pointer" type="edit-square" @click="editFrom(record.id)"></Icon>
+              <RouterLink
+                :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }"> 
+                <Icon class="text-xl text-primary cursor-pointer ml-2" type="table"></Icon>
+            </RouterLink>
             </span>
+            <template>
+           
+            </template>
           </template>
+          
         </template>
         
       </Table>
