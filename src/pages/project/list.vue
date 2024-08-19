@@ -5,13 +5,14 @@ import {Icon} from "@ue/icon";
 import {RouterLink} from "vue-router";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
+import Page from "src/components/page/index.vue";
 import LanguageDetail from "src/components/language/detail.vue";
-import {Table, Button, InputSearch, Pagination} from "ant-design-vue";
+import {Table, Button, InputSearch} from "ant-design-vue";
 import {useProject} from "src/utils/project";
 
 import type {Project} from 'src/types';
 
-const pageNumber = ref(1);
+const pageNumber = ref<number>(1);
 const searchValue = ref<string>();
 const {create: onCreate} = useProject();
 
@@ -49,10 +50,6 @@ const editFrom = async function (data: Project) {
   }
 }
 
-const changePage = function (page: number) {
-  pageNumber.value = page
-  onLoad()
-}
 </script>
 
 <template>
@@ -87,12 +84,6 @@ const changePage = function (page: number) {
       </template>
     </Table>
 
-    <div class="py-5 flex justify-end">
-      <Pagination v-model:current="pageNumber"
-                  :total="state.total"
-                  :show-less-items="true"
-                  @change="changePage"
-                  :show-total="() => `共 ${state.total} 条`"/>
-    </div>
+    <Page v-model:page="pageNumber" :total="state.total" @click="onSearch"></Page>
   </div>
 </template>

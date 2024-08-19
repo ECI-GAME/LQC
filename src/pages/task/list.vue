@@ -123,7 +123,7 @@ const changeProcess = function (doneCount: number, allCount: number) {
     </Card>
 
     <Card class="mt-5">
-      <Table :data-source="state.results" :columns="columns" :bordered="true" :loading="isLoading">
+      <Table :data-source="state.results" :columns="columns" :bordered="true" :loading="isLoading" :pagination="false">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'taskName'">
             <RouterLink :to="{ name: alias.Work.name, params:{ taskId: record.id,workId:record.relationId } }">

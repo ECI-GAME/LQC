@@ -5,7 +5,7 @@ import {Table, Button} from "ant-design-vue";
 import * as model from "src/utils/model";
 import {useRoute} from 'vue-router';
 import {ref} from 'vue';
-
+import Page from "src/components/page/index.vue";
 import LanguagePair from "src/components/language/pair.vue";
 
 import api from "src/api";
@@ -47,8 +47,7 @@ const changeProcess = function (doneCount: number, allCount: number) {
   return (doneCount / allCount) * 100;
 }
 
-const changePage = function (page: number) {
-  pageNumber.value = page
+const changePage = function () {
   onLoad()
 }
 </script>
@@ -59,11 +58,11 @@ const changePage = function (page: number) {
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'versionName'">
           <RouterLink :to="{ name: alias.TaskList.name, params: { projectId:projectId,versionId: record.id } }">
-            <Button type="link">{{ record.versionName }}</Button>
+            <Button type="link">{{ text }}</Button>
           </RouterLink>
         </template>
         <template v-else-if="column.key === 'languagePair'">
-          <LanguagePair :value="record.languagePair"></LanguagePair>
+          <LanguagePair :value="text"></LanguagePair>
         </template>
         <template v-else-if="column.key === 'doneCnt'">
           <Progress :percent="changeProcess(record.doneCnt,record.totalCnt)" status="active" :showInfo="true"
@@ -76,9 +75,6 @@ const changePage = function (page: number) {
         </template>
       </template>
     </Table>
-    <br/>
-    <Pagination v-model:current="pageNumber" :defaultPageSize="3" class="float-right" :total="state.total"
-                show-less-items @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
-
+    <Page v-model:page="pageNumber" :total="state.total" @click="changePage"></Page>
   </div>
 </template>

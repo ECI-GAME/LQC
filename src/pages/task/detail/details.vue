@@ -68,7 +68,6 @@ const columns = [
 
 <template>
   <div>
-
     <Breadcrumb>
       <BreadcrumbItem>Home</BreadcrumbItem>
       <BreadcrumbItem v-if="isReady">
@@ -80,7 +79,6 @@ const columns = [
       </BreadcrumbItem>
       <BreadcrumbItem>任务明细</BreadcrumbItem>
     </Breadcrumb>
-
     <Card>
       <div class="flex items-center justify-between">
         <TaskTitle v-if="isReady" :task-id="route.params.taskId" :data="stateData" />
@@ -92,9 +90,8 @@ const columns = [
       </div>
 
     </Card>
-
     <Card class="mt-5">
-      <Table :data-source="state.results" :columns="columns" :bordered="true">
+      <Table :data-source="state.results" :columns="columns" :bordered="true" :pagination="false">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'imageName'">
             <RouterLink :to="{ name: alias.Work.name, params:{ workId: record.id, taskId: route.params.taskId } }">
