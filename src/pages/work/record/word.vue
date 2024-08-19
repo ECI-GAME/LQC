@@ -14,7 +14,7 @@ defineProps({
 </script>
 
 <template>
-  <Descriptions class="deep-[th]:whitespace-nowrap" :column="1" :bordered="true" size="small">
+  <Descriptions :column="1" :bordered="true" size="small">
     <DescriptionsItem label="类别">{{ DotType[data.imageFlag] }}</DescriptionsItem>
     <DescriptionsItem label="原文">{{ data.originalText }}</DescriptionsItem>
     <DescriptionsItem label="译文">{{ data.translatedText }}</DescriptionsItem>

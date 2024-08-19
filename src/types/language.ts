@@ -1,8 +1,8 @@
 export interface LanguageData {
   createBy: string;
-  createTime: string; // You might want to use `Date` type if processing dates
+  createTime: string;
   updateBy: string | null;
-  updateTime: string | null; // You might want to use `Date` type if processing dates
+  updateTime: string | null;
   lang: string | null;
   dictCode: number;
   dictSort: number;

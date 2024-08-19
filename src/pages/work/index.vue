@@ -8,7 +8,7 @@ import api from "src/api";
 
 import {ref} from "vue";
 import * as alias from "src/router/alias";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import Record from "./record/index.vue";
 import * as model from "src/utils/model";
 import {RecordType} from "./record/config";
@@ -29,6 +29,7 @@ import type {DotData} from "src/components/preview/config";
 
 const previewRef = ref();
 const route = useRoute();
+const router = useRouter();
 const recordActive = ref<string>();
 const recordTabs = ref<string[]>([]);
 const dotAddTempValue = ref<DotData>();
@@ -38,7 +39,7 @@ const currentFile = ref<ImageData>();
 // 任务详情
 const {state: projectInfo} = model.result<Project>(() => {
   return api.project.getProjectInfoByTId(route.params.taskId as string);
-}, void 0, true);
+}, {} as Project, true);
 
 // 任务详情
 const {state: taskInfo} = model.result<TaskData>(async () => {
@@ -123,8 +124,34 @@ const onChangeTabValue = function () {
   onUpDataDots();
 }
 
-const onSubmit = function () {
-  console.log(taskInfo);
+const backOption = function (task: TaskData) {
+  return {
+    name: alias.TaskDetails.name,
+    params: {
+      versionId: task.versionId, taskId: task.id
+    }
+  }
+}
+
+const onSubmit = async function () {
+  const data = {
+    id: taskInfo.value.id,
+    taskStatus: taskInfo.value.taskStatus,
+    projectNum: projectInfo.value.projectNum,
+    projectId: projectInfo.value.id,
+    // 非必传
+    taskName: taskInfo.value.taskName,
+    taskOrder: taskInfo.value.taskOrder,
+    sourceLanguage: taskInfo.value.sourceLanguage,
+    targetLanguage: taskInfo.value.targetLanguage,
+    versionId: taskInfo.value.versionId,
+    versionName: taskInfo.value.versionName,
+  };
+  const status = await api.work.onSubmit(data);
+  if (status) {
+    const value = backOption(taskInfo.value);
+    await router.replace(value);
+  }
 }
 
 </script>
@@ -143,7 +170,7 @@ const onSubmit = function () {
             <template v-else>
               <Button type="primary" :disabled="true">提交</Button>
             </template>
-            <router-link :to="{ name: alias.TaskDetails.name, params: { versionId: task.versionId, taskId: task.id } }">
+            <router-link :to="backOption(task)" :replace="true">
               <Button>返回</Button>
             </router-link>
           </Space>
@@ -153,7 +180,7 @@ const onSubmit = function () {
     <LayoutContent class="border-t border-gray border-solid">
       <Layout class="h-full">
         <LayoutContent class="border-r border-gray border-solid bg-white">
-          <Preview v-if="currentFile"
+          <Preview v-if="currentFile && projectInfo.readOrder"
                    ref="previewRef"
                    class="h-full"
                    :disabled="!!dotAddTempValue"
@@ -167,7 +194,7 @@ const onSubmit = function () {
             </template>
           </Preview>
         </LayoutContent>
-        <LayoutSider class="!w-80 !max-w-80 !flex-auto bg-white overflow-y-auto">
+        <LayoutSider class="!w-120 !max-w-120 !flex-auto bg-white overflow-y-auto">
           <Loading class="h-full p-2" :status="isLoading">
             <Tab class="mb-2" v-model:value="recordActive" :list="recordTabs" @change="onChangeTabValue"
                  :disabled="!!dotAddTempValue"></Tab>

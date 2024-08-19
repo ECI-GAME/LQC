@@ -27,7 +27,7 @@ const {state, isReady} = model.result<TaskData>(() => {
 
 // 语言列表
 const {state: Language} = model.list<LanguageData>(() => {
-    return api.system.getDictData('comic_language_type');
+    return api.system.getDictData<LanguageData>('comic_language_type');
   },
   new model.PageResult<LanguageData>([]),
   true

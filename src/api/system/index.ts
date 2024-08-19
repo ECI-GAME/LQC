@@ -1,19 +1,27 @@
-import {validate, required, Get, Post, tryError} from "@js-lion/api";
 import {PageResult} from "src/utils/model";
-import type {LanguageData} from "src/types";
+import {validate, required, Get, Post, tryError} from "@js-lion/api";
 
 export default class {
-
-  @tryError(new PageResult<LanguageData>())
-  @Get("/system/dict/data/type/:lang")
+  /**
+   * 枚举列表
+   **/
+  @tryError(new PageResult<object>())
+  @Get("/system/dict/data/type/:name")
   @validate
-  getDictData(@required key: string): Promise<PageResult<LanguageData>> {
-    const params = {lang: key};
+  getDictData<T = object>(@required name: string): Promise<PageResult<T>> {
+    const params = {name};
+    const callback = function (value: object[] = []) {
+      // @ts-ignore
+      const list: T[] = [].concat([], value);
+      return new PageResult<T>(list);
+    };
     // @ts-ignore
-    return {params};
+    return {params, callback};
   }
 
-
+  /**
+   * OCR 识别
+   **/
   @tryError(void 0)
   @Post("/ocrutil/identify", {responseType: "text"})
   @validate

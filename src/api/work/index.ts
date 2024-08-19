@@ -2,7 +2,7 @@ import Word from "./word";
 import GraphQL from "../graphql";
 import * as message from "@ue/message";
 import {PageResult} from "src/utils/model";
-import {validate, required, Put, tryError} from "@js-lion/api";
+import {validate, required, Put, Post, tryError} from "@js-lion/api";
 
 
 export default class extends GraphQL {
@@ -12,7 +12,7 @@ export default class extends GraphQL {
   async getImages<T>(@required versionId: string | number): Promise<PageResult<T>> {
     const name: string = "getProjectTaskImageRelationsList";
     const query = {
-      "input": `{ id: ${versionId}, pageNum: 1, pageSize: 10000 }`
+      "input": `{ taskId: ${versionId}, pageNum: 1, pageSize: 10000 }`
     };
     const res = await this.graphQL<{ rows: T[] }>(name, [query], ["rows"]);
     return new PageResult<T>(res.rows);
@@ -29,12 +29,14 @@ export default class extends GraphQL {
     };
     const res = await this.graphQL<{ data: T[] }>(name, [query], ["data"]);
     if (res) {
-      console.log(coordinateType, res);
       return new PageResult<T>(res.data);
     }
     return new PageResult<T>();
   }
 
+  /**
+   *
+   **/
   @tryError(false)
   @message.$error()
   @message.$success("已保存")
@@ -46,6 +48,20 @@ export default class extends GraphQL {
       id: workId,
       isFinish: 1
     };
+    // @ts-ignore
+    return {data, callback};
+  }
+
+  /**
+   * 提交任务
+   **/
+  @tryError(false)
+  @message.$error()
+  @message.$success("已提交")
+  @Post("/project/tasks/submit")
+  @validate
+  onSubmit(@required data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
     return {data, callback};
   }
