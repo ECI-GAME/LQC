@@ -10,14 +10,14 @@ export interface Project {
   projectStatus: string;
   imageType: string;
   projectExplain: string;
-  remarks: string | null;
+  remarks?: string;
   createTime: string;
   createBy: string;
   createUserName: string;
-  updateBy: string | null;
-  updateTime: string | null;
-  projectPairs: any | null;
-  versionName: string | null;
-  timeCount: string | null;
+  updateBy: string;
+  updateTime: string;
+  projectPairs: any;
+  versionName: string;
+  timeCount: string;
   readOrder: string;
 }

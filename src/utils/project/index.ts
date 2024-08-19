@@ -1,126 +1,69 @@
-import * as modal from "@ue/modal";
-import {Input, DatePicker, Select} from "ant-design-vue";
 import api from "src/api";
-import { message } from 'ant-design-vue';
-import { ref } from 'vue';
+import {rules} from "@ue/form";
+import * as modal from "@ue/modal";
+import * as model from "src/utils/model";
+import safeSet from "@fengqiaogang/safe-set";
+import {Input, DatePicker, Select, message} from "ant-design-vue";
 
-const projectInfo = ref({})
-// 处理表单数据，传给接口完成项目创建逻辑
-const onSubmit = async function (formData: object) {
-  console.log(formData);
-  
-  if(formData.sourceLanguage===formData.targetLanguage){
-    message.error('源语言和目标语言不能相同！')
-    return
-  }
-  if(formData.id){
-    const code = await api.project.updateProject(formData);
-    if(code===false){
-      return false
-    }else{
-      return true
-    }
-  }else{
-    const code = await api.project.addProject(formData);
-    if(code===false){
-      return false
-    }else{
-      return true
-    }
-  }
-  
-  
-  
-  
-  
-};
+import type {LanguageData, Project} from 'src/types';
 
-const languageInfos = ref([]);
-const fetchLanguageInfo = async () => {
-  try {
-    languageInfos.value = await api.system.getDictData('comic_language_type');
-  } catch (error) {
-    console.error("Failed to fetch language:", error);
-  }
-};
-fetchLanguageInfo()
-
-const readOrders = ref([]);
-const fetchReadOrderInfo = async () => {
-  try {
-    readOrders.value = await api.system.getDictData('comic_image_read_order');
-  } catch (error) {
-    console.error("Failed to fetch language:", error);
-  }
-};
-
-fetchReadOrderInfo()
 /**
  * @file 项目创建
  * @author svon.me@gmail.com
  */
-export const onCreate = async function (data) {
-  if(data==undefined||data==null){
-    projectInfo.value= await api.project.projectInit()
-  }else{
-    projectInfo.value = data
-  }
-  console.log(projectInfo.value);
-  
+export const onCreate = async function (
+  data: Project,
+  languageInfo: LanguageData[] = [],
+  readOrder: object[] = [],
+  onSubmit?: (value: Project) => Promise<boolean>) {
   return modal.form([
-    {
-      key: "id",
-      value:projectInfo.value.id,
-      component: Input,
-      className:"hidden",
-      props:{
-        class:'hidden'
-      }
-    },
     [
       {
         key: "projectNum",
         label: "项目编号",
-        value:projectInfo.value.projectNum,
+        value: data.projectNum,
         component: Input,
-        props:{
-          disabled:true
+        props: {
+          disabled: true
         }
       },
       {
         key: "projectName",
-        value:projectInfo.value.projectName,
+        value: data.projectName,
         label: "项目名称",
         component: Input,
+        rules: rules.text("请填写项目名称")
       }
     ],
     [
       {
         key: "sourceLanguage",
         label: "源语言",
-        value:projectInfo.value.sourceLanguage,
+        value: data.sourceLanguage,
         component: Select,
-        props:{
-          fieldNames: { label: "dictLabel", value: "code" },
-          options: languageInfos.value
+        rules: rules.text("请选择源语言"),
+        props: {
+          fieldNames: {label: "dictLabel", value: "code"},
+          options: languageInfo
         }
       },
       {
         key: "targetLanguage",
         label: "目标语言",
-        value:projectInfo.value.targetLanguage,
+        value: data.targetLanguage,
         component: Select,
-        props:{
-          fieldNames: { label: "dictLabel", value: "code" },
-          options: languageInfos.value
+        rules: rules.text("请选择目标语言"),
+        props: {
+          fieldNames: {label: "dictLabel", value: "code"},
+          options: languageInfo
         }
       }
     ],
-    
+
     [
       {
         key: "comicPublisher",
-        value:projectInfo.value.comicPublisher,
+        value: data.comicPublisher,
         label: "发行商",
         component: Input,
       },
@@ -133,12 +76,13 @@ export const onCreate = async function (data) {
       {
         //comic_image_read_order
         key: "readOrder",
-        value:projectInfo.value.readOrder,
+        value: data.readOrder,
         label: "漫画阅读顺序",
         component: Select,
-        props:{
-          fieldNames: { label: "dictLabel", value: "dictValue" },
-          options: readOrders.value
+        rules: rules.text("请选择阅读顺序"),
+        props: {
+          options: readOrder,
+          fieldNames: {label: "dictLabel", value: "dictValue"},
         }
       },
     ],
@@ -148,9 +92,9 @@ export const onCreate = async function (data) {
         //value:projectInfo.value.planStartTime,
         label: "计划开始时间",
         component: DatePicker,
-        props:{
-          style:{
-            width:'100%'
+        props: {
+          style: {
+            width: '100%'
           }
         }
       },
@@ -159,26 +103,81 @@ export const onCreate = async function (data) {
         label: "计划完成时间",
         //value:projectInfo.value.planEndTime,
         component: DatePicker,
-        props:{
-          style:{
-            width:'100%'
+        props: {
+          style: {
+            width: '100%'
           }
         }
       },
     ],
-    
-     
     {
       key: "remarks",
-      value:projectInfo.value.remarks,
+      value: data.remarks,
       label: "备注",
       component: Input.TextArea,
     },
   ], {
-    title: (projectInfo.value.id || "新建项目","修改项目"),
+    title: (data.id ? "修改项目" : "新建项目"),
     width: 480,
-    buttonClassName: ["pb-5"],
+    buttonClassName: ["pb-5", "px-5"],
+    textAlign: "right",
     okText: "Submit",
     onOk: onSubmit
   });
+}
+
+const onSave = function (formData: Project) {
+  if (formData.sourceLanguage === formData.targetLanguage) {
+    message.error('源语言和目标语言不能相同！')
+    return false;
+  }
+  if (formData.id) {
+    return api.project.updateProject(formData)
+  }
+  return api.project.addProject(formData)
+}
+
+export const useProject = function () {
+  // 项目详情
+  const {
+    state: projectInfo,
+    execute: onLoadProject
+  } = model.result<Project>(() => api.project.projectInit(), {} as Project, true);
+
+  // 语言对列表
+  const {state: languageInfo} = model.list<LanguageData>(function () {
+      return api.system.getDictData<LanguageData>('comic_language_type');
+    },
+    new model.PageResult<LanguageData>([]),
+    true
+  );
+  // 项目遇到顺序
+  const {state: readOrder} = model.list<object>(function () {
+      return api.system.getDictData<object>('comic_image_read_order');
+    },
+    new model.PageResult<object>([]),
+    true
+  );
+
+  return {
+    project: projectInfo,
+    create: (data?: Project) => {
+      // 处理表单数据，传给接口完成项目创建逻辑
+      const onSubmit = async function (value: Project) {
+        if (data && data.id) {
+          safeSet(value, 'id', data.id)
+        }
+        const status = await onSave(value);
+        if (status) {
+          await onLoadProject(100);
+        }
+        return status;
+      };
+      return onCreate(
+        data || projectInfo.value,
+        languageInfo.value.results,
+        readOrder.value.results,
+        onSubmit);
+    }
+  }
 }

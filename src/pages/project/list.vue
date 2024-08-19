@@ -7,9 +7,10 @@ import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
 import LanguageDetail from "src/components/language/detail.vue";
 import {Table, Button, InputSearch, Pagination} from "ant-design-vue";
-import {onCreate} from "src/utils/project";
+import {useProject} from "src/utils/project";
 
-const pageNumber = ref(1)
+const pageNumber = ref(1);
+const { create: onCreate } = useProject();
 const columns = [
   {title: "项目名称", dataIndex: 'projectName', key: 'projectName'},
   {title: "项目编号", dataIndex: 'projectNum', key: 'projectNum'},
@@ -21,6 +22,7 @@ const columns = [
   {title: "PM", dataIndex: 'createUserName', key: 'createUserName', align: "center"},
   {title: "Actions", dataIndex: 'id', key: 'action', align: "right"},
 ];
+
 const {state, execute: onLoad, isLoading} = model.list<object>(
   function () {
 
@@ -58,16 +60,17 @@ const changePage = function (page: number) {
 
 <template>
   <div>
-    <div class="text-right">
+    <div class="flex items-center justify-between">
       <InputSearch
           v-model:value="searchValue"
           placeholder="请输入条件"
           enter-button
           @search="onSearch"
-          class="w-100 float-left"
+          class="w-100"
       />
       <Button @click="onCreateProject">新建</Button>
     </div>
+
     <Table class="mt-5" :loading="isLoading" :pagination="false" :data-source="state.results" :columns="columns"
            :bordered="true">
       <template #bodyCell="{ column, text, record  }">
@@ -87,8 +90,13 @@ const changePage = function (page: number) {
         </template>
       </template>
     </Table>
-    <br/>
-    <Pagination v-model:current="pageNumber" class="float-right" :total="state.total" show-less-items
-                @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
+
+    <div class="py-5 flex justify-end">
+      <Pagination v-model:current="pageNumber"
+                  :total="state.total"
+                  :show-less-items="true"
+                  @change="changePage"
+                  :show-total="() => `共 ${state.total} 条`"/>
+    </div>
   </div>
 </template>

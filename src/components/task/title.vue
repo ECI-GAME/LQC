@@ -5,7 +5,7 @@ import * as model from "src/utils/model";
 import LanguageDetail from "src/components/language/detail.vue";
 
 import type {PropType} from "vue";
-import type {TaskData, LanguageData} from "src/types";
+import type {TaskData} from "src/types";
 
 const props = defineProps({
   taskId: {

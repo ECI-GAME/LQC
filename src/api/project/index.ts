@@ -38,11 +38,21 @@ export default class extends Graphql {
   }
 
   //初始化项目
+  @tryError({})
   @Get("/project/initProject")
   @validate
-  projectInit() {
+  projectInit(): Promise<Project> {
     // @ts-ignore
     return {};
+  }
+
+  //根TaskID查询项目信息
+  @Get("project/taskId/:taskId")
+  @validate
+  getProjectInfoByTId(data: number | string): Promise<Project> {
+    const params = {taskId: data};
+    // @ts-ignore
+    return {params};
   }
 
 
@@ -52,7 +62,7 @@ export default class extends Graphql {
   @$success("操作成功")
   @post("/project")
   @validate
-  addProject(data: object) {
+  addProject(data: object): Promise<boolean> {
     // @ts-ignore
     return {data};
   }
@@ -63,7 +73,7 @@ export default class extends Graphql {
   @$success("操作成功")
   @post("/project/update")
   @validate
-  updateProject(data: object) {
+  updateProject(data: object): Promise<boolean> {
     // @ts-ignore
     return {data};
   }
@@ -81,14 +91,7 @@ export default class extends Graphql {
     return {data, params};
   }
 
-  //根TaskID查询项目信息
-  @Get("project/taskId/:taskId")
-  @validate
-  getProjectInfoByTId(data: number | string): Promise<Project> {
-    const params = {taskId: data};
-    // @ts-ignore
-    return {params};
-  }
+
 
 
   //根据ID查询项目信息
