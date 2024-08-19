@@ -9,8 +9,16 @@ import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
 import TaskTitle from "src/components/task/title.vue";
 import {Checkbox, Table, Button, Card, Space, Breadcrumb, BreadcrumbItem, Row, Col} from "ant-design-vue";
+import { onMounted } from 'vue';
 
 const route = useRoute();
+
+const {state: stateData, isReady} = model.result(() => {
+ 
+  return api.task.getTaskInfoById(route.params.taskId as string);
+}, {}, true);
+
+
 const {state, execute: onLoad, isLoading} = model.list<object>(
   // 执行逻辑
   function () {
@@ -46,8 +54,6 @@ const changeStatus = function (dict: string) {
 }
 
 
-
-
 const columns = [
   {title: "图片名称", dataIndex: 'imageName', key: 'imageName'},
   {title: "状态", dataIndex: 'imageStatus', key: 'imageStatus', align: "center"},
@@ -65,9 +71,11 @@ const columns = [
 
     <Breadcrumb>
       <BreadcrumbItem>Home</BreadcrumbItem>
-      <BreadcrumbItem>
+      <BreadcrumbItem v-if="isReady">
 
-        <a>任务列表</a>
+        <RouterLink :to="{ name: alias.TaskList.name, params: { projectId:stateData.projectId,versionId: stateData.versionId } }">
+          <a href="">任务中心</a>
+        </RouterLink>
 
       </BreadcrumbItem>
       <BreadcrumbItem>任务明细</BreadcrumbItem>
@@ -75,7 +83,7 @@ const columns = [
 
     <Card>
       <div class="flex items-center justify-between">
-        <TaskTitle :task-id="route.params.taskId"></TaskTitle>
+        <TaskTitle v-if="isReady" :task-id="route.params.taskId" :data="stateData" />
         <Space size="large">
           <Button type="default">操作记录</Button>
           <Button>知识库</Button>

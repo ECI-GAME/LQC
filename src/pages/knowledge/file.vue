@@ -74,9 +74,6 @@ const { state, execute: onLoad, isLoading } = model.list<object>(
 );
 //文件上传
 const onSuccess = async function (files: FileData[]) {
-  console.log('------');
-  
-  console.log(files);
   
   files.forEach( s=>{
     fileInfo.push({
@@ -90,15 +87,23 @@ const onSuccess = async function (files: FileData[]) {
     })
    
   })
-  message.success("上传成功")
-  api.project.addKnowLedgeInfo(fileInfo);
+  
+  const res = await api.project.addKnowLedgeInfo(fileInfo);
+  console.log(res);
+  if(res){
+    message.success("上传成功")
+  }
+  files = []
   fileInfo = []
-
+  
   onLoad(100)
 
 }
 
-
+const errorMethod = (files: FileData[])=>{
+    console.log('upload error');
+    files = []
+}
 onMounted(async () => {
   try {
     versionOption.value = await api.project.getVersionDict(route.params.projectId);
@@ -129,7 +134,7 @@ onMounted(async () => {
             </FromItem>
             <FromItem>
                 
-            <Upload :multiple="true" @success="onSuccess" class="ml-3" v-model:loading="isOnloading">
+            <Upload :multiple="true" @success="onSuccess" @abnormal="errorMethod" class="ml-3" v-model:loading="isOnloading">
                   <Button :loading="isOnloading">资源上传</Button>
             </Upload>
             </FromItem>

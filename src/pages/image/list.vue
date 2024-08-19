@@ -4,40 +4,35 @@
  */
  import api from "src/api";
  import * as model from "src/utils/model";
-import { ref } from "vue";
+import { ref,onMounted } from "vue";
 import {Icon} from "@ue/icon";
 import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
-import {Table, Button, Card, Form, FormItem, Input, Space, Select,message,Breadcrumb,BreadcrumbItem} from "ant-design-vue";
+import {Table, Button, Card, Form, FormItem, Input, Space, Select,message,Breadcrumb,BreadcrumbItem,Popconfirm,} from "ant-design-vue";
 import Upload from "src/components/upload/index.vue";
 import { FileData } from "src/utils/upload/common";
+import {ElSelect,ElOption} from "element-plus"
 
 
 const route = useRoute();
 console.log('Project ID = "%s"', route.params.projectId);
+const pageNumber = ref(1)
+const fromData = ref({})
+const tableDate = ref({})
+const versionOption =ref([])
 
-const versionInfos = ref([]);
-let versionInfo = {};
-const initVersioInfos = async () => {
-  try {
-    versionInfos.value = await api.version.geVersionInfoByPId(route.params.projectId);
-    console.log(versionInfos.value);
-    
-    versionInfos.value.forEach(element => {
-      if(element.versionStatus==1){
-        versionInfo = element
-      }
-    });
-    console.log('version');
-    console.log(versionInfo);
-    console.log('version');
-    
-  } catch (error) {
-    console.error("Failed to fetch task status:", error);
+
+
+const confirmDelete =async function (rowInfo:object){
+  if(rowInfo.taskName!=null||rowInfo.taskName!=undefined){
+    message.warning('当前图片还有任务关联，请先取消关联关系!')
+    return
   }
-};
+  
+  await api.version.deleteImageByVid(rowInfo.id);
+  onLoad(100)
+}
 
-initVersioInfos()
 
 const columns = [
   {title: "图片名称", dataIndex: 'imageName', key: 'imageName'},
@@ -52,29 +47,29 @@ const columns = [
   {title: "归档图片", dataIndex: 'deliveryImagePath', key: 'deliveryImagePath', align: "center"},
   {title: "关联任务", dataIndex: 'taskName', key: 'image', align: "center"},
   
-  {title: "操作", dataIndex: 'id', key: 'action', align: "right"},
+  {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
 ];
 
 const isOnloading = ref<boolean>(false);
 
-const {state, execute: onLoad, isLoading} = model.list<object>(
 
-  function () {
-    console.log('versionid');
-    console.log(versionInfo.id);
+const initTable = async function(){
+  const formData = {
+      'versionId':fromData.value.versionId||null,
+      'pageSize':10,
+      'pageNum':pageNumber.value,
+      'projectId': route.params.projectId,
+      'imageName':fromData.value.imageName||"",
+    } 
+    const res = await api.version.geVersionImageDetailPage(formData)
     
     
-    return api.version.geVersionImageDeailByVId(versionInfo.id);
-  },
-  new model.PageResult<object>([]),  
-  true
-);
+    
+    
+}
+
 let fileInfo: any[] = [];
 const onSuccess = async function (files: FileData[]) {
-  console.log('------');
-  
-  console.log(files);
-  
   files.forEach( s=>{
     fileInfo.push({
       'imageName':s.fileName,
@@ -82,14 +77,14 @@ const onSuccess = async function (files: FileData[]) {
       'originalImagePath':s.src,
       'imageType':s.type,
       'projectNum':versionInfo.projectNum,
-      'versionId':versionInfo.id
+      'versionId':FormData.value.versionId||""
   
     })
    
   })
   message.success("上传成功")
   api.version.addVersionImage(fileInfo);
-  onLoad(100)
+  initTable(100)
 
 }
 const openImage = function(data:string){
@@ -98,13 +93,23 @@ const openImage = function(data:string){
   window.open(data)
 }
 const searchImage = async function () {
-  onLoad(100)
+  initTable(100)
 }
 
 
 
-
-
+const changePage = function(page){
+  pageNumber.value = page
+  initTable()
+}
+onMounted(async () => {
+  try {
+    versionOption.value = await api.project.getVersionDict(route.params.projectId);
+    initTable()
+  } catch (error) {
+    console.error('Error fetching project info:', error);
+  }
+});
 
 </script>
 
@@ -124,10 +129,17 @@ const searchImage = async function () {
     <Card >
       <Form layout="inline">
         <FormItem label="画册">
-          <Select class="w-30"/>
+          <ElSelect v-model="fromData.versionId" placeholder="请选择画册" class="w-50" clearable >
+                    <ElOption
+                    v-for="item in versionOption"
+                    :key="item.versionId"
+                    :label="item.verisonName"
+                    :value="item.versionId">
+                    </ElOption>
+                </ElSelect>
         </FormItem>
         <FormItem label="图片名称">
-          <Input/>
+          <Input v-model:value="fromData.imageName"/>
         </FormItem>
         
         <FormItem>
@@ -149,7 +161,7 @@ const searchImage = async function () {
     </Card>
 
     <Card class="mt-5">
-      <Table :data-source="state.results"  :columns="columns" :bordered="true">
+      <Table :data-source="tableDate.rows" :pagination="false" :columns="columns" :bordered="true">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'name'">
             <RouterLink :to="{ name: alias.TaskDetails.name, params:{ projectId: record.projectId, taskId: record.id } }">
@@ -163,11 +175,20 @@ const searchImage = async function () {
           </template>
           <template v-else-if="column.key === 'action'">
           <span class="inline-block">
-            <Icon class="text-xl text-primary cursor-pointer" type="edit-square"></Icon>
+            <Popconfirm
+              title="确认需要删除当前图片信息吗?"
+              ok-text="Yes"
+              cancel-text="No"
+              @confirm="confirmDelete(record)"
+            >
+              <Icon class="text-xl text-primary cursor-pointer" type="delete"></Icon>
+            </Popconfirm>
+            
           </span>
           </template>
         </template>
       </Table>
+      <Pagination v-model:current="pageNumber" class="float-right" :total="tableDate.total" show-less-items @change="changePage" :show-total="total => `共 ${tableDate.total} 条`"/>
     </Card>
   </div>
 </template>
