@@ -3,7 +3,7 @@
  * @author svon.me@gmail.com
  */
 
-import { Delete, Get, Gql, Post, post, tryError, validate } from "@js-lion/api";
+import { Delete, Get, Gql, post, tryError, validate } from "@js-lion/api";
 
 import { PageResult } from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
@@ -16,7 +16,7 @@ export default class {
    */
   @tryError([])
   @Gql("/graphql")
-  async list(pageNum: number, projectId: number, pageSize: number = 3): Promise<PageResult<object>> {
+  async list(pageNum: number, projectId: number | string, pageSize: number = 3): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
       getProjectVersionPageList (input: { pageNum: ${pageNum},projectId: ${projectId}, pageSize: ${pageSize} }) {
@@ -42,9 +42,6 @@ export default class {
   @post("/project/version")
   @validate
   addVersion(data: object) {
-    const callback = function (res: object) {
-      return safeGet<number>(res, "code");
-    }
     // @ts-ignore
     return { data };
   }
@@ -53,9 +50,6 @@ export default class {
   @post("/project/images/batchAdd")
   @validate
   addVersionImage(data: object) {
-    const callback = function (res: object) {
-      return safeGet<number>(res, "code");
-    }
     // @ts-ignore
     return { data };
   }

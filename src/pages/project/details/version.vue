@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import { Icon } from "@ue/icon";
+import {Icon} from "@ue/icon";
 import * as alias from "src/router/alias";
 import {Table, Button} from "ant-design-vue";
 import * as model from "src/utils/model";
-import { useRoute } from 'vue-router';
-import { ref } from 'vue';
+import {useRoute} from 'vue-router';
+import {ref} from 'vue';
+
+import LanguagePair from "src/components/language/pair.vue";
 
 import api from "src/api";
-import {Progress,Pagination} from "ant-design-vue";
+import {Progress, Pagination} from "ant-design-vue";
 
 
-const route = useRoute();
-const projectId = route.params.projectId;
+const props = defineProps({
+  projectId: {
+    type: [String, Number],
+    required: true,
+  }
+});
+
 const pageNumber = ref(1)
 const columns = [
   {title: "画册名称", dataIndex: 'versionName', key: 'versionName'},
@@ -26,55 +33,21 @@ const columns = [
 const {state, execute: onLoad, isLoading} = model.list<object>(
   // 执行逻辑
   function () {
-    return api.version.list(pageNumber.value,projectId);
+    return api.version.list(pageNumber.value, props.projectId);
   },
   // 默认值，为空时自动创建
   new model.PageResult<object>([]),
   // 是否默认执行，默认为 false
-  
+
   true
 );
 
-
-const languageInfos = ref([]);
-const fetchLanguageInfo = async () => {
-  try {
-    languageInfos.value = await api.system.getDictData('comic_language_type');
-  } catch (error) {
-    console.error("Failed to fetch language:", error);
-  }
-};
-fetchLanguageInfo()
-//语言映射
-const changeLanguage = function(source:String){
- 
-  for (const element of languageInfos.value) {
-    if (source === element.code) {
-      return element.dictLabel;
-    }
-  
-  }
-  return '-';
-}
-const changePariLanguage = (source: string) => {
-  const [sourceLang, targetLang] = source.split("->");
-
-  const findLabelByCode = (code: string) => {
-    const language = languageInfos.value.find(element => element.code === code);
-    return language ? language.dictLabel : '';
-  };
-  const sourceRet = findLabelByCode(sourceLang);
-  const targetRet = findLabelByCode(targetLang);
-
-  return `${sourceRet} -> ${targetRet}`;
-};
-
 //进度计算
-const changeProcess = function(doneCount: number,allCount: number){
-  return (doneCount/allCount)*100;
+const changeProcess = function (doneCount: number, allCount: number) {
+  return (doneCount / allCount) * 100;
 }
 
-const changePage = function(page){
+const changePage = function (page: number) {
   pageNumber.value = page
   onLoad()
 }
@@ -82,7 +55,7 @@ const changePage = function(page){
 
 <template>
   <div>
-    <Table :data-source="state.results"  :pagination="false" :columns="columns" :bordered="true">
+    <Table :data-source="state.results" :pagination="false" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'versionName'">
           <RouterLink :to="{ name: alias.TaskList.name, params: { projectId:projectId,versionId: record.id } }">
@@ -90,11 +63,12 @@ const changePage = function(page){
           </RouterLink>
         </template>
         <template v-else-if="column.key === 'languagePair'">
-          {{changePariLanguage(record.languagePair)}}
+          <LanguagePair :value="record.languagePair"></LanguagePair>
         </template>
         <template v-else-if="column.key === 'doneCnt'">
-            <Progress :percent="changeProcess(record.doneCnt,record.totalCnt)" status="active" :showInfo="true" :format="percent => `${record.doneCnt} /${record.totalCnt}`" />
-          </template>
+          <Progress :percent="changeProcess(record.doneCnt,record.totalCnt)" status="active" :showInfo="true"
+                    :format="percent => `${record.doneCnt} /${record.totalCnt}`"/>
+        </template>
         <template v-else-if="column.key === 'action'">
           <span class="inline-block">
             <Icon class="text-xl text-primary cursor-pointer" type="edit-square"></Icon>
@@ -103,7 +77,8 @@ const changePage = function(page){
       </template>
     </Table>
     <br/>
-    <Pagination v-model:current="pageNumber" :defaultPageSize="3" class="float-right" :total="state.total" show-less-items @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
+    <Pagination v-model:current="pageNumber" :defaultPageSize="3" class="float-right" :total="state.total"
+                show-less-items @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
 
   </div>
 </template>

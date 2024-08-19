@@ -1,13 +1,13 @@
 //画册创建弹框
 import * as modal from "@ue/modal";
-import { h as createElement } from "vue";
-import { Input, DatePicker, Select } from "ant-design-vue";
+import {h as createElement} from "vue";
+import {Input, DatePicker, Select} from "ant-design-vue";
 import api from "src/api";
-import { RouterLink, useRoute } from "vue-router";
+import {RouterLink, useRoute} from "vue-router";
 import Upload from "src/components/upload/index.vue";
 import UploadPreview from "src/components/upload/preview.vue";
-import type { FileData } from "src/utils/upload/common";
-import { ref } from 'vue';
+import type {FileData} from "src/utils/upload/common";
+import {ref} from 'vue';
 
 const onSuccess = function (files: FileData[]) {
   console.log(files);
@@ -22,13 +22,13 @@ const fetchLanguageInfo = async () => {
   }
 };
 fetchLanguageInfo()
-const changeLanguage = function(source:String){
- 
+const changeLanguage = function (source: String) {
+
   for (const element of languageInfos.value) {
     if (source === element.code) {
       return element.dictLabel;
     }
-  
+
   }
   return '-';
 }
@@ -41,22 +41,20 @@ const onSubmit = function (formData: object) {
   formData.projectNum = projectInfo.projectNum
   formData.projectVersionImageVos = imageList
   console.log(formData);
-  
+
   api.version.addVersion(formData)
   return true;
 };
-let projectInfo: Object | undefined;  
-
-
+let projectInfo: Object | undefined;
 
 
 /**
  * @file 画册创建
  * @author svon.me@gmail.com
  */
-export const onCreate = async function (parma1: number) {
- 
-  projectInfo = await api.project.getProjectInfoById(parma1)
+export const onCreate = async function (projectId: number | string) {
+
+  projectInfo = await api.project.getProjectInfoById(projectId)
 
   projectInfo.languagePair = changeLanguage(projectInfo.sourceLanguage) + '->' + changeLanguage(projectInfo.targetLanguage)
 
@@ -72,7 +70,7 @@ export const onCreate = async function (parma1: number) {
         key: "language",
         label: "语言对",
         component: Input,
-        value:projectInfo.languagePair,
+        value: projectInfo.languagePair,
         props: {
           disabled: true
         }
@@ -84,9 +82,9 @@ export const onCreate = async function (parma1: number) {
         key: "startDate",
         label: "计划开始时间",
         component: DatePicker,
-        props:{
-          style:{
-            width:'100%'
+        props: {
+          style: {
+            width: '100%'
           }
         }
       },
@@ -94,9 +92,9 @@ export const onCreate = async function (parma1: number) {
         key: "endDate",
         label: "计划完成时间",
         component: DatePicker,
-        props:{
-          style:{
-            width:'100%'
+        props: {
+          style: {
+            width: '100%'
           }
         }
       },
@@ -126,7 +124,7 @@ export const onCreate = async function (parma1: number) {
 
       },
       slots: {
-        preview: ({ files, update }: { files: FileData[], update: (files: FileData[]) => void }) => {
+        preview: ({files, update}: { files: FileData[], update: (files: FileData[]) => void }) => {
           return createElement(UploadPreview, {
             list: files,
             onChange: update

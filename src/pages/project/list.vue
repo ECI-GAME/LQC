@@ -9,8 +9,12 @@ import LanguageDetail from "src/components/language/detail.vue";
 import {Table, Button, InputSearch, Pagination} from "ant-design-vue";
 import {useProject} from "src/utils/project";
 
+import type {Project} from 'src/types';
+
 const pageNumber = ref(1);
-const { create: onCreate } = useProject();
+const searchValue = ref<string>();
+const {create: onCreate} = useProject();
+
 const columns = [
   {title: "项目名称", dataIndex: 'projectName', key: 'projectName'},
   {title: "项目编号", dataIndex: 'projectNum', key: 'projectNum'},
@@ -23,35 +27,28 @@ const columns = [
   {title: "Actions", dataIndex: 'id', key: 'action', align: "right"},
 ];
 
-const {state, execute: onLoad, isLoading} = model.list<object>(
-  function () {
+const {state, execute: onLoad, isLoading} = model.list<object>(function () {
+  return api.project.list(pageNumber.value, searchValue.value);
+}, new model.PageResult<object>([]), true);
 
-    return api.project.list(pageNumber.value, searchValue.value);
-  },
-  new model.PageResult<object>([]),
-  true
-);
+const onSearch = function () {
+  onLoad(100)
+}
 
 const onCreateProject = async function () {
   const status = await onCreate();
-
   if (status) {
-    onLoad(100);
+    onSearch();
   }
 }
 
-const editFrom = async function (data: object) {
+const editFrom = async function (data: Project) {
   const status = await onCreate(data);
-
   if (status) {
-    onLoad(100);
+    onSearch();
   }
 }
 
-const onSearch = function () {
-  onLoad()
-}
-const searchValue = ref<string>('');
 const changePage = function (page: number) {
   pageNumber.value = page
   onLoad()
@@ -76,7 +73,6 @@ const changePage = function (page: number) {
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'projectName'">
           <RouterLink :to="{ name: alias.ProjectDetails.name, params: { projectId: record.id } }">
-            <!-- <RouterLink :to="{ name: alias.versionImage.name, params: { projectId: projectId } }"></RouterLink> -->
             <Button type="link">{{ text }}</Button>
           </RouterLink>
         </template>

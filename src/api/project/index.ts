@@ -11,7 +11,7 @@ import {$error, $success} from "@ue/message"
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 
-import type { Project } from "src/types";
+import type {Project} from "src/types";
 
 export default class extends Graphql {
   /**
@@ -79,19 +79,13 @@ export default class extends Graphql {
   }
 
   //根据ID查询项目信息
-  @Get("project/:projectId")
+  @Get("project/:id")
   @validate
-  getProjectInfoById(data: number) {
-    const params = {projectId: data};
+  getProjectInfoById(@required projectId: number | string): Promise<Project> {
+    const params = {id: projectId};
     // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
-    // @ts-ignore
-    return {data, params};
+    return {params};
   }
-
-
 
 
   //根据ID查询项目信息
