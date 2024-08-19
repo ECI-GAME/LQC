@@ -28,7 +28,11 @@ export default class extends GraphQL {
       "input": coordinateType ? `{ imageId: ${imageId}, coordinateType: ${coordinateType} }` : `{ imageId: ${imageId}, coordinateType: 0 }`
     };
     const res = await this.graphQL<{ data: T[] }>(name, [query], ["data"]);
-    return new PageResult<T>(res.data);
+    if (res) {
+      console.log(coordinateType, res);
+      return new PageResult<T>(res.data);
+    }
+    return new PageResult<T>();
   }
 
   @tryError(false)

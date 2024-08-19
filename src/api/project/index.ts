@@ -10,6 +10,8 @@ import {$error, $success} from "@ue/message"
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 
+import type { Project } from "src/types";
+
 export default class extends Graphql {
   /**
    * 用户详情
@@ -53,6 +55,7 @@ export default class extends Graphql {
     // @ts-ignore
     return {data};
   }
+
   //提交项目
   @tryError(false)
   @$error()
@@ -77,19 +80,15 @@ export default class extends Graphql {
     return {data, params};
   }
 
-    //根TaskID查询项目信息
-    @Get("project/taskId/:taskId")
-    @validate
-    getProjectInfoByTId(data: number) {
-      const params = { taskId: data };
-      // @ts-ignore
-      const callback = function (res: object) {
-        return safeGet<object>(res, "data");
-      }
-      // @ts-ignore
-      return { data, params };
-    }
-  
+  //根TaskID查询项目信息
+  @Get("project/taskId/:taskId")
+  @validate
+  getProjectInfoByTId(data: number | string): Promise<Project> {
+    const params = {taskId: data};
+    // @ts-ignore
+    return {params};
+  }
+
 
   //根据ID查询项目信息
   @Get("project/getProjectUser")

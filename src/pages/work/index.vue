@@ -24,11 +24,10 @@ import Loading from "src/components/loading/index.vue";
 import {TaskStatus} from "src/types";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space} from "ant-design-vue";
 
-import type {ImageData, TaskData} from "src/types";
+import type {ImageData, TaskData, Project} from "src/types";
 import type {DotData} from "src/components/preview/config";
 
 const previewRef = ref();
-const projectInfo = ref({});
 const route = useRoute();
 const recordActive = ref<string>();
 const recordTabs = ref<string[]>([]);
@@ -36,6 +35,10 @@ const dotAddTempValue = ref<DotData>();
 
 
 const currentFile = ref<ImageData>();
+// 任务详情
+const {state: projectInfo} = model.result<Project>(() => {
+  return api.project.getProjectInfoByTId(route.params.taskId as string);
+}, void 0, true);
 
 // 任务详情
 const {state: taskInfo} = model.result<TaskData>(async () => {
@@ -116,7 +119,6 @@ const onCancelDot = function () {
 }
 
 
-
 const onChangeTabValue = function () {
   onUpDataDots();
 }
@@ -158,6 +160,7 @@ const onSubmit = function () {
                    :data="currentFile"
                    :dots="dots.results"
                    :key="currentFile.id"
+                   :read-order="projectInfo.readOrder"
                    @dot="onChangeDot">
             <template #operate>
               <Switch :current="currentFile" :list="state.results"></Switch>

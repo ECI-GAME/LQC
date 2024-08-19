@@ -1,7 +1,7 @@
 <script setup lang="ts">
-
 import {DotType} from "src/components/preview/config";
-import { Descriptions, DescriptionsItem } from "ant-design-vue";
+import {Descriptions, DescriptionsItem} from "ant-design-vue";
+
 import type {PropType} from "vue";
 import type {DotData} from "src/components/preview/config";
 

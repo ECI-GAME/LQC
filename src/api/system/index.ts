@@ -17,7 +17,7 @@ export default class {
   @tryError(void 0)
   @Post("/ocrutil/identify", {responseType: "text"})
   @validate
-  ocr(@required image: File,readOrder: string): Promise<string> {
+  ocr(@required image: File, readOrder: string): Promise<string> {
     const data = new FormData();
     data.append("file", image);
     data.append("readOrder", readOrder);
