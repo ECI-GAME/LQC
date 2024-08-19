@@ -19,7 +19,7 @@ const getKey = function(scope: any) {
       <User></User>
     </div>
     <RouterView v-slot="scope">
-      <component :is="scope.Component" :key="getKey(scope)" class="p-4 md:p-6"/>
+      <component :is="scope.Component" :key="getKey(scope)" class="p-4 md:p-6"></component>
     </RouterView>
   </div>
 </template>

@@ -62,7 +62,7 @@ const editFrom = async function (data: Project) {
           @search="onSearch"
           class="w-100"
       />
-      <Button @click="onCreateProject">新建</Button>
+      <Button type="primary" @click="onCreateProject">新建</Button>
     </div>
 
     <Table class="mt-5" :loading="isLoading" :pagination="false" :data-source="state.results" :columns="columns"

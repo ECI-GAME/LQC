@@ -3,7 +3,6 @@ import {Icon} from "@ue/icon";
 import * as alias from "src/router/alias";
 import {Table, Button} from "ant-design-vue";
 import * as model from "src/utils/model";
-import {useRoute} from 'vue-router';
 import {ref} from 'vue';
 import Page from "src/components/page/index.vue";
 import LanguagePair from "src/components/language/pair.vue";
@@ -30,7 +29,7 @@ const columns = [
 ];
 
 // 构造当前列表数据对象
-const {state, execute: onLoad, isLoading} = model.list<object>(
+const {state, execute: onLoad} = model.list<object>(
   // 执行逻辑
   function () {
     return api.version.list(pageNumber.value, props.projectId);
@@ -38,7 +37,6 @@ const {state, execute: onLoad, isLoading} = model.list<object>(
   // 默认值，为空时自动创建
   new model.PageResult<object>([]),
   // 是否默认执行，默认为 false
-
   true
 );
 
