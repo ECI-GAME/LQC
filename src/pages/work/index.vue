@@ -57,7 +57,11 @@ const {state: taskInfo} = model.result<TaskData>(async () => {
 const {state, execute: _reloadList} = model.list<ImageData>(async function () {
   const res = await api.work.getImages<ImageData>(route.params.taskId as string);
   if (res.total > 0) {
-    currentFile.value = pickImage(res.results, route.params.workId as string);
+    if (route.params.workId) {
+      currentFile.value = pickImage(res.results, route.params.workId as string);
+    } else {
+      currentFile.value = res.results[0];
+    }
     setTimeout(onUpDataDots);
   }
   return res;

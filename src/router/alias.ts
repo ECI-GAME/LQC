@@ -68,7 +68,7 @@ export const Psd: RouteRecordBase = {
 
 export const Work: RouteRecordBase = {
   name: "Project Work",
-  path: "/work/:taskId/:workId",
+  path: "/work/:taskId/:workId?",
   meta: {
     type: PageType.work
   }

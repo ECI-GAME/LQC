@@ -5,51 +5,60 @@
 import api from "src/api";
 import * as model from "src/utils/model";
 import {ref} from 'vue';
-
+import Page from "src/components/page/index.vue";
 import {onCreate, columns} from "./config";
 import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
-import {Table, Button, Card, Form, FormItem, Input, Space, Progress, Breadcrumb, BreadcrumbItem} from "ant-design-vue";
+import {
+  Table,
+  Button,
+  Card,
+  Form,
+  FormItem,
+  Input,
+  Space,
+  Progress,
+  Breadcrumb,
+  BreadcrumbItem,
+  Tag
+} from "ant-design-vue";
 import {Icon} from "@ue/icon";
 
 
 const route = useRoute();
+const pageNumber = ref(1)
 const versionId: number = route.params.versionId as any;
 
-const taskStatus = ref([]);
-
-
-const initStatus = async () => {
-  try {
-    taskStatus.value = await api.system.getDictData('comic_task_status')
-  } catch (error) {
-    console.error("Failed to fetch language:", error);
-  }
-};
-initStatus()
 // 初始化集合
 const {state, execute: onLoad, isLoading} = model.list<object>(function () {
-    return api.task.list(1, versionId);
+    return api.task.list(pageNumber.value, versionId);
+  },
+  new model.PageResult<object>([]),
+  true
+);
+
+const {state: taskStatus} = model.list<object>(function () {
+    return api.system.getDictData('comic_task_status');
   },
   new model.PageResult<object>([]),
   true
 );
 
 
-const searchInfo = ()=>{
+const searchInfo = () => {
   onLoad(100)
 }
 const onCreateTask = async function () {
   console.log(versionId);
-  const res = await onCreate(versionId,1);
+  const res = await onCreate(versionId, 1);
   console.log(res);
   if (res) {
     await onLoad(100); // 100 毫秒后刷新列表
   }
 }
 
-const editFrom = async function (id:number) {
-  const status = await onCreate(id,2);
+const editFrom = async function (id: number) {
+  const status = await onCreate(id, 2);
 
   if (status) {
     onLoad(100);
@@ -57,22 +66,14 @@ const editFrom = async function (id:number) {
 }
 //状态映射
 const changeStatus = function (dict: String) {
-  console.log(dict);
-  console.log(taskStatus.value);
-  
-  for (const element of taskStatus.value) {
+  for (const element of taskStatus.value.results) {
     if (dict === element.dictValue) {
       return element.dictLabel;
     }
   }
   return '-';
 }
-const changePage = function(page){
-  pageNumber.value = page
-  onLoad()
-}
 
-const pageNumber = ref(1)
 //进度计算
 const changeProcess = function (doneCount: number, allCount: number) {
   return (doneCount / allCount) * 100;
@@ -92,26 +93,26 @@ const changeProcess = function (doneCount: number, allCount: number) {
 
     </Breadcrumb>
     <br/>
-    
-      <Form layout="inline">
-        <FormItem label="任务名称">
-          <Input/>
-        </FormItem>
-        <FormItem label="状态">
-          <Input/>
-        </FormItem>
-        <FormItem label="处理人">
-          <Input/>
-        </FormItem>
-        <FormItem>
-         
-          <Space>
-            <Button type="primary" @click="searchInfo">搜索</Button>
-            <Button>重置</Button>
-          </Space>
-        </FormItem>
-      </Form>
-    
+
+    <Form layout="inline">
+      <FormItem label="任务名称">
+        <Input/>
+      </FormItem>
+      <FormItem label="状态">
+        <Input/>
+      </FormItem>
+      <FormItem label="处理人">
+        <Input/>
+      </FormItem>
+      <FormItem>
+
+        <Space>
+          <Button type="primary" @click="searchInfo">搜索</Button>
+          <Button>重置</Button>
+        </Space>
+      </FormItem>
+    </Form>
+
 
     <Card class="mt-5 h-15">
       <Space size="large" class="ml-5 mt-2">
@@ -125,42 +126,35 @@ const changeProcess = function (doneCount: number, allCount: number) {
       <Table :data-source="state.results" :columns="columns" :bordered="true" :loading="isLoading">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'taskName'">
-            <!-- <RouterLink
-                :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }"> -->
-                <RouterLink
-                
-                :to="{ name: alias.Work.name, params:{ taskId: record.id,workId:record.relationId } }">
-                
-              <Button type="link">{{ record.taskName }}</Button>
+            <RouterLink :to="{ name: alias.Work.name, params:{ taskId: record.id,workId:record.relationId } }">
+              <Button type="link" class="px-0">{{ text }}</Button>
             </RouterLink>
           </template>
           <template v-else-if="column.key === 'taskStatus'">
             <span>{{ changeStatus(record.taskStatus) }}</span>
           </template>
-        
+          <template v-else-if="column.key === 'handlerName'">
+            <template v-for="name in text.split(';')" :key="name">
+              <Tag v-if="name" color="blue">{{ name }}</Tag>
+            </template>
+          </template>
           <template v-else-if="column.key === 'doneCnt'">
             <Progress :percent="changeProcess(record.doneCnt,record.totalCnt)" status="active" :showInfo="true"
-                      :format="percent => `${record.doneCnt} /${record.totalCnt}`"/>
+                      :format="() => `${record.doneCnt} /${record.totalCnt}`"/>
           </template>
-
           <template v-else-if="column.key === 'action'">
             <span class="inline-block">
               <Icon class="text-xl text-primary cursor-pointer" type="edit-square" @click="editFrom(record.id)"></Icon>
-              <RouterLink
-                :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }"> 
-                <Icon class="text-xl text-primary cursor-pointer ml-2" type="table"></Icon>
-            </RouterLink>
+                            <RouterLink
+                                :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }">
+                              <Icon class="text-xl text-primary cursor-pointer ml-2" type="table"></Icon>
+                          </RouterLink>
             </span>
-            <template>
-           
-            </template>
           </template>
-          
+          <template v-else>{{ text || "--" }}</template>
         </template>
-        
       </Table>
-      <br/>
-      <Pagination v-model:current="pageNumber" :defaultPageSize="3" class="float-right" :total="state.total" show-less-items @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
+      <Page :total="state.total" v-model:page="pageNumber" @click="searchInfo"></Page>
     </Card>
   </div>
 </template>
