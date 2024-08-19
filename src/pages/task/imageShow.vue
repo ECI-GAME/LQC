@@ -135,7 +135,7 @@ const formatImageName = (imageName: string) => {
 defineExpose({ onSubmit: onSave })
 
 </script>
-<style>
+<style scoped>
 .ant-card-body {
   padding: 2px !important;
 }

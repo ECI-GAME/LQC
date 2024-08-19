@@ -82,40 +82,30 @@ const changeProcess = function (doneCount: number, allCount: number) {
 
 <template>
   <div>
-    <Breadcrumb v-if="versionId">
-      <BreadcrumbItem>Home</BreadcrumbItem>
-      <BreadcrumbItem>
-        <RouterLink :to="{ name: alias.ProjectDetails.name, params:{ projectId: route.params.projectId } }">
-          <a href="">项目中心</a>
-        </RouterLink>
-      </BreadcrumbItem>
-      <BreadcrumbItem>任务列表</BreadcrumbItem>
+    <Card>
+      <Form layout="inline">
+        <FormItem label="任务名称">
+          <Input/>
+        </FormItem>
+        <FormItem label="状态">
+          <Input/>
+        </FormItem>
+        <FormItem label="处理人">
+          <Input/>
+        </FormItem>
+        <FormItem>
 
-    </Breadcrumb>
-    <br/>
-
-    <Form layout="inline">
-      <FormItem label="任务名称">
-        <Input/>
-      </FormItem>
-      <FormItem label="状态">
-        <Input/>
-      </FormItem>
-      <FormItem label="处理人">
-        <Input/>
-      </FormItem>
-      <FormItem>
-
-        <Space>
-          <Button type="primary" @click="searchInfo">搜索</Button>
-          <Button>重置</Button>
-        </Space>
-      </FormItem>
-    </Form>
+          <Space>
+            <Button type="primary" @click="searchInfo">搜索</Button>
+            <Button>重置</Button>
+          </Space>
+        </FormItem>
+      </Form>
+    </Card>
 
 
-    <Card class="mt-5 h-15">
-      <Space size="large" class="ml-5 mt-2">
+    <Card class="mt-5">
+      <Space size="large">
         <Button @click="onCreateTask" type="primary">新建任务</Button>
         <Button>生成交付文件</Button>
         <Button>归档</Button>

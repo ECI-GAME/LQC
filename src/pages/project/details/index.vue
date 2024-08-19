@@ -7,7 +7,7 @@ import * as alias from "src/router/alias";
 import {onCreate} from "src/utils/version";
 import Loading from "src/components/loading/index.vue";
 import LanguageDetail from "src/components/language/detail.vue";
-import {Descriptions, DescriptionsItem, Card, Button, Space, Breadcrumb, BreadcrumbItem} from 'ant-design-vue';
+import {Descriptions, DescriptionsItem, Card, Button, Space} from 'ant-design-vue';
 
 import type {Project} from "src/types";
 
@@ -31,16 +31,6 @@ const onCreateVersion = async function () {
 
 <template>
   <div>
-    <Breadcrumb>
-      <BreadcrumbItem>Home</BreadcrumbItem>
-      <BreadcrumbItem>
-        <RouterLink :to="{ name: alias.ProjectList.name }">
-          <a href="">项目列表</a>
-        </RouterLink>
-      </BreadcrumbItem>
-      <BreadcrumbItem>项目中心</BreadcrumbItem>
-    </Breadcrumb>
-
     <template v-if="isReady">
       <Card>
         <template #title>{{ projectInfo.projectName }} ({{ projectInfo.projectStatus }})</template>

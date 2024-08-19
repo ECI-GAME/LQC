@@ -24,7 +24,10 @@ export const ProjectList: RouteRecordBase = {
 
 export const ProjectDetails: RouteRecordBase = {
   name: "Project Details",
-  path: "/project/:projectId"
+  path: "/project/:projectId",
+  meta: {
+    breadcrumb: "project/details.vue"
+  },
 }
 
 
@@ -35,7 +38,10 @@ export const VersionImage: RouteRecordBase = {
 
 export const TaskList: RouteRecordBase = {
   name: "Project Task List",
-  path: "/task/:projectId/:versionId?"
+  path: "/task/:projectId/:versionId",
+  meta: {
+    breadcrumb: "task/list.vue"
+  },
 }
 
 export const TaskDetails: RouteRecordBase = {
