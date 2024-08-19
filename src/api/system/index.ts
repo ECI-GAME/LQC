@@ -1,3 +1,4 @@
+import cache from "src/utils/cache";
 import {PageResult} from "src/utils/model";
 import {validate, required, Get, Post, tryError} from "@js-lion/api";
 
@@ -6,6 +7,7 @@ export default class {
    * 枚举列表
    **/
   @tryError(new PageResult<object>())
+  @cache()
   @Get("/system/dict/data/type/:name")
   @validate
   getDictData<T = object>(@required name: string): Promise<PageResult<T>> {

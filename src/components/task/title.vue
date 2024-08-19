@@ -1,8 +1,8 @@
 <script setup lang="ts">
-
 import api from "src/api";
 import {Space} from "ant-design-vue";
 import * as model from "src/utils/model";
+import LanguageDetail from "src/components/language/detail.vue";
 
 import type {PropType} from "vue";
 import type {TaskData, LanguageData} from "src/types";
@@ -24,29 +24,6 @@ const {state, isReady} = model.result<TaskData>(() => {
   }
   return api.task.getTaskInfoById(props.taskId);
 }, void 0, true);
-
-// 语言列表
-const {state: Language} = model.list<LanguageData>(() => {
-    return api.system.getDictData<LanguageData>('comic_language_type');
-  },
-  new model.PageResult<LanguageData>([]),
-  true
-);
-
-//语言映射
-const findLanguageValue = function (dict: string) {
-  let value = "-";
-  const res = Language.value;
-  for (const element of res.results) {
-    if (dict === element.code) {
-      value = element.dictLabel;
-      break;
-    }
-  }
-  return value;
-}
-
-
 </script>
 
 <template>
@@ -57,9 +34,7 @@ const findLanguageValue = function (dict: string) {
         [<label class="text-red-600">{{ state.estimatedStartDate }} ~ {{ state.estimatedEndDate }}</label>]
       </span>
       <span>
-        [<label class="text-blue-600">
-          {{ findLanguageValue(state.sourceLanguage) }}->{{ findLanguageValue(state.targetLanguage) }}
-        </label>]
+        [<LanguageDetail class="text-blue-600" :value="state"></LanguageDetail>]
       </span>
       <span>
         [<label class="text-green-600">{{ state.handlerName }}</label>]

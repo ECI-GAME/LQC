@@ -4,6 +4,7 @@
  */
 
 import Graphql from "../graphql";
+import cache from "src/utils/cache";
 import {Delete, Get, Gql, post, tryError, validate, required} from "@js-lion/api";
 import {$error, $success} from "@ue/message"
 
@@ -187,6 +188,7 @@ export default class extends Graphql {
    * @returns UserIfno
    */
   @tryError([])
+  @cache()
   @validate
   async projectErrorType(@required projectId: string | number): Promise<PageResult<object>> {
     const name: string = "getProjectErrorTypeList";
