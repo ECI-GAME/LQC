@@ -28,6 +28,7 @@ import type {ImageData, TaskData} from "src/types";
 import type {DotData} from "src/components/preview/config";
 
 const previewRef = ref();
+const projectInfo = ref({});
 const route = useRoute();
 const recordActive = ref<string>();
 const recordTabs = ref<string[]>([]);
@@ -113,6 +114,7 @@ const onEditLocation = function (id: string | number) {
 const onCancelDot = function () {
   dotAddTempValue.value = void 0;
 }
+
 
 
 const onChangeTabValue = function () {

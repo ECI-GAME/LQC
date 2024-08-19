@@ -36,8 +36,16 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: () => false,
-  }
+  },
+  readOrder: {
+    type: String,
+    required: true,
+  },
 });
+console.log("readOrder:"+props.readOrder);
+console.log("readOrder:"+typeof(props.readOrder));
+console.log(props.src);
+
 
 const boxRef = ref();
 const imageRef = ref();
@@ -117,11 +125,14 @@ const onClickDotButton = async function (res: object) {
       if (value) {
         // base64 数据转换为 File 对象
         const img = ImageUtil.base64ToImage(value);
+        
+        
         // 上传 File 获取图片地址
         const upload = new Upload([img]);
         const [data, text] = await Promise.all([
           upload.start(),
-          api.system.ocr(img)
+          //api.system.ocr(img)
+          api.system.ocr(img,props.readOrder)
         ]);
         if (data && data[0]) {
           const image = format(data[0]);

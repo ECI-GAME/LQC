@@ -1,7 +1,9 @@
 <!-- src/components/ImageShow.vue -->
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue';
-import { Image, Card, Checkbox, Divider, Row, Col,Upload,Button,message } from "ant-design-vue";
+import { Image, Card, Checkbox, Divider, Row, Col,Button,message } from "ant-design-vue";
+import Upload from "src/components/upload/index.vue";
+
 import {ElButton} from "element-plus"
 
 import api from "src/api";
@@ -10,12 +12,17 @@ const $emit = defineEmits(["submit","cancel"])
 const props = defineProps({
   versionId: {
     type: [Number, String],
+  },
+  projectNum: {
+    type: [String, String],
+  },
+  taskId:{
+    type: [Number, String],
   }
 });
 
 
-console.log(props.versionId);
-
+console.log(props.projectNum);
 const open = ref<boolean>(true);
 
 const state = reactive({
@@ -48,6 +55,9 @@ const initImage = async () => {
     imageInfos.value = await api.version.geVersionImageById(props.versionId);
     imageInfos.value.forEach(s=>{
       s.checkStatus = false;
+      if(props.taskId!=0&&props.taskId ==s.taskId ){
+        s.checkStatus = true;
+      }
     })
     
     console.log(imageInfos.value);
@@ -62,34 +72,29 @@ initImage()
 
 
 
-
+const isOnloading = ref<boolean>(false);
 
 let fileInfo: any[] = [];
 const onSuccess = async function (files: FileData[]) {
-  console.log('------');
-  
-  console.log(files);
-  
   files.forEach( s=>{
     fileInfo.push({
       'imageName':s.fileName,
       'imageSize':s.size,
       'originalImagePath':s.src,
       'imageType':s.type,
-      'versionId':versionId
+      'projectNum':props.projectNum,
+      'versionId':props.versionId
   
     })
    
   })
-  console.log(fileInfo);
-  console.log('------');
   message.success("上传成功")
-  api.version.addVersionImage(fileInfo);
-  onLoad(100)
+  await api.version.addVersionImage(fileInfo);
+  initImage()
 
 }
 let imageIds = []
-const submitFrom = ()=>{
+const submitFrom =async function(){
   imageInfos.value.forEach(e=>{
     if(e.checkStatus){
       imageIds.push({id: e.id})
@@ -99,6 +104,17 @@ const submitFrom = ()=>{
     message.error('请至少选择一张图片!')
     return
   }
+  // 有ID直接更新
+  if(props.taskId!=0){
+    imageIds.forEach(e=>{
+      e.taskId = props.taskId
+    })
+    const res = await api.task.updateImageInfo(imageIds)
+    console.log(res);
+    
+    
+  }
+
   $emit("submit");
 }
 
@@ -139,8 +155,8 @@ defineExpose({ onSubmit: onSave })
     <Checkbox v-model:checked="state.checkAll" class="ml-5 mt-5" @change="onCheckAllChange">
       全选
     </Checkbox>
-    <Upload :multiple="true" @success="onSuccess" v-model:loading="isOnloading" class="float-right mt-2">
-          <Button type="primary":loading="isOnloading">图片上传</Button>
+        <Upload :multiple="true" @success="onSuccess" class="float-right" v-model:loading="isOnloading">
+            <Button :loading="isOnloading">图片上传</Button>
         </Upload>
     <Divider class="mt-2 mb-2" />
 

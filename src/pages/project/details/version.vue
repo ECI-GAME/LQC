@@ -7,12 +7,12 @@ import { useRoute } from 'vue-router';
 import { ref } from 'vue';
 
 import api from "src/api";
-import {Progress} from "ant-design-vue";
+import {Progress,Pagination} from "ant-design-vue";
 
 
 const route = useRoute();
 const projectId = route.params.projectId;
-
+const pageNumber = ref(1)
 const columns = [
   {title: "画册名称", dataIndex: 'versionName', key: 'versionName'},
   {title: "语言对", dataIndex: 'languagePair', key: 'languagePair', align: "center"},
@@ -26,7 +26,7 @@ const columns = [
 const {state, execute: onLoad, isLoading} = model.list<object>(
   // 执行逻辑
   function () {
-    return api.version.list(1,projectId);
+    return api.version.list(pageNumber.value,projectId);
   },
   // 默认值，为空时自动创建
   new model.PageResult<object>([]),
@@ -73,11 +73,16 @@ const changePariLanguage = (source: string) => {
 const changeProcess = function(doneCount: number,allCount: number){
   return (doneCount/allCount)*100;
 }
+
+const changePage = function(page){
+  pageNumber.value = page
+  onLoad()
+}
 </script>
 
 <template>
   <div>
-    <Table :data-source="state.results" :columns="columns" :bordered="true">
+    <Table :data-source="state.results"  :pagination="false" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'versionName'">
           <RouterLink :to="{ name: alias.TaskList.name, params: { projectId:projectId,versionId: record.id } }">
@@ -97,5 +102,8 @@ const changeProcess = function(doneCount: number,allCount: number){
         </template>
       </template>
     </Table>
+    <br/>
+    <Pagination v-model:current="pageNumber" :defaultPageSize="3" class="float-right" :total="state.total" show-less-items @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
+
   </div>
 </template>

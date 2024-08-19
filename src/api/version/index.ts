@@ -16,13 +16,14 @@ export default class {
    */
   @tryError([])
   @Gql("/graphql")
-  async list(pageNum: number, projectId: number, pageSize: number = 20): Promise<PageResult<object>> {
+  async list(pageNum: number, projectId: number, pageSize: number = 3): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
       getProjectVersionPageList (input: { pageNum: ${pageNum},projectId: ${projectId}, pageSize: ${pageSize} }) {
         code
         rows
         msg
+        total
       }
     }`;
     const callback = function (res: object) {

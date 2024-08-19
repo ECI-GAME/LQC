@@ -44,6 +44,17 @@ const fetchLanguageInfo = async () => {
   }
 };
 fetchLanguageInfo()
+
+const readOrders = ref([]);
+const fetchReadOrderInfo = async () => {
+  try {
+    readOrders.value = await api.system.getDictData('comic_image_read_order');
+  } catch (error) {
+    console.error("Failed to fetch language:", error);
+  }
+};
+
+fetchReadOrderInfo()
 /**
  * @file 项目创建
  * @author svon.me@gmail.com
@@ -111,13 +122,23 @@ export const onCreate = async function (data) {
         label: "发行商",
         component: Input,
       },
+      // {
+      //   key: "imageType",
+      //   value:projectInfo.value.imageType,
+      //   label: "交付图片格式",
+      //   component: Input,
+      // },
       {
-        key: "imageType",
-        value:projectInfo.value.imageType,
-        label: "交付图片格式",
-        component: Input,
+        //comic_image_read_order
+        key: "readOrder",
+        value:projectInfo.value.readOrder,
+        label: "阅读顺序",
+        component: Select,
+        props:{
+          fieldNames: { label: "dictLabel", value: "dictValue" },
+          options: readOrders.value
+        }
       },
-     
     ],
     [
       {
@@ -143,6 +164,8 @@ export const onCreate = async function (data) {
         }
       },
     ],
+    
+     
     {
       key: "remarks",
       value:projectInfo.value.remarks,

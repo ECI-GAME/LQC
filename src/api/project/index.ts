@@ -53,7 +53,6 @@ export default class extends Graphql {
     // @ts-ignore
     return {data};
   }
-
   //提交项目
   @tryError(false)
   @$error()
@@ -64,7 +63,6 @@ export default class extends Graphql {
     // @ts-ignore
     return {data};
   }
-
 
   //根据ID查询项目信息
   @Get("project/:projectId")
@@ -78,6 +76,20 @@ export default class extends Graphql {
     // @ts-ignore
     return {data, params};
   }
+
+    //根TaskID查询项目信息
+    @Get("project/taskId/:taskId")
+    @validate
+    getProjectInfoByTId(data: number) {
+      const params = { taskId: data };
+      // @ts-ignore
+      const callback = function (res: object) {
+        return safeGet<object>(res, "data");
+      }
+      // @ts-ignore
+      return { data, params };
+    }
+  
 
   //根据ID查询项目信息
   @Get("project/getProjectUser")
