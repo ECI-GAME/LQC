@@ -16,7 +16,12 @@ const languageInfos = ref([]);
 
 const fetchLanguageInfo = async () => {
   try {
-    languageInfos.value = await api.system.getDictData('comic_language_type');
+    languageInfos.value = await  api.system.getDictData<Object>('comic_language_type');
+    console.log('------');
+    
+    
+    console.log(languageInfos.value.results);
+    console.log('------');
   } catch (error) {
     console.error("Failed to fetch language:", error);
   }
@@ -24,7 +29,7 @@ const fetchLanguageInfo = async () => {
 fetchLanguageInfo()
 const changeLanguage = function (source: String) {
 
-  for (const element of languageInfos.value) {
+  for (const element of languageInfos.value.results) {
     if (source === element.code) {
       return element.dictLabel;
     }
@@ -45,23 +50,33 @@ const onSubmit = function (formData: object) {
   api.version.addVersion(formData)
   return true;
 };
+
+const onUpdate = function (formData: object) {
+  formData.id = versionInfo.id
+  api.version.updateVersion(formData)
+  return true;
+};
 let projectInfo: Object | undefined;
+let versionInfo: Object | undefined;
 
 
 /**
  * @file 画册创建
  * @author svon.me@gmail.com
  */
-export const onCreate = async function (projectId: number | string) {
-
+export const onCreate = async function (projectId: number | string,type:number,versionId: number | string) {
   projectInfo = await api.project.getProjectInfoById(projectId)
-
   projectInfo.languagePair = changeLanguage(projectInfo.sourceLanguage) + '->' + changeLanguage(projectInfo.targetLanguage)
-
+  
+  if(type==1){
+    versionInfo = await api.version.geVersionInfoById(versionId)
+  }
   return modal.form([
+    
     [
       {
         key: "versionName",
+        value : versionInfo.versionName,
         label: "画册名称",
         component: Input,
 
@@ -100,8 +115,9 @@ export const onCreate = async function (projectId: number | string) {
       },
     ],
     {
-      key: "projectExplain",
+      key: "remark",
       label: "备注",
+      value: versionInfo.remark,
       component: Input.TextArea,
     },
     {
@@ -134,10 +150,10 @@ export const onCreate = async function (projectId: number | string) {
     },
 
   ], {
-    title: "新建画册",
+    title: type==0?"新建画册":"修改画册",
     width: 480,
     buttonClassName: ["pb-5"],
-    okText: "Submit",
-    onOk: onSubmit
+    okText: type==0?"Submit":"修改",
+    onOk: type==0?onSubmit:onUpdate
   });
 }

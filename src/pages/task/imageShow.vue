@@ -136,9 +136,7 @@ defineExpose({ onSubmit: onSave })
 
 </script>
 <style scoped>
-.ant-card-body {
-  padding: 2px !important;
-}
+
 .card-container {  
   display: flex;
   flex-wrap: wrap;
@@ -146,8 +144,10 @@ defineExpose({ onSubmit: onSave })
   padding: 10px;
   align-items: center
 }  
-  
-  
+
+::v-deep .ant-card-body{
+  padding: 0px !important;
+}
 </style>
 <template>
   <div class="ml-4 mr-5 mt-5 mb-5">
@@ -162,16 +162,17 @@ defineExpose({ onSubmit: onSave })
 
   
       <div class="card-container">
-      <Card class="card flex-card mt-5  ml-4" hoverable style="width: 100px;height:155px"   v-for="item in imageInfos"  :key="item.id" >
-        <template #cover>
-          <Image alt="example" class="object-cover" :src="item.originalImagePath" height="120px"/>
-        </template>
-        
-        <Checkbox class="mt-2" v-model:checked="item.checkStatus">
-        </Checkbox>
-       <label>{{ formatImageName(item.imageName) }}</label> 
-      </Card>
+        <Card class="card flex-card mt-5  ml-4" hoverable style="width: 100px;height:155px"   v-for="item in imageInfos"  :key="item.id" >
+          <template #cover>
+            <Image alt="example" class="object-cover" :src="item.originalImagePath" height="120px"/>
+          </template>
+          
+          <Checkbox class="mt-2" v-model:checked="item.checkStatus">
+          </Checkbox>
+        <label>{{ formatImageName(item.imageName) }}</label> 
+        </Card>
     </div>
+    <br/>
     <div class="text-right">
       <ElButton type="primary" @click="submitFrom">保存</ElButton>
       <ElButton type="info" @click="cancelFrom">取消</ElButton>

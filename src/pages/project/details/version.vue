@@ -9,6 +9,7 @@ import LanguagePair from "src/components/language/pair.vue";
 
 import api from "src/api";
 import {Progress, Pagination} from "ant-design-vue";
+import {onCreate} from "src/utils/version";
 
 
 const props = defineProps({
@@ -25,7 +26,7 @@ const columns = [
   {title: "状态", dataIndex: 'status', key: 'status', align: "center"},
   {title: "时间区域", dataIndex: 'dateInterval', key: 'dateInterval', align: "center"},
   {title: "画册进度", dataIndex: 'doneCnt', key: 'doneCnt', align: "center"},
-  {title: "操作", dataIndex: 'id', key: 'action', align: "right"},
+  {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
 ];
 
 // 构造当前列表数据对象
@@ -45,8 +46,18 @@ const changeProcess = function (doneCount: number, allCount: number) {
   return (doneCount / allCount) * 100;
 }
 
-const changePage = function () {
+const changePage = function (page: number) {
+  pageNumber.value = page
   onLoad()
+}
+const onUpdateVersion = async function (versionId:number) {
+
+// 创建项目
+const status = await onCreate(props.projectId as string,1,versionId);
+// 状态判断
+if (status) {
+  window.location.reload();
+}
 }
 </script>
 
@@ -68,7 +79,7 @@ const changePage = function () {
         </template>
         <template v-else-if="column.key === 'action'">
           <span class="inline-block">
-            <Icon class="text-xl text-primary cursor-pointer" type="edit-square"></Icon>
+            <Icon class="text-xl text-primary cursor-pointer" @click="onUpdateVersion(record.id)" type="edit-square"></Icon>
           </span>
         </template>
       </template>

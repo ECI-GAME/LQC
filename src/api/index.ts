@@ -5,6 +5,7 @@ import Version from "./version/index";
 import Task from "./task/index";
 import Work from "./work/index";
 import knowLedge from "./knowLedge";
+import Common from "./common";
 
 
 export class Api {
@@ -15,6 +16,7 @@ export class Api {
   task: Task = new Task();
   work: Work = new Work();
   knowLedge: knowLedge = new knowLedge();
+  Common: Common = new Common();
 }
 
 export default new Api();

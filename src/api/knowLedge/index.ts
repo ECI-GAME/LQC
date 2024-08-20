@@ -34,13 +34,14 @@ export default class {
    */
   @tryError([])
   @Gql("/graphql")
-  async textList(pageNum: number, projectId:number,versionId:number=0,searchValue:string = ""  ,pageSize: number = 20): Promise<PageResult<object>> {
+  async textList(pageNum: number, projectId:number,versionId:number=0,searchValue:string = ""  ,pageSize: number = 10): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
       getProjectTextResourcePage (input: { pageNum: ${pageNum},projectId: ${projectId},versionId:${versionId},searchValue:"${searchValue}", pageSize: ${pageSize} }) {
         code
         rows
         msg
+        total
       }
     }`;
     const callback = function (res: object) {

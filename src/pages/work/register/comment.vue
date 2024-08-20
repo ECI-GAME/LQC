@@ -49,7 +49,7 @@ const getResult = function () {
   const data = {
     ...formData.value,
     taskId: safeGet<string | number>(props.file, "taskId"),  //任务ID
-    imageId: safeGet<string | number>(props.file, "id"),     //图片ID
+    imageId: safeGet<string | number>(props.file, "imageId"),     //图片ID
     xCorrdinate1: props.data.xCorrdinate1,
     yCorrdinate1: props.data.yCorrdinate1,
     xCorrdinate2: props.data.xCorrdinate2,

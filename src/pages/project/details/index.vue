@@ -21,7 +21,9 @@ const {
 const onCreateVersion = async function () {
 
   // 创建项目
-  const status = await onCreate(route.params.projectId as string);
+  
+  const status = await onCreate(route.params.projectId as string,0,0);
+
   // 状态判断
   if (status) {
     window.location.reload();
