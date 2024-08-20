@@ -8,7 +8,7 @@ import { ref,onMounted } from "vue";
 import {Icon} from "@ue/icon";
 import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
-import {Table, Button, Card, Form, FormItem, Input, Space, Select,message,Breadcrumb,BreadcrumbItem,Popconfirm,} from "ant-design-vue";
+import {Table, Button, Card, Form, FormItem, Input, Space, Select,message,Breadcrumb,BreadcrumbItem,Popconfirm,Pagination} from "ant-design-vue";
 import Upload from "src/components/upload/index.vue";
 import { FileData } from "src/utils/upload/common";
 import {ElSelect,ElOption} from "element-plus"
@@ -53,59 +53,82 @@ const columns = [
 const isOnloading = ref<boolean>(false);
 
 
-const initTable = async function(){
-  const formData = {
-      'versionId':fromData.value.versionId||null,
-      'pageSize':10,
-      'pageNum':pageNumber.value,
-      'projectId': route.params.projectId,
-      'imageName':fromData.value.imageName||"",
-    } 
-    const res = await api.version.geVersionImageDetailPage(formData)
-    
-    
-    
-    
-}
+let projectInfo = {};
+const initVersioInfos = async () => {
+  try {
+    projectInfo.value = await api.project.getProjectInfoById(route.params.projectId);
+  } catch (error) {
+    console.error("Failed to fetch task status:", error);
+  }
+};
+initVersioInfos()
+
+const {state, execute: onLoad, isLoading} = model.list<object>(function () {
+  if(fromData.value.imageName==undefined){
+      fromData.value.imageName = ""
+  }
+  return api.version.geVersionImageDetailPage(fromData.value.versionId,pageNumber.value,10,route.params.projectId,fromData.value.imageName)
+}, new model.PageResult<object>([]), true);
+
 
 let fileInfo: any[] = [];
 const onSuccess = async function (files: FileData[]) {
-  files.forEach( s=>{
-    fileInfo.push({
-      'imageName':s.fileName,
-      'imageSize':s.size,
-      'originalImagePath':s.src,
-      'imageType':s.type,
-      'projectNum':versionInfo.projectNum,
-      'versionId':FormData.value.versionId||""
-  
-    })
-   
-  })
-  message.success("上传成功")
-  api.version.addVersionImage(fileInfo);
-  initTable(100)
+  var imageCName = '';
+  let allImagesValid = true;
+  debugger
+  for (const s of files) {
+    const res = await api.version.checkImage(fromData.value.versionId, s.fileName);
 
+    if (res > 0) {
+      imageCName = s.fileName;
+      message.error("文件名称重复，请重命名：" + imageCName);
+      allImagesValid = false;
+      break; 
+    }
+
+    fileInfo.push({
+      'imageName': s.fileName,
+      'imageSize': s.size,
+      'originalImagePath': s.src,
+      'imageType': s.type,
+      'projectNum': projectInfo.value.projectNum,
+      'versionId': fromData.value.versionId || ""
+    });
+  }
+
+  if (allImagesValid && fileInfo.length === files.length) {
+    message.success("上传成功");
+    await api.version.addVersionImage(fileInfo); 
+    fileInfo = []
+    onLoad(100);
+    
+  }
 }
+
 const openImage = function(data:string){
-  console.log(data);
-  
   window.open(data)
 }
 const searchImage = async function () {
-  initTable(100)
+  onLoad(100)
 }
 
 
 
 const changePage = function(page){
   pageNumber.value = page
-  initTable()
+  onLoad()
 }
 onMounted(async () => {
   try {
     versionOption.value = await api.project.getVersionDict(route.params.projectId);
-    initTable()
+    console.log(versionOption.value);
+    
+    if(versionOption.value.length==0){
+      message.warning('请先创建画册！')
+      return
+    }
+    fromData.value.versionId = versionOption.value[0].versionId
+    onLoad()
   } catch (error) {
     console.error('Error fetching project info:', error);
   }
@@ -134,7 +157,8 @@ onMounted(async () => {
                     v-for="item in versionOption"
                     :key="item.versionId"
                     :label="item.verisonName"
-                    :value="item.versionId">
+                    :value="item.versionId"
+                    >
                     </ElOption>
                 </ElSelect>
         </FormItem>
@@ -154,14 +178,14 @@ onMounted(async () => {
     <Card class="mt-5" >
       <Space size="large">
         <Upload :multiple="true" @success="onSuccess" v-model:loading="isOnloading">
-          <Button :loading="isOnloading">图片上传</Button>
+          <Button :loading="isOnloading" :disabled="!fromData.versionId">图片上传</Button>
         </Upload>
             
       </Space>
     </Card>
 
     <Card class="mt-5">
-      <Table :data-source="tableDate.rows" :pagination="false" :columns="columns" :bordered="true">
+      <Table v-if="state" :data-source="state.results" :pagination="false" :columns="columns" :bordered="true">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'name'">
             <RouterLink :to="{ name: alias.TaskDetails.name, params:{ projectId: record.projectId, taskId: record.id } }">
@@ -188,7 +212,7 @@ onMounted(async () => {
           </template>
         </template>
       </Table>
-      <Pagination v-model:current="pageNumber" class="float-right" :total="tableDate.total" show-less-items @change="changePage" :show-total="total => `共 ${tableDate.total} 条`"/>
+      <Pagination v-if="state" v-model:current="pageNumber" class="float-right" :total="state.total" show-less-items @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
     </Card>
   </div>
 </template>

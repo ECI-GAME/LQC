@@ -8,7 +8,7 @@ import {preview} from "src/utils/brower/image";
 import {ElImage as Image} from 'element-plus';
 import safeGet from "@fengqiaogang/safe-get";
 import Textarea from "./textarea.vue";
-import {Card, Form, FormItem, Select, SelectOption, Button, Descriptions, DescriptionsItem} from "ant-design-vue";
+import {Card, Form, FormItem, Select, SelectOption, Button, Spin, Descriptions, DescriptionsItem} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import type {DotData} from "src/components/preview/config";
@@ -45,7 +45,7 @@ const getResult = function () {
   return {
     ...model.value,
     taskId: safeGet<string | number>(props.file, "taskId"),  //任务ID
-    imageId: safeGet<string | number>(props.file, "id"),     //图片ID
+    imageId: safeGet<string | number>(props.file, "imageId"),     //图片ID
     imageName: props.data.imageName || basename(props.data.imagePath),    //图片名称
     imagePath: props.data.imagePath,              //图片路径
     xCorrdinate1: props.data.xCorrdinate1,
@@ -76,6 +76,25 @@ const onSave = async function () {
 
 const onCancel = function () {
   $emit("cancel");
+}
+const spinning = ref<boolean>(false);
+const translateUuid = ref<number>(Math.random());
+//google机翻接口
+const translateMt = async function () {
+  console.log(model.value.originalText);
+  console.log(props.file.taskId);
+  spinning.value = true
+  const fromData = {
+    'taskId': props.file.taskId,
+    'content': model.value.originalText
+  }
+  const res = await api.Common.googleMt(fromData);
+  if (res.content) {
+    model.value.translatedText = res.content;
+    model.value.translatedHtml = res.content;
+    translateUuid.value = Math.random();
+  }
+  spinning.value = false
 }
 
 const onChangeTranslationList = function (data: string[][]) {
@@ -119,7 +138,10 @@ const onChangeTranslationList = function (data: string[][]) {
               <span>原文</span>
             </div>
             <div>
-              <Icon class="text-xl text-primary cursor-pointer" type="font-size"></Icon>
+              <Spin :spinning="spinning">
+                <Icon class="text-xl text-primary cursor-pointer" type="font-size" @Click="translateMt"
+                      :loading="true"></Icon>
+              </Spin>
             </div>
           </div>
         </template>
@@ -129,7 +151,7 @@ const onChangeTranslationList = function (data: string[][]) {
                   @translation="onChangeTranslationList"></Textarea>
       </FormItem>
       <FormItem label="译文">
-        <Textarea :project-id="projectId"
+        <Textarea :key="translateUuid" :project-id="projectId"
                   v-model:html="model.translatedHtml"
                   v-model:text="model.translatedText"
                   @translation="onChangeTranslationList"></Textarea>

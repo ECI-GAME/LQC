@@ -71,9 +71,9 @@ const {state, execute: _reloadList} = model.list<ImageData>(async function () {
 const {state: dots, execute: _reloadDots, isLoading} = model.list<DotData>(function () {
   if (currentFile.value) {
     if (recordActive.value === RecordType[1]) {
-      return api.work.getDotList<DotData>(currentFile.value.id, DotDataType.Comment);
+      return api.work.getDotList<DotData>(currentFile.value.imageId, DotDataType.Comment);
     }
-    return api.work.getDotList<DotData>(currentFile.value.id);
+    return api.work.getDotList<DotData>(currentFile.value.imageId);
   }
   return new model.PageResult<DotData>();
 }, new model.PageResult<DotData>(), false);

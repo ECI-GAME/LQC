@@ -9,17 +9,21 @@ import api from "src/api";
 import { RouterLink, useRoute } from "vue-router";
 import * as alias from "src/router/alias";
 import * as model from "src/utils/model";
-import { Table, Form, InputSearch, Button, FormProps,Upload,message } from "ant-design-vue";
+import { Table, Form, InputSearch, Button, FormProps,Upload,message,Pagination } from "ant-design-vue";
 import fileInfo from './file.vue'
 import {Icon} from "@ue/icon";
 import { reactive } from 'vue';
 import {ElSelect,ElOption} from "element-plus"
 import {onCreate} from "src/utils/textResource";
 import { API_BASE} from "../../config";
+import Authorization from "../../libs/http/config/authorization";
+
 
 
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 
+
+const pageNumber = ref(1)
 const route = useRoute();
 const versionOption =ref([])
 console.log('Project ID = "%s"', route.params.projectId);
@@ -75,7 +79,7 @@ const { state, execute: onLoad, isLoading } = model.list<object>(
     function () {
 
         //return api.knowLedge.textList(1, formState.typeId);
-        return api.knowLedge.textList(1, formState.typeId, formState.versionId,formState.searchValue);
+        return api.knowLedge.textList(pageNumber.value, formState.typeId, formState.versionId,formState.searchValue);
     },
     new model.PageResult<object>([]),
     true
@@ -98,7 +102,10 @@ const nweTextRource = async function () {
 }
 const fileList = ref([]);
 const  uploadData = {'projectId':route.params.projectId}
-const headers = {'Authorization':'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlaWQiOiIwMDAwMHJhMnp4bTUwc3BjNnEzMXdqOW9iZ2Z5NzRuZCIsInVzZXJfbmFtZSI6InJvb3QiLCJ0eiI6Ik1hcnF1ZXNhcyBTdGFuZGFyZCBUaW1lIiwicGlkIjotMSwib2lkIjotMSwib2xkaWQiOm51bGwsImNsaWVudF9pZCI6ImxxYV9nYW1lIiwiYXR0YWNocyI6IiIsImVuYW1lIjoiTFFBIiwiaHBpZCI6bnVsbCwiYXR5cGUiOiIxIiwic2NvcGUiOlsiYWxsIl0sImRuYW1lIjoiRUNJW-i2heeuoV0iLCJleHAiOjE3MjM4NjA3MjcsInF5d3giOm51bGwsImFpZCI6IjAwMDAwMDA1eHY2ZTkwb3RkbjdobWYyYjR1c3pqcGljIiwianRpIjoiNmM1YzY5N2YtYmFjMS00ZjM4LTk0NWYtM2Y2YmEyZjNhYTg0IiwiZGlkIjotMX0.XTx4E1JkqSByfJgWA-R5fmDnemadocrCeW8UHdADuufX5JnHuCXUDra9v4lqhZ1011xbU38nLs5mNxMkZ6YOD_IdHSBDtNRSYSJXaSCn45tsBfLinvBMZl_uoGWUFmrXs4up36UoDJtNIA9042iIQz65FFMwHZDJUtwp-L6FgVbe0ToM13c9W9BECV73dCfxth5LiZ-xtYU0MrMSyaUAApV5oQh0RfcyH6NiP7kL6_RKaU7Qdw7P9BR7WwCLiLJOsjfGqhp5kBE_e6ZRSnCmine9QI8aQjYGkkziDCSoit6_Xu-AouXn40ozV-VajVmDDHh4bWB9xXB7xd-FdPCizA'}
+const headers = {'Authorization': Authorization('TOKEN', 'Authorization').Authorization}
+
+console.log('header');
+
 const handleChange = (info: UploadChangeParam) => {
     console.log(info);
     
@@ -133,6 +140,11 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   }
   return isJpgOrPng && isLt2M;
 };
+
+const changePage = function(page){
+  pageNumber.value = page
+  onLoad()
+}
 </script>
 <template>
     <div>
@@ -150,7 +162,7 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
             </FromItem>
             <FromItem>
 
-                <InputSearch v-model:value="formState.searchValue" placeholder="请输入条件" enter-button @search="onSearch"
+                <InputSearch v-model:value="formState.searchValue" :allow-clear="true" placeholder="请输入条件" enter-button @search="onSearch"
                     class="w-100 float-left" />
             </FromItem>
             <FromItem class="ml-3">
@@ -180,7 +192,7 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
        
         </Form>
 
-        <Table class="mt-5" :loading="isLoading" :data-source="state.results" :columns="columns" :bordered="true">
+        <Table class="mt-5" :loading="isLoading" :data-source="state.results" :pagination="false"  :columns="columns" :bordered="true">
             <template #bodyCell="{ column, text, record }">
                
               
@@ -191,6 +203,8 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
                 </template>
             </template>
         </Table>
+        <br/>
+    <Pagination v-model:current="pageNumber" class="float-right" :total="state.total" show-less-items @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
     </div>
 
 </template>

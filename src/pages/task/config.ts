@@ -122,7 +122,7 @@ const fetchPersonInfo = async (nodeId) => {
 
 const fetchLanguageInfo = async () => {
   try {
-    languageInfos.value = await api.system.getDictData('comic_language_type');
+    languageInfos.value.results = await api.system.getDictData<Object>('comic_language_type');
   } catch (error) {
     console.error("Failed to fetch language:", error);
   }
@@ -133,7 +133,7 @@ const changePariLanguage = (source: string) => {
   const [sourceLang, targetLang] = source.split("->");
 
   const findLabelByCode = (code: string) => {
-    const language = languageInfos.value.find(element => element.code === code);
+    const language = languageInfos.value.results.results.find(element => element.code === code);
     return language ? language.dictLabel : '';
   };
   const sourceRet = findLabelByCode(sourceLang);
@@ -190,10 +190,6 @@ export const onCreate =async function (param1:number,type:number) {
     taskInfo.value = []
   }else{
     taskInfo.value =await api.task.getTaskInfoById(param1)
-    console.log('-----------');
-    console.log(taskInfo.value);
-    console.log(persons.value);
-    console.log('-----------');
     versionId.value = taskInfo.value.versionId
     
   }
