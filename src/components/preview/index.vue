@@ -2,7 +2,6 @@
 import {ref, nextTick} from "vue";
 import api from "src/api";
 import {Icon} from "@ue/icon";
-import {DotButton, DotData, DotDataType, getDotButtons, isCheckStatus, scaleTipFormatter} from "./config";
 import BigNumber from "bignumber.js";
 import Cropper from "src/utils/cropper";
 import Screen from "../screen/index.vue";
@@ -12,9 +11,10 @@ import * as ImageUtil from "src/utils/image";
 import {format} from "src/utils/upload/common";
 import * as image from "src/utils/brower/image";
 import {downloadFile} from "src/utils/brower/download";
-import Loading from "src/components/loading/index.vue";
 import {ElLoading} from 'element-plus';
+import Loading from "src/components/loading/index.vue";
 import {Badge, Button, Layout, LayoutContent, LayoutHeader, Result, Slider, Space} from "ant-design-vue";
+import {DotButton, DotData, DotDataType, getDotButtons, isCheckStatus, scaleTipFormatter} from "./config";
 
 import type {PropType} from "vue";
 import type {ImageData} from "src/types/image";
@@ -233,7 +233,7 @@ defineExpose({setBoxScroll, setBoxDot});
               </Button>
             </a>
           </Space>
-          <div class="w-20 flex-1 flex justify-end px-10">
+          <div class="w-20 flex-1 flex justify-end pl-10 pr-2">
             <Slider class="w-100 max-w-full"
                     :min="30"
                     :max="300"
@@ -242,6 +242,11 @@ defineExpose({setBoxScroll, setBoxDot});
                     v-model:value="ratio"
                     :tip-formatter="scaleTipFormatter"
                     tooltip-placement="bottom"></Slider>
+            <div>
+              <Button class="scale-[0.65]" type="primary" shape="circle" @click="ratio = 100">
+                <Icon class="text-xl" type="reload"></Icon>
+              </Button>
+            </div>
           </div>
           <div>
             <slot name="operate"></slot>
