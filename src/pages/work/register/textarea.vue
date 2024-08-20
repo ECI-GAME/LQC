@@ -95,7 +95,7 @@ editor.on("blur", onCheckText);
 </script>
 
 <template>
-  <div class="text-sm h-40 px-3 py-1 border border-solid border-[var(--el-border-color)] rounded overflow-auto"
+  <div class="text-sm h-30 px-3 py-1 border border-solid border-[var(--el-border-color)] rounded overflow-auto"
        translate="no">
     <EditorContent class="h-full tiptap-box deep-[.tiptap]:outline-none" :editor="editor"/>
   </div>

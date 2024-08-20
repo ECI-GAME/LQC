@@ -89,7 +89,7 @@ const translateMt = async function () {
     'content': model.value.originalText
   }
   const res = await api.Common.googleMt(fromData);
-  if (res.content) {
+  if (res && res.content) {
     model.value.translatedText = res.content;
     model.value.translatedHtml = res.content;
     translateUuid.value = Math.random();

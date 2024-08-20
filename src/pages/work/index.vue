@@ -202,31 +202,30 @@ const onSubmit = async function () {
           <Loading class="h-full p-2" :status="isLoading">
             <Tab class="mb-2" v-model:value="recordActive" :list="recordTabs" @change="onChangeTabValue"
                  :disabled="!!dotAddTempValue"></Tab>
-            <template v-if="dotAddTempValue && taskInfo.projectId">
-              <RegisterComment v-if="dotAddTempValue.coordinateType === DotDataType.Comment"
-                               :data="dotAddTempValue"
-                               :file="currentFile"
-                               :projectId="taskInfo.projectId"
-                               @save="onUpDataDots"
-                               @cancel="onCancelDot"></RegisterComment>
-              <RegisterWord v-else
-                            :data="dotAddTempValue"
-                            :file="currentFile"
-                            :projectId="taskInfo.projectId"
-                            @save="onUpDataDots"
-                            @cancel="onCancelDot"></RegisterWord>
-            </template>
-            <template v-else-if="taskInfo && taskInfo.projectId">
-              <Record
-                  @view="onViewLocation"
-                  @edit="onEditLocation"
-                  @success="onReloadList"
-                  :work-id="route.params.workId"
-                  :active="recordActive"
-                  :projectId="taskInfo.projectId"
-                  :key="recordActive"
-                  :list="dots.results"></Record>
-            </template>
+            <Record v-if="taskInfo && taskInfo.projectId"
+                @view="onViewLocation"
+                @edit="onEditLocation"
+                @success="onReloadList"
+                :work-id="route.params.workId"
+                :active="recordActive"
+                :projectId="taskInfo.projectId"
+                :key="recordActive"
+                :list="dots.results">
+              <div class="mt-2" v-if="dotAddTempValue">
+                <RegisterComment v-if="dotAddTempValue.coordinateType === DotDataType.Comment"
+                                 :data="dotAddTempValue"
+                                 :file="currentFile"
+                                 :projectId="taskInfo.projectId"
+                                 @save="onUpDataDots"
+                                 @cancel="onCancelDot"></RegisterComment>
+                <RegisterWord v-else
+                              :data="dotAddTempValue"
+                              :file="currentFile"
+                              :projectId="taskInfo.projectId"
+                              @save="onUpDataDots"
+                              @cancel="onCancelDot"></RegisterWord>
+              </div>
+            </Record>
           </Loading>
         </LayoutSider>
       </Layout>
