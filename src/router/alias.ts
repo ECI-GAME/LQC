@@ -46,7 +46,10 @@ export const TaskList: RouteRecordBase = {
 
 export const TaskDetails: RouteRecordBase = {
   name: "Project Task Details",
-  path: "/task/detail/:versionId/:taskId"
+  path: "/task/detail/:versionId/:taskId",
+  meta: {
+    breadcrumb: "task/details.vue"
+  },
 }
 export const NodeConfig: RouteRecordBase = {
   name: "Project Node Config",
@@ -76,6 +79,7 @@ export const Work: RouteRecordBase = {
   name: "Project Work",
   path: "/work/:taskId/:workId?",
   meta: {
-    type: PageType.work
+    type: PageType.work,
+    breadcrumb: "task/details.vue"
   }
 }

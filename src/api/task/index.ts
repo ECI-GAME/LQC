@@ -1,8 +1,8 @@
+import cache from "src/utils/cache";
 import {PageResult} from "src/utils/model";
-import {$error, $success} from "@ue/message"
-import { Get, Gql, post, tryError, validate, required, Put } from "@js-lion/api";
-import { $error, $success } from "@ue/message"
 import safeGet from "@fengqiaogang/safe-get";
+import {$error, $success} from "@ue/message"
+import {Get, Gql, post, tryError, validate, required, Put} from "@js-lion/api";
 
 import type {TaskData} from "src/types/task";
 
@@ -47,8 +47,9 @@ export default class {
   @validate
   updateTask(data: object) {
     // @ts-ignore
-    return { data };
+    return {data};
   }
+
   //根据ID查询画册信息
   @tryError(new PageResult<object>())
   @Get("/project/task/relations/tasks/:id")
@@ -61,6 +62,7 @@ export default class {
 
   //根据ID查询画册信息
   @tryError({})
+  @cache(1000 * 3)
   @Get("/project/tasks/:id")
   @validate
   getTaskInfoById(@required taskId: number | string): Promise<TaskData> {
@@ -121,15 +123,15 @@ export default class {
     return {params};
   }
 
-  
-   //更新图片信息
-   @tryError(false)
-   @$error()
-   @$success("操作成功")
-   @post("/project/images/changeImage")
-   @validate
-   updateImageInfo(data: object) {
-     // @ts-ignore
-     return { data };
-   }
+
+  //更新图片信息
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
+  @post("/project/images/changeImage")
+  @validate
+  updateImageInfo(data: object) {
+    // @ts-ignore
+    return {data};
+  }
 }

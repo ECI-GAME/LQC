@@ -9,14 +9,14 @@ import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
 import TaskTitle from "src/components/task/title.vue";
 import {Checkbox, Table, Button, Card, Space, Breadcrumb, BreadcrumbItem, Row, Col} from "ant-design-vue";
-import { onMounted } from 'vue';
+
+import type {TaskData} from "src/types/task";
 
 const route = useRoute();
 
-const {state: stateData, isReady} = model.result(() => {
- 
+const {state: stateData, isReady} = model.result<TaskData>(() => {
   return api.task.getTaskInfoById(route.params.taskId as string);
-}, {}, true);
+}, {} as TaskData, true);
 
 
 const {state, execute: onLoad, isLoading} = model.list<object>(
@@ -62,23 +62,10 @@ const columns = [
   {title: "最近处理时间", dataIndex: 'dealTime', key: 'dealTime', align: "center"},
   {title: "操作", dataIndex: 'fileId', key: 'action', align: "center"},
 ];
-
-
 </script>
 
 <template>
   <div>
-    <Breadcrumb>
-      <BreadcrumbItem>Home</BreadcrumbItem>
-      <BreadcrumbItem v-if="isReady">
-
-        <RouterLink :to="{ name: alias.TaskList.name, params: { projectId:stateData.projectId,versionId: stateData.versionId } }">
-          <a href="">任务中心</a>
-        </RouterLink>
-
-      </BreadcrumbItem>
-      <BreadcrumbItem>任务明细</BreadcrumbItem>
-    </Breadcrumb>
     <Card>
       <div class="flex items-center justify-between">
         <TaskTitle v-if="isReady" :task-id="route.params.taskId" :data="stateData" />
