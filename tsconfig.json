@@ -44,7 +44,8 @@
       "@ue/modal",
       "@ue/form",
       "element-plus/global",
-      "@fengqiaogang/dblist"
+      "@fengqiaogang/dblist",
+      "@tiptap/extension-document"
     ],
     "typeRoots": [
       "./node_modules/@types",

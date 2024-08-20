@@ -35,3 +35,15 @@ h2 {
     max-width: 100% !important;
   }
 }
+
+/* 富文本 */
+.tiptap-box {
+  img {
+    max-width: 100%;
+    height: auto;
+
+    &.ProseMirror-selectednode {
+      outline: 3px solid #68CEF8;
+    }
+  }
+}

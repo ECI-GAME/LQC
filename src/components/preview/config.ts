@@ -46,6 +46,9 @@ export class DotData {
   public imageName?: string;
   public imageFlag: string | number = "1"; // 类型， 默认框内
   public translatedText: string = "";      // 译文
+  public translatedHtml: string = "";
+  public originalText: string = "";       // 原文 / 图片识别的文字内容
+  public originalHtml: string = "";
   public coordinateType!: DotDataType;     // 标注类型 1: 带 OCR 翻译的文字录入， 2: 普通的文字录入, 3: 标注
   public remark: string = "";              // 备注
   constructor(
@@ -56,10 +59,12 @@ export class DotData {
     public imageWidth: number,
     public imageHeight: number,
     public imagePath?: string,             // 选取的图片, 上传后的 URL 地址
-    public originalText?: string,          // 原文 / 图片识别的文字内容
+    originalText: string = "",          // 原文 / 图片识别的文字内容
   ) {
     if (imagePath) {
       this.imageName = basename(imagePath); // 图片名称
     }
+    this.originalHtml = originalText;
+    this.originalText = originalText;
   }
 }

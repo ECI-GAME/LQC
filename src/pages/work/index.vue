@@ -212,6 +212,7 @@ const onSubmit = async function () {
               <RegisterWord v-else
                             :data="dotAddTempValue"
                             :file="currentFile"
+                            :projectId="taskInfo.projectId"
                             @save="onUpDataDots"
                             @cancel="onCancelDot"></RegisterWord>
             </template>

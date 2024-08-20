@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import api from "src/api";
 import {ref} from "vue";
+import api from "src/api";
 import {Icon} from "@ue/icon";
 import {useValidate} from "@ue/form";
 import {basename} from "src/utils/image";
 import {preview} from "src/utils/brower/image";
 import {ElImage as Image} from 'element-plus';
 import safeGet from "@fengqiaogang/safe-get";
-import {Card, Form, FormItem, Select, SelectOption, Textarea, Button} from "ant-design-vue";
+import Textarea from "./textarea.vue";
+import {Card, Form, FormItem, Select, SelectOption, Button, Descriptions, DescriptionsItem} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import type {DotData} from "src/components/preview/config";
@@ -23,14 +24,21 @@ const props = defineProps({
   file: {
     type: Object,
     required: true,
-  }
+  },
+  projectId: {
+    type: [String, Number],
+    required: true,
+  },
 });
 
 const {formRef, validate} = useValidate();
+const translationWord = ref<object>();
 const model = ref({
   imageFlag: String(props.data.imageFlag || 1), // 类型
   translatedText: props.data.translatedText,          // 译文
+  translatedHtml: props.data.translatedHtml,
   originalText: props.data.originalText,              // 原文
+  originalHtml: props.data.originalHtml,
 });
 
 const getResult = function () {
@@ -54,6 +62,7 @@ const onSave = async function () {
   let status = await validate();
   if (status) {
     const value = getResult();
+    console.log(value)
     if (props.data.id) {
       status = await api.work.word.update({...value, id: props.data.id});
     } else {
@@ -67,6 +76,21 @@ const onSave = async function () {
 
 const onCancel = function () {
   $emit("cancel");
+}
+
+const onChangeTranslationList = function (data: string[][]) {
+  const map = new Map<string, string>(translationWord.value ? Object.entries(translationWord.value) : void 0);
+  for (const item of data) {
+    const [key, value] = item;
+    if (!map.has(key)) {
+      map.set(key, value);
+    }
+  }
+  if (map.size > 0) {
+    translationWord.value = Object.fromEntries(map);
+  } else {
+    translationWord.value = void 0;
+  }
 }
 
 </script>
@@ -99,11 +123,26 @@ const onCancel = function () {
             </div>
           </div>
         </template>
-        <Textarea :rows="4" v-model:value="model.originalText"></Textarea>
+        <Textarea :project-id="projectId"
+                  v-model:html="model.originalHtml"
+                  v-model:text="model.originalText"
+                  @translation="onChangeTranslationList"></Textarea>
       </FormItem>
       <FormItem label="译文">
-        <Textarea :rows="4" v-model:value="model.translatedText"></Textarea>
+        <Textarea :project-id="projectId"
+                  v-model:html="model.translatedHtml"
+                  v-model:text="model.translatedText"
+                  @translation="onChangeTranslationList"></Textarea>
       </FormItem>
+      <Descriptions v-if="translationWord" class="mb-5 deep-[th]:hidden" :column="1" :bordered="true" size="small">
+        <template v-for="(name, value) in translationWord" :key="name">
+          <DescriptionsItem>
+            <span class="text-primary mr-3">{{ name }}:</span>
+            <span class="text-primary">{{ value }}</span>
+          </DescriptionsItem>
+        </template>
+      </Descriptions>
+
       <div class="flex items-center justify-between">
         <Button type="primary" danger @click="onCancel">取消</Button>
         <Button type="primary" @click="onSave">保存</Button>

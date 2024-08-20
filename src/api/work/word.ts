@@ -1,5 +1,6 @@
 import * as message from "@ue/message";
 import {Post, Put, validate, required, tryError} from "@js-lion/api";
+import type {CheckType} from "src/types";
 
 export default class {
   @tryError(false)
@@ -22,5 +23,17 @@ export default class {
     const callback = () => true;
     // @ts-ignore
     return {data, callback};
+  }
+
+  /**
+   * 内容关键字检查
+   **/
+  @tryError([])
+  @Post("/project/image/translations/words/check")
+  @validate
+  check(@required projectId: string | number, keyword?: string): Promise<CheckType[]> {
+    const data: object = {text: keyword, projectId};
+    // @ts-ignore
+    return {data};
   }
 }
