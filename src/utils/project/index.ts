@@ -151,7 +151,7 @@ export const useProject = function () {
     new model.PageResult<LanguageData>([]),
     true
   );
-  // 项目遇到顺序
+  // 项目阅读顺序
   const {state: readOrder} = model.list<object>(function () {
       return api.system.getDictData<object>('comic_image_read_order');
     },

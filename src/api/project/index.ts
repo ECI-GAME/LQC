@@ -11,7 +11,7 @@ import {$error, $success} from "@ue/message"
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 
-import type {Project} from "src/types";
+import type {Project, PsConfig} from "src/types";
 
 export default class extends Graphql {
   /**
@@ -198,16 +198,13 @@ export default class extends Graphql {
 
 
   //根据节点ID查询项目PS配置
+  @tryError(new PageResult())
   @Get("system/psconfig/projectId/:id")
   @validate
-  getProjectPSConfig(data: number) {
-    const params = {id: data};
+  getProjectPSConfig(@required value: number | string): Promise<PageResult<PsConfig>> {
+    const params = {id: value};
     // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
-    // @ts-ignore
-    return {data, params};
+    return {params};
   }
 
 
@@ -255,7 +252,7 @@ export default class extends Graphql {
   @$success("操作成功")
   @post("system/psconfig/update")
   @validate
-  updateProjectPSErrorData(data: object) {
+  updateProjectPSErrorData(data: object): Promise<boolean> {
     // @ts-ignore
     return {data};
   }

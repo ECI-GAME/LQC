@@ -16,11 +16,12 @@ const languageInfos = ref([]);
 
 const fetchLanguageInfo = async () => {
   try {
-    languageInfos.value = await  api.system.getDictData<Object>('comic_language_type');
+    const res = await api.system.getDictData('comic_language_type');
+    languageInfos.value = res.results;
     console.log('------');
     
     
-    console.log(languageInfos.value.results);
+    console.log(languageInfos.value);
     console.log('------');
   } catch (error) {
     console.error("Failed to fetch language:", error);
@@ -29,7 +30,7 @@ const fetchLanguageInfo = async () => {
 fetchLanguageInfo()
 const changeLanguage = function (source: String) {
 
-  for (const element of languageInfos.value.results) {
+  for (const element of languageInfos.value) {
     if (source === element.code) {
       return element.dictLabel;
     }

@@ -62,7 +62,10 @@ export const Knowledge: RouteRecordBase = {
 
 export const PsTypeConfig: RouteRecordBase = {
   name: "Ps Config",
-  path: "/psTypeConfig/:projectId"
+  path: "/psTypeConfig/:projectId",
+  meta: {
+    breadcrumb: "project/psconfig.vue"
+  },
 }
 
 export const RemarkTypeConfig: RouteRecordBase = {

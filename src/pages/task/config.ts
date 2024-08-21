@@ -122,7 +122,8 @@ const fetchPersonInfo = async (nodeId) => {
 
 const fetchLanguageInfo = async () => {
   try {
-    languageInfos.value.results = await api.system.getDictData<Object>('comic_language_type');
+    const res = await api.system.getDictData('comic_language_type');
+    languageInfos.value.results = res.results;
   } catch (error) {
     console.error("Failed to fetch language:", error);
   }
@@ -147,7 +148,8 @@ const changePariLanguage = (source: string) => {
 
 const fetchTaskStatusInfo = async () => {
   try {
-    taskStatusOption.value = await api.system.getDictData('comic_task_status');
+    const res = await api.system.getDictData('comic_task_status');
+    taskStatusOption.value = res.results;
   } catch (error) {
     console.error("Failed to fetch language:", error);
   }

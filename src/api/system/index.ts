@@ -2,6 +2,8 @@ import cache from "src/utils/cache";
 import {PageResult} from "src/utils/model";
 import {validate, required, Get, Post, tryError} from "@js-lion/api";
 
+import type { DictItem } from "src/types";
+
 export default class {
   /**
    * 枚举列表
@@ -10,7 +12,7 @@ export default class {
   @cache()
   @Get("/system/dict/data/type/:name")
   @validate
-  getDictData<T = object>(@required name: string): Promise<PageResult<T>> {
+  getDictData<T = DictItem>(@required name: string): Promise<PageResult<T>> {
     const params = {name};
     const callback = function (value: object[] = []) {
       // @ts-ignore

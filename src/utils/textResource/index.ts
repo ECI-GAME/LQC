@@ -37,7 +37,8 @@ const onSubmit = async function (formData: object) {
 const textTypes = ref([]);
 const fetchLanguageInfo = async () => {
   try {
-    textTypes.value = await api.system.getDictData('comic_text_reource_type');
+    const res = await api.system.getDictData('comic_text_reource_type');
+    textTypes.value = res.results;
   } catch (error) {
     console.error("Failed to fetch language:", error);
   }

@@ -41,6 +41,14 @@ export class PageResult<T = object> {
   get items(): T[] {
     return this.results;
   }
+
+  forEach(callback: (v: T) => void) {
+    if (callback) {
+      for (const value of this.results) {
+        callback(value);
+      }
+    }
+  }
 }
 
 export type UseResult<T = object> = UseAsyncStateReturn<T, any, true>;

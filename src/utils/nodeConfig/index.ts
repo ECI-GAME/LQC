@@ -11,7 +11,8 @@ let methodArray = [];
 let projectId = 0;
 const fetchMethodInfo = async () => {
   try {
-    methodInfos.value = await api.system.getDictData('comic_method_job');
+    const res = await api.system.getDictData('comic_method_job');
+    methodInfos.value = res.results;
     console.log(methodInfos.value);
     
     methodInfos.value.forEach(e=>{
@@ -63,7 +64,7 @@ export const onCreate = async function (methodList:Array,projectNum:number) {
       component: Select,
       props:{
         fieldNames: { label: "dictLabel", value: "dictValue"},
-        options: methodInfos,
+        options: methodInfos.value,
       }
     },
   ], {
