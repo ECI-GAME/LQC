@@ -1,3 +1,8 @@
+/**
+ * @file 项目创建与编辑
+ * @author svon.me@gmail.com
+ */
+
 import api from "src/api";
 import {rules} from "@ue/form";
 import * as modal from "@ue/modal";
@@ -7,11 +12,7 @@ import {Input, DatePicker, Select, message} from "ant-design-vue";
 
 import type {LanguageData, Project} from 'src/types';
 
-/**
- * @file 项目创建
- * @author svon.me@gmail.com
- */
-export const onCreate = async function (
+const onCreate = async function (
   data: Project,
   languageInfo: LanguageData[] = [],
   readOrder: object[] = [],
@@ -159,25 +160,36 @@ export const useProject = function () {
     true
   );
 
+  const __submit = async function (value: Project) {
+    const status = await onSave(value);
+    if (status) {
+      await onLoadProject(100);
+    }
+    return status;
+  }
+
   return {
     project: projectInfo,
-    create: (data?: Project) => {
+    // 编辑项目信息
+    edit: (data: Project) => {
       // 处理表单数据，传给接口完成项目创建逻辑
       const onSubmit = async function (value: Project) {
-        if (data && data.id) {
-          safeSet(value, 'id', data.id)
-        }
-        const status = await onSave(value);
-        if (status) {
-          await onLoadProject(100);
-        }
-        return status;
+        safeSet(value, 'id', data.id);
+        return __submit(value);
       };
       return onCreate(
-        data || projectInfo.value,
+        data,
         languageInfo.value.results,
         readOrder.value.results,
         onSubmit);
+    },
+    // 创建项目信息
+    create: () => {
+      return onCreate(
+        projectInfo.value,
+        languageInfo.value.results,
+        readOrder.value.results,
+        __submit);
     }
   }
 }

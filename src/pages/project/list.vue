@@ -1,20 +1,25 @@
 <script setup lang="ts">
+/**
+ * @file 项目列表
+ * @author svon.me@gmail.com
+ **/
+
 import {ref} from 'vue';
 import api from "src/api";
 import {Icon} from "@ue/icon";
 import {RouterLink} from "vue-router";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
+import {useProject} from "src/utils/project";
 import Page from "src/components/page/index.vue";
 import LanguageDetail from "src/components/language/detail.vue";
 import {Table, Button, InputSearch} from "ant-design-vue";
-import {useProject} from "src/utils/project";
 
 import type {Project} from 'src/types';
 
-const pageNumber = ref<number>(1);
 const searchValue = ref<string>();
-const {create: onCreate} = useProject();
+const pageNumber = ref<number>(1);
+const {create: onCreate, edit: onEdit} = useProject();
 
 const columns = [
   {title: "项目名称", dataIndex: 'projectName', key: 'projectName'},
@@ -44,7 +49,7 @@ const onCreateProject = async function () {
 }
 
 const editFrom = async function (data: Project) {
-  const status = await onCreate(data);
+  const status = await onEdit(data);
   if (status) {
     onSearch();
   }
