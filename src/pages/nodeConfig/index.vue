@@ -103,6 +103,11 @@ const onCreatePeople = async function () {
   }
 }
 
+const saveNodeInfo =async function  (){
+  console.log(methodList.value);
+  
+  await api.project.updateProMethSort(methodList.value)
+}
 
 </script>
 
@@ -124,7 +129,7 @@ const onCreatePeople = async function () {
           <span class="float-left font-bold text-xl">流程节点</span>
 
           <Button class="float-right bg-blue-700  ms-3" type="primary" @click="onCreateWorkFlow">新增流程节点</Button>
-          <Button class="float-right bg-violet-700" type="primary">保存</Button>
+          <Button class="float-right bg-violet-700" @click="saveNodeInfo" type="primary">保存</Button>
         </div>
         <VueDraggableNext class="dragArea list-group w-full cursor-pointer" :list="methodList" @change="log">
           <div v-for="element in methodList" :key="element.methCode">
