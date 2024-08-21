@@ -8,27 +8,42 @@ import {onCreate} from "src/utils/version";
 import Loading from "src/components/loading/index.vue";
 import LanguageDetail from "src/components/language/detail.vue";
 import {Descriptions, DescriptionsItem, Card, Button, Space} from 'ant-design-vue';
+import {ref} from 'vue';
 
 import type {Project} from "src/types";
 
 const route = useRoute();
 // 构造当前列表数据对象
+const readOptions = ref([])
+const initReadOrder = async function () {
+  readOptions.value =  await api.system.getDictData('comic_image_read_order');
+  
+}
+ 
+initReadOrder()
 const {
   state: projectInfo,
   isReady
 } = model.result<Project>(() => api.project.getProjectInfoById(route.params.projectId as string), {} as Project, true);
 
 const onCreateVersion = async function () {
-
-  // 创建项目
-  
   const status = await onCreate(route.params.projectId as string,0,0);
-
-  // 状态判断
   if (status) {
     window.location.reload();
   }
 }
+const showValue = ref('')
+const showLabel = function(value:string){
+  console.log(readOptions.value.results);
+  
+  readOptions.value.results.forEach(s=>{
+    if(s.dictValue == value){
+      showValue.value =  s.dictLabel
+    }
+  })
+ return showValue.value
+}
+
 </script>
 
 <template>
@@ -47,8 +62,8 @@ const onCreateVersion = async function () {
             }}
           </DescriptionsItem>
           <DescriptionsItem label="状态">进行中</DescriptionsItem>
-          <DescriptionsItem label="交付图片类型">{{ projectInfo.imageType }}</DescriptionsItem>
-          <DescriptionsItem label="备注" :span="3">{{ projectInfo.projectExplain }}</DescriptionsItem>
+          <DescriptionsItem label="阅读顺序">{{showLabel(projectInfo.readOrder)}}</DescriptionsItem>
+          <DescriptionsItem label="备注" :span="3">{{ projectInfo.remarks }}</DescriptionsItem>
         </Descriptions>
       </Card>
       <Card class="mt-5" title="配置中心">

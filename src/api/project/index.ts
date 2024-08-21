@@ -78,6 +78,17 @@ export default class extends Graphql {
     return {data};
   }
 
+   //修改方法排序
+   @tryError(false)
+   @$error()
+   @$success("操作成功")
+   @post("/project/methods/upSort")
+   @validate
+   updateProMethSort(data: Array<Object>): Promise<boolean> {
+     // @ts-ignore
+     return {data};
+   }
+
   //根据ID查询项目信息
   @Get("project/:id")
   @validate
