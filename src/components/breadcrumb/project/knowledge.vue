@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * @file 面包屑 - 项目中心 PS Config
+ * @file 面包屑 - 项目中心 知识库
  **/
 
 import * as alias from "src/router/alias";
@@ -20,6 +20,6 @@ const route = useRoute();
     <BreadcrumbItem>
       <RouterLink :to="{ name: alias.ProjectDetails.name, params: route.params }">项目中心</RouterLink>
     </BreadcrumbItem>
-    <BreadcrumbItem>PSD 生成配置</BreadcrumbItem>
+    <BreadcrumbItem>知识库</BreadcrumbItem>
   </Breadcrumb>
 </template>

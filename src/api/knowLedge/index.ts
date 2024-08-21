@@ -3,7 +3,7 @@ import {Get, Gql, post, tryError, validate} from "@js-lion/api";
 
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
-import { $error, $success } from "@ue/message"
+import {$error, $success} from "@ue/message"
 
 export default class {
   /**
@@ -12,10 +12,10 @@ export default class {
    */
   @tryError([])
   @Gql("/graphql")
-  async list(pageNum: number, typeId:number,versionId:number = 0,searchValue:string = "",resourceType:string ,pageSize: number = 20): Promise<PageResult<object>> {
+  async list(pageNum: number, projectId: number | string, versionId: number = 0, searchValue: string = "", resourceType: string, pageSize: number = 20): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
-      knowledgeList (input: { pageNum: ${pageNum},projectId: ${typeId},versionId:${versionId},searchValue:"${searchValue}",resourceType:"${resourceType}", pageSize: ${pageSize} }) {
+      knowledgeList (input: { pageNum: ${pageNum},projectId: ${projectId},versionId:${versionId},searchValue:"${searchValue}",resourceType:"${resourceType}", pageSize: ${pageSize} }) {
         code
         rows
         msg
@@ -34,7 +34,7 @@ export default class {
    */
   @tryError([])
   @Gql("/graphql")
-  async textList(pageNum: number, projectId:number,versionId:number=0,searchValue:string = ""  ,pageSize: number = 10): Promise<PageResult<object>> {
+  async textList(pageNum: number, projectId: number, versionId: number = 0, searchValue: string = "", pageSize: number = 10): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
       getProjectTextResourcePage (input: { pageNum: ${pageNum},projectId: ${projectId},versionId:${versionId},searchValue:"${searchValue}", pageSize: ${pageSize} }) {
@@ -51,5 +51,5 @@ export default class {
     return {data, callback};
   }
 
-  
+
 }

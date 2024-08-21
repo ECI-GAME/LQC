@@ -57,7 +57,10 @@ export const NodeConfig: RouteRecordBase = {
 }
 export const Knowledge: RouteRecordBase = {
   name: "Knowledge Config",
-  path: "/knowledge/:projectId"
+  path: "/knowledge/:projectId/:type?",
+  meta: {
+    breadcrumb: "project/knowledge.vue"
+  },
 }
 
 export const PsTypeConfig: RouteRecordBase = {

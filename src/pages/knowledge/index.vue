@@ -2,45 +2,46 @@
 /**
  * @file 知识库
  */
- import {ref} from "vue"
- import api from "src/api";
- import {RouterLink, useRoute} from "vue-router";
- import * as alias from "src/router/alias";
- import {Table, Button, Card, Space,Breadcrumb,BreadcrumbItem,Row,Col, Tag, Tabs,TabPane  } from "ant-design-vue";
-import fileInfo from './file.vue'
-import textFile from './text.vue'
-import ImageFile from './image.vue'
+import {ref} from "vue";
+import * as alias from "src/router/alias";
+import lazyload from "src/utils/lazyload";
+import {Tabs, TabPane} from "ant-design-vue";
+import {useRoute, RouterLink} from "vue-router";
 
 const route = useRoute();
-console.log('Project ID = "%s"', route.params.projectId);
-const projectId = route.params.projectId
 
-const activeKey = ref('1');
+const list = [
+  {key: "1", value: "文件资源"},
+  {key: "2", value: "文本资源"},
+  {key: "3", value: "图片资源"},
+];
 
+const activeKey = ref<string>(String(route.params.type || list[0].key));
+
+const isComp = function (type: string) {
+  if (type === list[1].key) {
+    return lazyload(() => import("./text.vue"));
+  }
+  if (type === list[2].key) {
+    return lazyload(() => import("./image.vue"));
+  }
+  return lazyload(() => import("./file.vue"));
+}
+
+const getRouteValue = function (type: string) {
+  return {name: alias.Knowledge.name, params: {...route.params, type}};
+}
 </script>
 
 <template>
   <div>
-
-    
-    <Breadcrumb>
-    <BreadcrumbItem>Home</BreadcrumbItem>
-      <BreadcrumbItem>
-        <RouterLink :to="{ name: alias.ProjectList.name }">
-            <a href="">项目列表</a>
-        </RouterLink>
-    </BreadcrumbItem>  
-    <BreadcrumbItem>
-        <RouterLink :to="{ name: alias.ProjectDetails.name, params:{ projectId: projectId } }">
-            <a href="">项目中心</a>
-        </RouterLink>
-      </BreadcrumbItem>    
-      <BreadcrumbItem>知识库</BreadcrumbItem>
-    </Breadcrumb>
-    <Tabs v-model:activeKey="activeKey">
-      <TabPane key="1" tab="文件资源"><fileInfo/></TabPane>
-      <TabPane key="2" tab="文本资源"><textFile/></TabPane>
-      <TabPane key="3" tab="图片资源"><ImageFile/></TabPane>
+    <Tabs :activeKey="activeKey">
+      <TabPane v-for="item in list" :key="item.key">
+        <template #tab>
+          <RouterLink :to="getRouteValue(item.key)">{{ item.value }}</RouterLink>
+        </template>
+      </TabPane>
     </Tabs>
+    <component :is="isComp(activeKey)" :project-id="route.params.projectId"></component>
   </div>
 </template>

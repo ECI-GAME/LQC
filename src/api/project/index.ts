@@ -275,7 +275,7 @@ export default class extends Graphql {
   //删除人员信息
   @Get("project/getVersionDict/:projectId")
   @validate
-  getVersionDict(data: number) {
+  getVersionDict(data: number | string) {
     const params = {projectId: data};
     return {data, params};
   }

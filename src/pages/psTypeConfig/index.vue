@@ -1,7 +1,6 @@
-<!--PSD 生成页面 -->
 <script setup lang="ts">
 /**
- * @file 错误类型配置
+ * @file PSD 参数配置页面
  */
 import api from "src/api";
 import {ref, onMounted} from "vue";

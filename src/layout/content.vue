@@ -16,7 +16,7 @@ const route = useRoute();
         class="flex items-center justify-between sticky top-0 bg-white h-[var(--header-value)] z-[99] px-4 md:px-6 border-b border-gray border-solid">
       <div class="flex-1 mr-5">
         <!--        <Search class="max-w-2/3 min-w-1/2 w-150"></Search>-->
-        <Breadcrumb v-if="route.meta && route.meta.breadcrumb" :view="route.meta.breadcrumb" :key="route.fullPath"></Breadcrumb>
+        <Breadcrumb v-if="route.meta && route.meta.breadcrumb" :view="route.meta.breadcrumb" :key="route.name"></Breadcrumb>
       </div>
       <User></User>
     </div>
