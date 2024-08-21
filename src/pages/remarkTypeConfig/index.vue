@@ -1,27 +1,11 @@
-<!-- 错误类型配置 -->
 <script setup lang="ts">
 /**
  * @file 错误类型配置
  */
 import api from "src/api";
-import {ref, reactive, nextTick} from 'vue';
-import {RouterLink, useRoute} from "vue-router";
-import {
-  Table,
-  Button,
-  Card,
-  Space,
-  Breadcrumb,
-  BreadcrumbItem,
-  Row,
-  Col,
-  Tag,
-  Divider,
-  Input,
-  Empty,
-  message
-} from "ant-design-vue";
-import * as alias from "src/router/alias";
+import {ref, reactive} from 'vue';
+import {useRoute} from "vue-router";
+import {Card, Tag, Input, message} from "ant-design-vue";
 
 const route = useRoute();
 console.log('Project ID = "%s"', route.params.projectId);
@@ -85,21 +69,7 @@ const handleInputConfirm = async function (item) {
 
 <template>
   <div>
-    <Breadcrumb>
-      <BreadcrumbItem>Home</BreadcrumbItem>
-      <BreadcrumbItem>
-        <RouterLink :to="{ name: alias.ProjectDetails.name, params:{ projectId: projectId } }">
-          <a href="">项目中心</a>
-        </RouterLink>
-      </BreadcrumbItem>
-
-      <BreadcrumbItem>错误类型配置</BreadcrumbItem>
-    </Breadcrumb>
-    <br/>
-    <br/>
-    <div v-for="item in state" :key="item.id">
-      <Tag color="green">{{ item.errorTypeName }}</Tag>
-      <br/><br/>
+    <Card class="mt-5 first:mt-0" v-for="item in state" :key="item.id" :title="item.errorTypeName">
       <a-space :size="[0, 'small']" wrap>
         <template v-for="(tag, index) in item.childrenList" :key="tag">
           <a-tooltip v-if="tag.errorTypeName.length > 20" :title="tag">
@@ -125,10 +95,6 @@ const handleInputConfirm = async function (item) {
           + 新增类别
         </Tag>
       </a-space>
-
-      <Divider/>
-
-    </div>
-
+    </Card>
   </div>
 </template>

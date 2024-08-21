@@ -1,12 +1,11 @@
 <script setup lang="ts">
 /**
- * @file 面包屑 - 项目详情
+ * @file 面包屑 - 项目中心 图片管理
  **/
 
 import Base from "./base.vue";
-
 </script>
 
 <template>
-  <Base/>
+  <Base title="图片管理"/>
 </template>

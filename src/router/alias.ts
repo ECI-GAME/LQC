@@ -33,7 +33,10 @@ export const ProjectDetails: RouteRecordBase = {
 
 export const VersionImage: RouteRecordBase = {
   name: "Image Details",
-  path: "/image/:projectId"
+  path: "/image/:projectId",
+  meta: {
+    breadcrumb: "project/image.vue"
+  },
 }
 
 export const TaskList: RouteRecordBase = {
@@ -53,7 +56,10 @@ export const TaskDetails: RouteRecordBase = {
 }
 export const NodeConfig: RouteRecordBase = {
   name: "Project Node Config",
-  path: "/node/:projectId"
+  path: "/node/:projectId",
+  meta: {
+    breadcrumb: "project/node.vue"
+  },
 }
 export const Knowledge: RouteRecordBase = {
   name: "Knowledge Config",
@@ -73,7 +79,10 @@ export const PsTypeConfig: RouteRecordBase = {
 
 export const RemarkTypeConfig: RouteRecordBase = {
   name: "Image reamrk",
-  path: "/remarkTypeConfig/:projectId"
+  path: "/remarkTypeConfig/:projectId",
+  meta: {
+    breadcrumb: "project/config.vue"
+  },
 }
 
 export const Psd: RouteRecordBase = {

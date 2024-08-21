@@ -113,15 +113,6 @@ const saveNodeInfo =async function  (){
 
 <template>
   <div>
-    <Breadcrumb>
-      <BreadcrumbItem>Home</BreadcrumbItem>
-      <BreadcrumbItem>
-        <RouterLink :to="{ name: alias.ProjectDetails.name, params: { projectId: projectId } }">
-          <a href="">项目中心</a>
-        </RouterLink>
-      </BreadcrumbItem>
-      <BreadcrumbItem>节点配置页面</BreadcrumbItem>
-    </Breadcrumb>
     <div class="flex m-10">
       <Row class="w-11/12">
         <Col :span="11">

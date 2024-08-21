@@ -21,6 +21,11 @@ const {state, isReady} = model.result<TaskData>(() => {
 
 <template>
   <Breadcrumb>
+    <BreadcrumbItem>
+      <RouterLink :to="{ name: alias.ProjectList.name }">
+        <span>项目列表</span>
+      </RouterLink>
+    </BreadcrumbItem>
     <template v-if="isReady">
       <BreadcrumbItem>
         <RouterLink :to="{ name: alias.ProjectDetails.name, params:{ projectId: state.projectId } }">

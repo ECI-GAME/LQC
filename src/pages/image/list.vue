@@ -137,18 +137,7 @@ onMounted(async () => {
 </script>
 
 <template>
-   
-  <div >
-    <Breadcrumb>
-      <BreadcrumbItem>Home</BreadcrumbItem>
-      <BreadcrumbItem>
-        <RouterLink :to="{ name: alias.ProjectDetails.name, params: { projectId: projectId } }">
-          <a href="">项目中心</a>
-        </RouterLink>
-      </BreadcrumbItem>
-      <BreadcrumbItem>图片管理</BreadcrumbItem>
-    </Breadcrumb>
-    <br/>
+  <div>
     <Card >
       <Form layout="inline">
         <FormItem label="画册">
