@@ -8,7 +8,7 @@ import {preview} from "src/utils/brower/image";
 import {ElImage as Image} from 'element-plus';
 import safeGet from "@fengqiaogang/safe-get";
 import Textarea from "./textarea.vue";
-import {Card, Form, FormItem, Select, SelectOption, Button, Spin, Descriptions, DescriptionsItem} from "ant-design-vue";
+import {Form, FormItem, Select, SelectOption, Button, Spin, Descriptions, DescriptionsItem} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import type {DotData} from "src/components/preview/config";
@@ -115,60 +115,58 @@ const onChangeTranslationList = function (data: string[][]) {
 </script>
 
 <template>
-  <Card size="small">
-    <Form layout="vertical" ref="formRef" :model="model">
-      <FormItem label="类别">
-        <Select v-model:value="model.imageFlag">
-          <SelectOption value="1">框内</SelectOption>
-          <SelectOption value="2">框外</SelectOption>
-        </Select>
-      </FormItem>
-      <FormItem v-if="data.imagePath">
-        <a class="block" :href="preview(data.imagePath)" target="_blank">
-          <Card class="deep-[.ant-card-body]:p-1">
-            <Image class="w-full h-30" :src="data.imagePath" fit="cover"/>
-          </Card>
-        </a>
-      </FormItem>
+  <Form layout="vertical" ref="formRef" :model="model">
+    <FormItem label="类别">
+      <Select v-model:value="model.imageFlag">
+        <SelectOption value="1">框内</SelectOption>
+        <SelectOption value="2">框外</SelectOption>
+      </Select>
+    </FormItem>
+    <FormItem v-if="data.imagePath">
+      <a class="block" :href="preview(data.imagePath)" target="_blank">
+        <Card class="deep-[.ant-card-body]:p-1">
+          <Image class="w-full h-30" :src="data.imagePath" fit="cover"/>
+        </Card>
+      </a>
+    </FormItem>
 
-      <FormItem class="deep-[label]:w-full">
-        <template #label>
-          <div class="w-full flex items-center justify-between">
-            <div>
-              <span>原文</span>
-            </div>
-            <div>
-              <Spin :spinning="spinning">
-                <Icon class="text-xl text-primary cursor-pointer" type="font-size" @Click="translateMt"
-                      :loading="true"></Icon>
-              </Spin>
-            </div>
+    <FormItem class="deep-[label]:w-full">
+      <template #label>
+        <div class="w-full flex items-center justify-between">
+          <div>
+            <span>原文</span>
           </div>
-        </template>
-        <Textarea :project-id="projectId"
-                  v-model:html="model.originalHtml"
-                  v-model:text="model.originalText"
-                  @translation="onChangeTranslationList"></Textarea>
-      </FormItem>
-      <FormItem label="译文">
+          <div>
+            <Spin :spinning="spinning">
+              <Icon class="text-xl text-primary cursor-pointer" type="font-size" @Click="translateMt"
+                    :loading="true"></Icon>
+            </Spin>
+          </div>
+        </div>
+      </template>
+      <Textarea :project-id="projectId"
+                v-model:html="model.originalHtml"
+                v-model:text="model.originalText"
+                @translation="onChangeTranslationList"></Textarea>
+    </FormItem>
+    <FormItem label="译文">
         <Textarea :key="translateUuid" :project-id="projectId"
                   v-model:html="model.translatedHtml"
                   v-model:text="model.translatedText"
                   @translation="onChangeTranslationList"></Textarea>
-      </FormItem>
-      <Descriptions v-if="translationWord" class="mb-5 deep-[th]:hidden" :column="1" :bordered="true" size="small">
-        <template v-for="(name, value) in translationWord" :key="name">
-          <DescriptionsItem>
-            <span class="text-primary mr-3">{{ name }}:</span>
-            <span class="text-primary">{{ value }}</span>
-          </DescriptionsItem>
-        </template>
-      </Descriptions>
+    </FormItem>
+    <Descriptions v-if="translationWord" class="mb-5 deep-[th]:hidden" :column="1" :bordered="true" size="small">
+      <template v-for="(name, value) in translationWord" :key="name">
+        <DescriptionsItem>
+          <span class="text-primary mr-3">{{ name }}:</span>
+          <span class="text-primary">{{ value }}</span>
+        </DescriptionsItem>
+      </template>
+    </Descriptions>
 
-      <div class="flex items-center justify-between">
-        <Button type="primary" danger @click="onCancel">取消</Button>
-        <Button type="primary" @click="onSave">保存</Button>
-      </div>
-    </Form>
-  </Card>
+    <div class="flex items-center justify-between">
+      <Button type="primary" danger @click="onCancel">取消</Button>
+      <Button type="primary" @click="onSave">保存</Button>
+    </div>
+  </Form>
 </template>

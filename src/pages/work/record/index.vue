@@ -4,7 +4,7 @@
  * @author svon.me@gmail.com
  */
 
-import { ref } from "vue";
+import {ref} from "vue";
 import api from "src/api";
 import Word from "./word.vue";
 import Comment from "./comment.vue";
@@ -61,16 +61,25 @@ const onUpdate = function () {
 
 <template>
   <div>
-    <div v-if="list.length > 0" class="deep-[th]:whitespace-nowrap deep-[th]:w-35">
+    <div v-if="list.length > 0" class="pb-2 deep-[th]:whitespace-nowrap deep-[th]:w-35">
       <Collapse class="deep-[.ant-collapse-header]:items-center" v-model:activeKey="activeKey">
         <CollapsePanel v-for="(item, index) in list" :key="item.id">
           <template #header>
             <div class="flex items-center justify-between">
-              <span>{{ index + 1 }}</span>
+              <span>({{ index + 1 }})</span>
+              <template v-if="active === RecordType[0]">
+                <span class="flex-1 w-1 truncate mr-2 ml-1" :title="item.translatedText">{{ item.translatedText }}</span>
+              </template>
+              <template v-else>
+                <span class="flex-1 w-1 truncate mr-2 ml-1" :title="item.remark">{{ item.remark }}</span>
+              </template>
               <Space>
-                <Button class="p-0" type="link" @click="onShowDetail(item)">详情</Button>
-                <Button v-if="active === RecordType[0]" class="p-0" type="link" :danger="true"
-                        @click="onEditDetail(item)">编辑
+                <Button class="p-0" type="link" @click.stop="onShowDetail(item)">详情</Button>
+                <Button v-if="active === RecordType[0]"
+                        class="p-0"
+                        type="link"
+                        :danger="true"
+                        @click.stop="onEditDetail(item)">编辑
                 </Button>
               </Space>
             </div>

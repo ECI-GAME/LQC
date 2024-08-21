@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import {ref} from "vue";
 import api from "src/api";
 import * as _ from "lodash-es";
-import {ref, toRaw} from "vue";
-import {useValidate, rules} from "@ue/form";
 import * as model from "src/utils/model";
+import {useValidate, rules} from "@ue/form";
 import safeGet from "@fengqiaogang/safe-get";
-import {Form, FormItem, Cascader, Textarea, Button, Card} from "ant-design-vue";
+import {Form, FormItem, Cascader, Textarea, Button} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import type {DotData} from "src/components/preview/config";
@@ -84,24 +84,22 @@ const onCancel = function () {
 </script>
 
 <template>
-  <Card size="small">
-    <Form layout="vertical" ref="formRef" :model="formData">
-      <FormItem label="类别" name="imageFlag" :rules="rules.array('请选择类别！')">
-        <Cascader
-            v-model:value="formData.imageFlag"
-            placeholder="请选择类别"
-            :options="typeList.results"
-            :multiple="false"
-            :allow-clear="false"
-            :field-names="fieldNames"></Cascader>
-      </FormItem>
-      <FormItem label="备注">
-        <Textarea :rows="4" v-model:value="formData.remark"></Textarea>
-      </FormItem>
-      <div class="flex items-center justify-between">
-        <Button type="primary" danger @click="onCancel">取消</Button>
-        <Button type="primary" @click="onSave">保存</Button>
-      </div>
-    </Form>
-  </Card>
+  <Form layout="vertical" ref="formRef" :model="formData">
+    <FormItem label="类别" name="imageFlag" :rules="rules.array('请选择类别！')">
+      <Cascader
+          v-model:value="formData.imageFlag"
+          placeholder="请选择类别"
+          :options="typeList.results"
+          :multiple="false"
+          :allow-clear="false"
+          :field-names="fieldNames"></Cascader>
+    </FormItem>
+    <FormItem label="备注">
+      <Textarea :rows="4" v-model:value="formData.remark"></Textarea>
+    </FormItem>
+    <div class="flex items-center justify-between">
+      <Button type="primary" danger @click="onCancel">取消</Button>
+      <Button type="primary" @click="onSave">保存</Button>
+    </div>
+  </Form>
 </template>

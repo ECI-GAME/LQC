@@ -22,7 +22,7 @@ import {filterSuccess, pickImage, RecordTabs} from "./config";
 import {DotDataType} from "src/components/preview/config";
 import Loading from "src/components/loading/index.vue";
 import {TaskStatus} from "src/types";
-import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space} from "ant-design-vue";
+import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card} from "ant-design-vue";
 
 import type {ImageData, TaskData, Project} from "src/types";
 import type {DotData} from "src/components/preview/config";
@@ -87,14 +87,24 @@ const onUpDataDots = function () {
   dotAddTempValue.value = void 0;
 }
 
+const onChangeTabValue = function () {
+  onUpDataDots();
+}
+
 // 打点（描点）
-const onChangeDot = function (data: DotData) {
-  dotAddTempValue.value = data;
+const onChangeDot = async function (data: DotData) {
   if (data.coordinateType === DotDataType.Comment) {
-    recordActive.value = RecordType[1];
+    if (recordActive.value === RecordType[0]) {
+      recordActive.value = RecordType[1];
+      await _reloadDots(100);
+    }
   } else {
-    recordActive.value = RecordType[0];
+    if (recordActive.value === RecordType[1]) {
+      recordActive.value = RecordType[0];
+      await _reloadDots(100);
+    }
   }
+  dotAddTempValue.value = data;
 }
 
 // 查看标记位置
@@ -121,11 +131,6 @@ const onEditLocation = function (id: string | number) {
 
 const onCancelDot = function () {
   dotAddTempValue.value = void 0;
-}
-
-
-const onChangeTabValue = function () {
-  onUpDataDots();
 }
 
 const backOption = function (task: TaskData) {
@@ -156,6 +161,13 @@ const onSubmit = async function () {
     const value = backOption(taskInfo.value);
     await router.replace(value);
   }
+}
+
+const _join_dots = function (list: DotData[], value?: DotData) {
+  if (value) {
+    return [...list, value];
+  }
+  return list;
 }
 
 </script>
@@ -189,7 +201,7 @@ const onSubmit = async function () {
                    class="h-full"
                    :disabled="!!dotAddTempValue"
                    :data="currentFile"
-                   :dots="dots.results"
+                   :dots="_join_dots(dots.results, dotAddTempValue)"
                    :key="currentFile.id"
                    :read-order="projectInfo.readOrder"
                    @dot="onChangeDot">
@@ -203,15 +215,15 @@ const onSubmit = async function () {
             <Tab class="mb-2" v-model:value="recordActive" :list="recordTabs" @change="onChangeTabValue"
                  :disabled="!!dotAddTempValue"></Tab>
             <Record v-if="taskInfo && taskInfo.projectId"
-                @view="onViewLocation"
-                @edit="onEditLocation"
-                @success="onReloadList"
-                :work-id="route.params.workId"
-                :active="recordActive"
-                :projectId="taskInfo.projectId"
-                :key="recordActive"
-                :list="dots.results">
-              <div class="mt-2" v-if="dotAddTempValue">
+                    @view="onViewLocation"
+                    @edit="onEditLocation"
+                    @success="onReloadList"
+                    :work-id="route.params.workId"
+                    :active="recordActive"
+                    :projectId="taskInfo.projectId"
+                    :key="recordActive"
+                    :list="dots.results">
+              <Card class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small" v-if="dotAddTempValue">
                 <RegisterComment v-if="dotAddTempValue.coordinateType === DotDataType.Comment"
                                  :data="dotAddTempValue"
                                  :file="currentFile"
@@ -224,7 +236,7 @@ const onSubmit = async function () {
                               :projectId="taskInfo.projectId"
                               @save="onUpDataDots"
                               @cancel="onCancelDot"></RegisterWord>
-              </div>
+              </Card>
             </Record>
           </Loading>
         </LayoutSider>
