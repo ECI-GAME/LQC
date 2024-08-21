@@ -68,7 +68,7 @@ let versionInfo: Object | undefined;
 export const onCreate = async function (projectId: number | string,type:number,versionId: number | string) {
   projectInfo = await api.project.getProjectInfoById(projectId)
   projectInfo.languagePair = changeLanguage(projectInfo.sourceLanguage) + '->' + changeLanguage(projectInfo.targetLanguage)
-  
+  versionInfo = {}
   if(type==1){
     versionInfo = await api.version.geVersionInfoById(versionId)
   }
@@ -134,9 +134,6 @@ export const onCreate = async function (projectId: number | string,type:number,v
             'originalImagePath': files[0].src,
             'imageType': files[0].type
           })
-          console.log('upload success');
-          console.log(imageList);
-
         },
 
       },
