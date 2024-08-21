@@ -22,7 +22,7 @@ import {filterSuccess, pickImage, RecordTabs} from "./config";
 import {DotDataType} from "src/components/preview/config";
 import Loading from "src/components/loading/index.vue";
 import {TaskStatus} from "src/types";
-import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card} from "ant-design-vue";
+import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
 
 import type {ImageData, TaskData, Project} from "src/types";
 import type {DotData} from "src/components/preview/config";
@@ -214,30 +214,37 @@ const _join_dots = function (list: DotData[], value?: DotData) {
           <Loading class="h-full p-2" :status="isLoading">
             <Tab class="mb-2" v-model:value="recordActive" :list="recordTabs" @change="onChangeTabValue"
                  :disabled="!!dotAddTempValue"></Tab>
-            <Record v-if="taskInfo && taskInfo.projectId"
-                    @view="onViewLocation"
-                    @edit="onEditLocation"
-                    @success="onReloadList"
-                    :work-id="route.params.workId"
-                    :active="recordActive"
-                    :projectId="taskInfo.projectId"
-                    :key="recordActive"
-                    :list="dots.results">
-              <Card class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small" v-if="dotAddTempValue">
-                <RegisterComment v-if="dotAddTempValue.coordinateType === DotDataType.Comment"
-                                 :data="dotAddTempValue"
-                                 :file="currentFile"
-                                 :projectId="taskInfo.projectId"
-                                 @save="onUpDataDots"
-                                 @cancel="onCancelDot"></RegisterComment>
-                <RegisterWord v-else
-                              :data="dotAddTempValue"
-                              :file="currentFile"
-                              :projectId="taskInfo.projectId"
-                              @save="onUpDataDots"
-                              @cancel="onCancelDot"></RegisterWord>
-              </Card>
-            </Record>
+            <!-- 标记数量大于0或者正在创建标记点数据 -->
+            <template v-if="dotAddTempValue || dots.total > 0">
+              <Record v-if="taskInfo && taskInfo.projectId"
+                      @view="onViewLocation"
+                      @edit="onEditLocation"
+                      @success="onReloadList"
+                      :work-id="route.params.workId"
+                      :active="recordActive"
+                      :projectId="taskInfo.projectId"
+                      :key="recordActive"
+                      :list="dots.results">
+                <Card v-if="dotAddTempValue" class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small">
+                  <RegisterComment v-if="dotAddTempValue.coordinateType === DotDataType.Comment"
+                                   :data="dotAddTempValue"
+                                   :file="currentFile"
+                                   :projectId="taskInfo.projectId"
+                                   @save="onUpDataDots"
+                                   @cancel="onCancelDot"></RegisterComment>
+                  <RegisterWord v-else
+                                :data="dotAddTempValue"
+                                :file="currentFile"
+                                :projectId="taskInfo.projectId"
+                                @save="onUpDataDots"
+                                @cancel="onCancelDot"></RegisterWord>
+                </Card>
+              </Record>
+            </template>
+            <!-- 提示数据为空 -->
+            <Card v-else class="py-10" size="small">
+              <Empty></Empty>
+            </Card>
           </Loading>
         </LayoutSider>
       </Layout>
