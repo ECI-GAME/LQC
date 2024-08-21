@@ -4,21 +4,34 @@
  * @file 错误类型配置
  */
 import api from "src/api";
+import {ref, onMounted} from "vue";
 import {useRoute} from "vue-router";
 import * as model from "src/utils/model";
 import Loading from "src/components/loading/index.vue";
-import {Card, Button, Form, FormItem, Cascader, Input} from "ant-design-vue";
+import {Card, Button, Form, FormItem, Cascader, InputNumber} from "ant-design-vue";
+
+import type {PsConfig} from "src/types";
 
 const route = useRoute();
+const isLoading = ref<boolean>(true);
 const labelCol = {style: {width: '5rem'}};
 const fieldNames = {label: 'dictLabel', value: 'dictValue', children: 'children'};
 
+const psConfigList = ref<PsConfig[]>([]);
 const {state: psFontList} = model.list(() => api.system.getDictData('sys_ps_font'), void 0, true);
 const {state: psFontConfigList} = model.list(() => api.system.getDictData('comic_ps_font_direction'), void 0, true);
 const {state: psTitleConfigList} = model.list(() => api.system.getDictData('comic_ps_title_config'), void 0, true);
-const {state: psConfigList, execute: getConfigList, isLoading} = model.list(() => {
-  return api.project.getProjectPSConfig(route.params.projectId as string)
-}, void 0, true);
+
+const getConfigList = async function () {
+  isLoading.value = true;
+  const res = await api.project.getProjectPSConfig(route.params.projectId as string);
+  psConfigList.value = res.results;
+  setTimeout(() => {
+    isLoading.value = false;
+  }, 150);
+}
+
+onMounted(getConfigList);
 
 const findTitle = function (dictValue: string | number): string | undefined {
   let text: string | undefined;
@@ -34,16 +47,16 @@ const findTitle = function (dictValue: string | number): string | undefined {
 const onSubmit = async function () {
   const status = await api.project.updateProjectPSErrorData(psConfigList.value);
   if (status) {
-    await getConfigList(200);
+    await getConfigList();
   }
 }
 </script>
 
 <template>
   <Loading :status="isLoading">
-    <Form class="min-h-screen" layout="horizontal" :label-col="labelCol">
+    <Form class="min-h-150" layout="horizontal" :label-col="labelCol">
       <Card class="mt-5 first:mt-0" size="small"
-            v-for="item in psConfigList.results"
+            v-for="item in psConfigList"
             :key="item.id"
             :title="findTitle(item.category)">
         <FormItem label="文字方向">
@@ -68,14 +81,16 @@ const onSubmit = async function () {
               </Cascader>
             </div>
             <div class="flex-1 max-w-50 ml-5">
-              <Input v-model:value="item.fontSize" :min="1" size="small" suffix="PT"/>
+              <InputNumber v-model:value="item.fontSize" :min="1" :step="1" :precision="0" size="small"
+                           addon-after="PT"/>
             </div>
           </div>
         </FormItem>
 
         <FormItem label="行距">
           <div class="w-full max-w-50">
-            <Input v-model:value="item.lineSpacing" :min="1" size="small" suffix="%"/>
+            <InputNumber v-model:value="item.lineSpacing" :min="1" :step="1" :precision="0" size="small"
+                         addon-after="%"/>
           </div>
         </FormItem>
       </Card>

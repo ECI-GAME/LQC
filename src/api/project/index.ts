@@ -78,16 +78,16 @@ export default class extends Graphql {
     return {data};
   }
 
-   //修改方法排序
-   @tryError(false)
-   @$error()
-   @$success("操作成功")
-   @post("/project/methods/upSort")
-   @validate
-   updateProMethSort(data: Array<Object>): Promise<boolean> {
-     // @ts-ignore
-     return {data};
-   }
+  //修改方法排序
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
+  @post("/project/methods/upSort")
+  @validate
+  updateProMethSort(data: Array<Object>): Promise<boolean> {
+    // @ts-ignore
+    return {data};
+  }
 
   //根据ID查询项目信息
   @Get("project/:id")
@@ -214,8 +214,11 @@ export default class extends Graphql {
   @validate
   getProjectPSConfig(@required value: number | string): Promise<PageResult<PsConfig>> {
     const params = {id: value};
+    const callback = function (value: PsConfig[]) {
+      return new PageResult<PsConfig>(value);
+    };
     // @ts-ignore
-    return {params};
+    return {params, callback};
   }
 
 
@@ -263,7 +266,7 @@ export default class extends Graphql {
   @$success("操作成功")
   @post("system/psconfig/update")
   @validate
-  updateProjectPSErrorData(data: object): Promise<boolean> {
+  updateProjectPSErrorData(data: PsConfig[]): Promise<boolean> {
     // @ts-ignore
     return {data};
   }
