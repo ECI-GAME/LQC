@@ -6,6 +6,7 @@
 
 import {computed} from "vue";
 import Select from "./select.vue";
+import { FormItemRest } from "ant-design-vue";
 
 import type {PropType} from "vue";
 
@@ -35,11 +36,13 @@ const data = computed<Array<string | number>>({
 </script>
 
 <template>
-  <div class="flex items-center">
-    <Select class="flex-1 ml-5 first:ml-0" v-model:value="data[0]" :disabled="disabled"
-            placeholder="请选择源语言" :readonly="data[1]"></Select>
-    <Select class="flex-1 ml-5 first:ml-0" v-model:value="data[1]" :disabled="disabled"
-            placeholder="请选择目标语言" :readonly="data[0]"></Select>
-  </div>
+  <FormItemRest>
+    <div class="flex items-center">
+      <Select class="flex-1 ml-5 first:ml-0" v-model:value="data[0]" :disabled="disabled"
+              placeholder="请选择源语言" :readonly="data[1]"></Select>
+      <Select class="flex-1 ml-5 first:ml-0" v-model:value="data[1]" :disabled="disabled"
+              placeholder="请选择目标语言" :readonly="data[0]"></Select>
+    </div>
+  </FormItemRest>
 </template>
 

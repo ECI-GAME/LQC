@@ -5,16 +5,45 @@
 
 import api from "src/api";
 import {rules} from "@ue/form";
+import * as _ from "lodash-es";
 import * as modal from "@ue/modal";
 import * as model from "src/utils/model";
 import safeSet from "@fengqiaogang/safe-set";
 import {Input, DatePicker, Select, message} from "ant-design-vue";
+import LanguagePair from "src/components/language/select_pair.vue";
 
-import type {LanguageData, Project} from 'src/types';
+import type {Project} from 'src/types';
+import type {RuleObject} from "ant-design-vue/es/form";
+
+const dateFormat: string = "YYYY-MM-DD";
+const languageValidator = function () {
+  const isArray = rules.array("请选择语言对");
+  const validator: RuleObject = {
+    required: true,
+    validator(rule: RuleObject, value: any[]) {
+      if (value && Array.isArray(value)) {
+        const list = _.compact(value);
+        if (list.length === 2) {
+          return Promise.resolve();
+        }
+      }
+      return Promise.reject("请选择语言对");
+    },
+  };
+  return [...isArray, validator];
+}
+
+const languageTransform = function (value: Project): Project {
+  const languagePair: string[] = _.get(value, "languagePair") || [];
+  const sourceLanguage = languagePair[0];
+  const targetLanguage = languagePair[1];
+
+  const tmp = _.omit(value, ["languagePair"]);
+  return {...tmp, sourceLanguage, targetLanguage} as Project;
+}
 
 const onCreate = async function (
   data: Project,
-  languageInfo: LanguageData[] = [],
   readOrder: object[] = [],
   onSubmit?: (value: Project) => Promise<boolean>) {
   return modal.form([
@@ -36,31 +65,13 @@ const onCreate = async function (
         rules: rules.text("请填写项目名称")
       }
     ],
-    [
-      {
-        key: "sourceLanguage",
-        label: "源语言",
-        value: data.sourceLanguage,
-        component: Select,
-        rules: rules.text("请选择源语言"),
-        props: {
-          fieldNames: {label: "dictLabel", value: "code"},
-          options: languageInfo
-        }
-      },
-      {
-        key: "targetLanguage",
-        label: "目标语言",
-        value: data.targetLanguage,
-        component: Select,
-        rules: rules.text("请选择目标语言"),
-        props: {
-          fieldNames: {label: "dictLabel", value: "code"},
-          options: languageInfo
-        }
-      }
-    ],
-
+    {
+      key: "languagePair",
+      label: "语言对",
+      value: [data.sourceLanguage, data.targetLanguage],
+      component: LanguagePair,
+      rules: languageValidator(),
+    },
     [
       {
         key: "comicPublisher",
@@ -90,24 +101,26 @@ const onCreate = async function (
     [
       {
         key: "planStartTime",
-        //value:projectInfo.value.planStartTime,
+        value: data.planStartTime,
         label: "计划开始时间",
         component: DatePicker,
         props: {
-          style: {
-            width: '100%'
-          }
+          "class": "w-full",
+          mode: "date",
+          format: dateFormat,
+          valueFormat: dateFormat,
         }
       },
       {
         key: "planEndTime",
         label: "计划完成时间",
-        //value:projectInfo.value.planEndTime,
+        value: data.planEndTime,
         component: DatePicker,
         props: {
-          style: {
-            width: '100%'
-          }
+          "class": "w-full",
+          mode: "date",
+          format: dateFormat,
+          valueFormat: dateFormat,
         }
       },
     ],
@@ -144,14 +157,6 @@ export const useProject = function () {
     state: projectInfo,
     execute: onLoadProject
   } = model.result<Project>(() => api.project.projectInit(), {} as Project, true);
-
-  // 语言对列表
-  const {state: languageInfo} = model.list<LanguageData>(function () {
-      return api.system.getDictData<LanguageData>('comic_language_type');
-    },
-    new model.PageResult<LanguageData>([]),
-    true
-  );
   // 项目阅读顺序
   const {state: readOrder} = model.list<object>(function () {
       return api.system.getDictData<object>('comic_image_read_order');
@@ -161,7 +166,8 @@ export const useProject = function () {
   );
 
   const __submit = async function (value: Project) {
-    const status = await onSave(value);
+    const info = languageTransform(value);
+    const status = await onSave(info);
     if (status) {
       await onLoadProject(100);
     }
@@ -179,7 +185,6 @@ export const useProject = function () {
       };
       return onCreate(
         data,
-        languageInfo.value.results,
         readOrder.value.results,
         onSubmit);
     },
@@ -187,7 +192,6 @@ export const useProject = function () {
     create: () => {
       return onCreate(
         projectInfo.value,
-        languageInfo.value.results,
         readOrder.value.results,
         __submit);
     }
