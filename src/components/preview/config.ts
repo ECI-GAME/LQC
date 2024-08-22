@@ -18,17 +18,6 @@ export const isCheckStatus = function (data: ImageData) {
   return TaskStatus.CHECK.includes(status);
 }
 
-export const getDotButtons = function (data: ImageData): string[] {
-  const status: string = String(data.imageStatus);
-  const list: string[] = [];
-  if (TaskStatus.RUN.includes(status)) {
-    list.push(DotButton.Crop, DotButton.Location);
-  } else if (isCheckStatus(data)) {
-    list.push(DotButton.Location);
-  }
-  return list;
-}
-
 export const scaleTipFormatter = function (value: string | number): string {
   return `${value}%`;
 }

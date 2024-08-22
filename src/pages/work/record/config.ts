@@ -1,1 +1,0 @@
-export const RecordType: string[] = ["文字翻译", "批注"];

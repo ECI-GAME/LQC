@@ -14,7 +14,7 @@ import {downloadFile} from "src/utils/brower/download";
 import {ElLoading} from 'element-plus';
 import Loading from "src/components/loading/index.vue";
 import {Badge, Button, Layout, LayoutContent, LayoutHeader, Result, Slider, Space} from "ant-design-vue";
-import {DotButton, DotData, DotDataType, getDotButtons, isCheckStatus, scaleTipFormatter} from "./config";
+import {DotButton, DotData, DotDataType, isCheckStatus, scaleTipFormatter} from "./config";
 
 import type {PropType} from "vue";
 import type {ImageData} from "src/types/image";
@@ -41,6 +41,11 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  screenButtons: {
+    required: false,
+    default: () => [],
+    type: Array as PropType<string[]>,
+  }
 });
 
 
@@ -282,12 +287,12 @@ defineExpose({setBoxScroll, setBoxDot});
               </div>
             </div>
           </div>
-          <Screen v-if="!disabled && screenStatus"
+          <Screen v-if="!disabled && screenStatus && screenButtons.length > 0"
                   :left="screenX"
                   :top="screenY"
                   :width="screenWidth"
                   :height="screenHeight"
-                  :buttons="getDotButtons(data)"
+                  :buttons="screenButtons"
                   @remove="onRemoveScreen"
                   @click="onClickDotButton"/>
         </div>

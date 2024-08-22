@@ -8,8 +8,8 @@ import {ref} from "vue";
 import api from "src/api";
 import Word from "./word.vue";
 import Comment from "./comment.vue";
-import {RecordType} from "./config";
-import {Card, Button, Space, Empty, Collapse, CollapsePanel} from "ant-design-vue";
+import {RecordTabType} from "../config";
+import {Button, Space, Collapse, CollapsePanel} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import type {DotData} from "src/components/preview/config";
@@ -66,7 +66,7 @@ const onUpdate = function () {
         <template #header>
           <div class="flex items-center justify-between">
             <span>({{ index + 1 }})</span>
-            <template v-if="active === RecordType[0]">
+            <template v-if="active === RecordTabType.Word">
               <span class="flex-1 w-1 truncate mr-2 ml-1" :title="item.translatedText">{{ item.translatedText }}</span>
             </template>
             <template v-else>
@@ -74,7 +74,7 @@ const onUpdate = function () {
             </template>
             <Space>
               <Button class="p-0" type="link" @click.stop="onShowDetail(item)">详情</Button>
-              <Button v-if="active === RecordType[0]"
+              <Button v-if="active === RecordTabType.Word"
                       class="p-0"
                       type="link"
                       :danger="true"
@@ -83,16 +83,16 @@ const onUpdate = function () {
             </Space>
           </div>
         </template>
-        <template v-if="active === RecordType[0]">
+        <template v-if="active === RecordTabType.Word">
           <Word :data="item"></Word>
         </template>
-        <template v-else-if="active === RecordType[1]">
+        <template v-else-if="active === RecordTabType.Comment">
           <Comment :data="item" :project-id="projectId" @success="onUpdate"></Comment>
         </template>
       </CollapsePanel>
     </Collapse>
     <slot>
-      <div v-if="list.length > 0 && active === RecordType[0]" class="mt-2 first:mt-0 sticky bottom-0">
+      <div v-if="list.length > 0 && active === RecordTabType.Word" class="mt-2 first:mt-0 sticky bottom-0">
         <Button class="w-full" type="primary" @click="onSave">保存</Button>
       </div>
     </slot>

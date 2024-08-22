@@ -4,28 +4,27 @@
  * @author svon.me@gmail.com
  */
 
-import api from "src/api";
-
 import {ref} from "vue";
-import * as alias from "src/router/alias";
-import {useRoute, useRouter} from "vue-router";
+import api from "src/api";
+import Switch from "./switch.vue";
+import {TaskStatus} from "src/types";
 import Record from "./record/index.vue";
 import * as model from "src/utils/model";
-import {RecordType} from "./record/config";
-import Preview from "src/components/preview/index.vue";
+import * as alias from "src/router/alias";
+import {useRoute, useRouter} from "vue-router";
 import RegisterWord from "./register/word.vue";
-import RegisterComment from "./register/comment.vue";
 import Tab from "src/components/tab/index.vue";
-import Switch from "./switch.vue";
+import RegisterComment from "./register/comment.vue";
+import Preview from "src/components/preview/index.vue";
 import TaskTitle from "src/components/task/title.vue";
-import {filterSuccess, pickImage, RecordTabs} from "./config";
-import {DotDataType} from "src/components/preview/config";
 import Loading from "src/components/loading/index.vue";
-import {TaskStatus} from "src/types";
+import {DotButton} from "src/components/preview/config";
+import {DotDataType} from "src/components/preview/config";
+import {filterSuccess, pickImage, RecordTabType} from "./config";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
 
-import type {ImageData, TaskData, Project} from "src/types";
 import type {DotData} from "src/components/preview/config";
+import type {ImageData, TaskData, Project} from "src/types";
 
 const previewRef = ref();
 const route = useRoute();
@@ -45,9 +44,9 @@ const {state: projectInfo} = model.result<Project>(() => {
 const {state: taskInfo} = model.result<TaskData>(async () => {
   const data = await api.task.getTaskInfoById(route.params.taskId as string);
   if (data && data.taskStatus && TaskStatus.CHECK.includes(String(data.taskStatus))) {
-    recordTabs.value = [...RecordTabs];
+    recordTabs.value = [RecordTabType.Word, RecordTabType.Comment];
   } else {
-    recordTabs.value = [RecordTabs[0]];
+    recordTabs.value = [RecordTabType.Comment];
   }
   recordActive.value = recordTabs.value[0];
   return data;
@@ -70,7 +69,8 @@ const {state, execute: _reloadList} = model.list<ImageData>(async function () {
 // 记录点
 const {state: dots, execute: _reloadDots, isLoading} = model.list<DotData>(function () {
   if (currentFile.value) {
-    if (recordActive.value === RecordType[1]) {
+    // 判断当前展示的是否为批注数据
+    if (recordActive.value === RecordTabType.Comment) {
       return api.work.getDotList<DotData>(currentFile.value.imageId, DotDataType.Comment);
     }
     return api.work.getDotList<DotData>(currentFile.value.imageId);
@@ -93,17 +93,6 @@ const onChangeTabValue = function () {
 
 // 打点（描点）
 const onChangeDot = async function (data: DotData) {
-  if (data.coordinateType === DotDataType.Comment) {
-    if (recordActive.value === RecordType[0]) {
-      recordActive.value = RecordType[1];
-      await _reloadDots(100);
-    }
-  } else {
-    if (recordActive.value === RecordType[1]) {
-      recordActive.value = RecordType[0];
-      await _reloadDots(100);
-    }
-  }
   dotAddTempValue.value = data;
 }
 
@@ -170,6 +159,18 @@ const _join_dots = function (list: DotData[], value?: DotData) {
   return list;
 }
 
+const getDotButtons = function (action?: string): string[] {
+  const list: string[] = [];
+  if (action && action === RecordTabType.Word) {
+    // 文字翻译
+    list.push(DotButton.Crop, DotButton.Location);
+  } else if (action && action === RecordTabType.Comment) {
+    // 批注
+    list.push(DotButton.Location);
+  }
+  return list;
+}
+
 </script>
 
 <template>
@@ -204,6 +205,7 @@ const _join_dots = function (list: DotData[], value?: DotData) {
                    :dots="_join_dots(dots.results, dotAddTempValue)"
                    :key="currentFile.id"
                    :read-order="projectInfo.readOrder"
+                   :screen-buttons="getDotButtons(recordActive)"
                    @dot="onChangeDot">
             <template #operate>
               <Switch :current="currentFile" :list="state.results"></Switch>
@@ -226,7 +228,7 @@ const _join_dots = function (list: DotData[], value?: DotData) {
                       :key="recordActive"
                       :list="dots.results">
                 <Card v-if="dotAddTempValue" class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small">
-                  <RegisterComment v-if="dotAddTempValue.coordinateType === DotDataType.Comment"
+                  <RegisterComment v-if="recordActive === RecordTabType.Comment"
                                    :data="dotAddTempValue"
                                    :file="currentFile"
                                    :projectId="taskInfo.projectId"

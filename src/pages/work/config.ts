@@ -4,8 +4,10 @@ import {DBList} from "@fengqiaogang/dblist";
 import safeGet from "@fengqiaogang/safe-get";
 import type {ImageData} from "src/types/image";
 
-export const RecordTabs: string[] = ["文字翻译", "批注"];
-
+export enum RecordTabType {
+  Word = "文字翻译",
+  Comment = "批注"
+}
 
 export const pickImage = function <T = ImageData>(list: T[], id: string | number): T | undefined {
   return _.find(list, function (item: T) {
