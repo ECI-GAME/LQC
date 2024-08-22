@@ -4,9 +4,10 @@
  * @author svon.me@gmail.com
  */
 
-import {h as createElement} from "vue";
+import {h as createElement, ref} from "vue";
 import {Button} from "ant-design-vue";
-import {onCreate} from "src/utils/project";
+import {useProject} from "src/utils/project";
+import LanguagePair from "src/components/language/select_pair.vue";
 import Upload from "src/components/upload/index.vue";
 import UploadPreview from "src/components/upload/preview.vue";
 import * as modal from "@ue/modal";
@@ -19,6 +20,9 @@ interface PreviewOption {
   // 修改文件列表数据
   update: (files: FileData[]) => void
 }
+
+const languages = ref<string[]>([]);
+const {create: onCreate} = useProject()
 
 const onSuccess = function (files: FileData[]) {
   console.log(files);
@@ -56,7 +60,11 @@ const onDemo = async function () {
 </script>
 <template>
   <div>
-    <div>
+    <div>{{ languages }}</div>
+    <div class="mt-5">
+      <LanguagePair class="w-100" v-model:value="languages"></LanguagePair>
+    </div>
+    <div class="mt-5">
       <Button @click="onCreate">新建</Button>
     </div>
     <div>项目进度总览</div>

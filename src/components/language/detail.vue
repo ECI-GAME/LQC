@@ -1,4 +1,9 @@
 <script setup lang="ts">
+/**
+ * @file 语言对展示
+ * @author svon.me@gamil.com
+ **/
+
 import api from "src/api";
 import * as model from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";

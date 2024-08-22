@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * @file 语言对展示
+ * @author svon.me@gamil.com
+ * @description detail 组件的扩展
+ **/
+
 import Detail from "./detail.vue";
 
 defineProps({
