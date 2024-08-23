@@ -46,7 +46,7 @@ const {state: taskInfo} = model.result<TaskData>(async () => {
   if (data && data.taskStatus && TaskStatus.CHECK.includes(String(data.taskStatus))) {
     recordTabs.value = [RecordTabType.Word, RecordTabType.Comment];
   } else {
-    recordTabs.value = [RecordTabType.Comment];
+    recordTabs.value = [RecordTabType.Word];
   }
   recordActive.value = recordTabs.value[0];
   return data;
