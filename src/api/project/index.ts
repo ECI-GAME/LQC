@@ -63,8 +63,9 @@ export default class extends Graphql {
   @post("/project")
   @validate
   addProject(data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
   //提交项目
@@ -74,8 +75,9 @@ export default class extends Graphql {
   @post("/project/update")
   @validate
   updateProject(data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
   //修改方法排序
