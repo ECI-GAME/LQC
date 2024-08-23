@@ -30,7 +30,7 @@ const previewRef = ref();
 const route = useRoute();
 const router = useRouter();
 const recordActive = ref<string>();
-const recordTabs = ref<string[]>([]);
+const recordTabs = ref<string[]>([RecordTabType.Word, RecordTabType.Comment]);
 const dotAddTempValue = ref<DotData>();
 
 
@@ -44,13 +44,11 @@ const {state: projectInfo} = model.result<Project>(() => {
 const {state: taskInfo} = model.result<TaskData>(async () => {
   const data = await api.task.getTaskInfoById(route.params.taskId as string);
   if (data && data.taskStatus) {
-    if (TaskStatus.CHECK.includes(String(data.taskStatus))) {
-      recordTabs.value = [RecordTabType.Word, RecordTabType.Comment];
-    } else if (TaskStatus.RUN.includes(String(data.taskStatus))) {
+    if (TaskStatus.RUN.includes(String(data.taskStatus))) {
       recordTabs.value = [RecordTabType.Word];
     }
-    recordActive.value = recordTabs.value[0];
   }
+  recordActive.value = recordTabs.value[0];
   return data;
 }, void 0, true);
 
@@ -95,6 +93,11 @@ const onChangeTabValue = function () {
 
 // 打点（描点）
 const onChangeDot = async function (data: DotData) {
+  if (recordActive.value === RecordTabType.Comment) {
+    data.coordinateType = DotDataType.Comment;
+  } else {
+    data.coordinateType = DotDataType.Ocr;
+  }
   dotAddTempValue.value = data;
 }
 

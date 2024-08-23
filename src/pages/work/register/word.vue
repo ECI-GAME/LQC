@@ -8,6 +8,7 @@ import {preview} from "src/utils/brower/image";
 import {ElImage as Image} from 'element-plus';
 import safeGet from "@fengqiaogang/safe-get";
 import Textarea from "./textarea.vue";
+import Tips from "./tips.vue";
 import {Form, FormItem, Select, SelectOption, Button, Spin, Descriptions, DescriptionsItem} from "ant-design-vue";
 
 import type {PropType} from "vue";
@@ -155,15 +156,7 @@ const onChangeTranslationList = function (data: string[][]) {
                   v-model:text="model.translatedText"
                   @translation="onChangeTranslationList"></Textarea>
     </FormItem>
-    <Descriptions v-if="translationWord" class="mb-5 deep-[th]:hidden" :column="1" :bordered="true" size="small">
-      <template v-for="(name, value) in translationWord" :key="name">
-        <DescriptionsItem>
-          <span class="text-primary mr-3">{{ name }}:</span>
-          <span class="text-primary">{{ value }}</span>
-        </DescriptionsItem>
-      </template>
-    </Descriptions>
-
+    <Tips v-if="translationWord" class="deep-[.ant-descriptions-item-content]:text-primary" :word="translationWord"></Tips>
     <div class="flex items-center justify-between">
       <Button type="primary" danger @click="onCancel">取消</Button>
       <Button type="primary" @click="onSave">保存</Button>

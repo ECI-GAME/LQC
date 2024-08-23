@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Log from "./log.vue";
+import Tips from "../register/tips.vue";
 import {DotType} from "src/components/preview/config";
 import {Descriptions, DescriptionsItem} from "ant-design-vue";
 
@@ -9,14 +11,42 @@ defineProps({
   data: {
     required: true,
     type: Object as PropType<DotData>,
+  },
+  index: {
+    type: Number,
+    required: true,
   }
 });
+
+
+const translationWord2 = {
+  "术语1": "测试内容1",
+  "术语2": "测试内容2"
+};
+
+
 </script>
 
 <template>
   <Descriptions :column="1" :bordered="true" size="small">
     <DescriptionsItem label="类别">{{ DotType[data.imageFlag] }}</DescriptionsItem>
-    <DescriptionsItem label="原文">{{ data.originalText }}</DescriptionsItem>
+    <DescriptionsItem label="原文" class="deep-[s]:text-[red]">
+      <template v-if="index === 0">
+        <span>禁用词测试</span>
+        <s>1111</s>
+        <span>禁用词测试</span>
+        <s>1111</s>
+        <span>禁用词测试</span>
+        <s>1111</s>
+      </template>
+      <template v-else>{{ data.originalHtml }}</template>
+    </DescriptionsItem>
     <DescriptionsItem label="译文">{{ data.translatedText }}</DescriptionsItem>
   </Descriptions>
+  <template v-if="index === 0">
+    <Tips class="mt-5 deep-[.ant-descriptions-item-content]:text-[red]" :word="translationWord2"></Tips>
+  </template>
+  <template v-else-if="index === 1">
+    <Log class="mt-5 deep-[.ant-descriptions-item-content]:text-green-700"></Log>
+  </template>
 </template>

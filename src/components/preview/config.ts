@@ -1,6 +1,4 @@
-import {TaskStatus} from "src/types";
 import {basename} from "src/utils/image";
-import type {ImageData} from "src/types/image";
 
 export const DotType = {
   "1": "框内",
@@ -11,11 +9,6 @@ export const DotType = {
 export enum DotButton {
   Crop = "font-size",
   Location = "location-fill"
-}
-
-export const isCheckStatus = function (data: ImageData) {
-  const status: string = String(data.imageStatus);
-  return TaskStatus.CHECK.includes(status);
 }
 
 export const scaleTipFormatter = function (value: string | number): string {

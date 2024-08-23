@@ -114,7 +114,6 @@ const onClickDotButton = async function (res: object) {
   );
 
   if (type === DotButton.Crop) {
-    result.coordinateType = DotDataType.Ocr;
     const loading = ElLoading.service({
       lock: true,
       text: 'Loading',
@@ -151,10 +150,6 @@ const onClickDotButton = async function (res: object) {
         loading.close();
       }, 500);
     }
-  } else if (isCheckStatus(props.data)) {
-    result.coordinateType = DotDataType.Comment;
-  } else {
-    result.coordinateType = DotDataType.Word;
   }
   $emit("dot", result);
   onRemoveScreen();
