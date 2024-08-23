@@ -62,7 +62,7 @@ const checkWord = async function (keyword: string): Promise<string | undefined> 
       const text = keyword.slice(end, item.index - 1);
       result.push(text + `<span style="color: #0EA5E9;">${item.word}<span>`);
       end = item.index + _.size(item.word) - 1;
-      translation.push([item.word, item.suggestTranslation]);
+      translation.push([item.suggestTranslation, item.word]);
     }
   }
   if (translation.length > 0) {

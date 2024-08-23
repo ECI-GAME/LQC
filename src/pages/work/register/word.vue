@@ -153,8 +153,7 @@ const onChangeTranslationList = function (data: string[][]) {
     <FormItem label="译文">
         <Textarea :key="translateUuid" :project-id="projectId"
                   v-model:html="model.translatedHtml"
-                  v-model:text="model.translatedText"
-                  @translation="onChangeTranslationList"></Textarea>
+                  v-model:text="model.translatedText"></Textarea>
     </FormItem>
     <Tips v-if="translationWord" class="deep-[.ant-descriptions-item-content]:text-primary" :word="translationWord"></Tips>
     <div class="flex items-center justify-between">

@@ -39,7 +39,7 @@ const translationWord2 = {
         <span>禁用词测试</span>
         <s>1111</s>
       </template>
-      <template v-else>{{ data.originalHtml }}</template>
+      <template v-else>{{ data.originalText }}</template>
     </DescriptionsItem>
     <DescriptionsItem label="译文">{{ data.translatedText }}</DescriptionsItem>
   </Descriptions>
