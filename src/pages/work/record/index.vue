@@ -67,8 +67,8 @@ const onUpdate = function () {
           <div class="flex items-center justify-between">
             <span>({{ index + 1 }})</span>
             <template v-if="active === RecordTabType.Word">
-              <span v-if="index === 0" class="flex-1 w-1 truncate mr-2 ml-1 text-[red]" :title="item.translatedText">{{ item.translatedText }}</span>
-              <span v-else-if="index === 1" class="flex-1 w-1 truncate mr-2 ml-1 text-green-700" :title="item.translatedText">{{ item.translatedText }}</span>
+              <span v-if="item.id === 101" class="flex-1 w-1 truncate mr-2 ml-1 text-[red]" :title="item.translatedText">{{ item.translatedText }}</span>
+              <span v-else-if="item.id === 102" class="flex-1 w-1 truncate mr-2 ml-1 text-green-700" :title="item.translatedText">{{ item.translatedText }}</span>
               <span v-else class="flex-1 w-1 truncate mr-2 ml-1" :title="item.translatedText">{{ item.translatedText }}</span>
             </template>
             <template v-else>
@@ -86,7 +86,7 @@ const onUpdate = function () {
           </div>
         </template>
         <Comment v-if="String(item.coordinateType) === '3'" :data="item" :project-id="projectId" @success="onUpdate"/>
-        <Word v-else :data="item" :index="index"></Word>
+        <Word v-else :data="item"></Word>
       </CollapsePanel>
     </Collapse>
     <slot>

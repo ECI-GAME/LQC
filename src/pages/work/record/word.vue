@@ -31,7 +31,7 @@ const translationWord2 = {
   <Descriptions :column="1" :bordered="true" size="small">
     <DescriptionsItem label="类别">{{ DotType[data.imageFlag] }}</DescriptionsItem>
     <DescriptionsItem label="原文" class="deep-[s]:text-[red]">
-      <template v-if="index === 0">
+      <template v-if="data.id === 101">
         <span>禁用词测试</span>
         <s>1111</s>
         <span>禁用词测试</span>
@@ -43,10 +43,10 @@ const translationWord2 = {
     </DescriptionsItem>
     <DescriptionsItem label="译文">{{ data.translatedText }}</DescriptionsItem>
   </Descriptions>
-  <template v-if="index === 0">
+  <template v-if="data.id === 101">
     <Tips class="mt-5 deep-[.ant-descriptions-item-content]:text-[red]" :word="translationWord2"></Tips>
   </template>
-  <template v-else-if="index === 1">
+  <template v-else-if="data.id === 102">
     <Log class="mt-5 deep-[.ant-descriptions-item-content]:text-green-700"></Log>
   </template>
 </template>

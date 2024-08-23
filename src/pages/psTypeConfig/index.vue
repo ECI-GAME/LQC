@@ -7,19 +7,25 @@ import {ref, onMounted} from "vue";
 import {useRoute} from "vue-router";
 import * as model from "src/utils/model";
 import Loading from "src/components/loading/index.vue";
-import {Card, Button, Form, FormItem, Cascader, InputNumber} from "ant-design-vue";
+import {Card, Button, Form, FormItem, Select, InputNumber} from "ant-design-vue";
 
 import type {PsConfig} from "src/types";
 
 const route = useRoute();
 const isLoading = ref<boolean>(true);
 const labelCol = {style: {width: '5rem'}};
-const fieldNames = {label: 'dictLabel', value: 'dictValue', children: 'children'};
+const fieldNames = {label: 'dictLabel', value: 'dictValue'};
 
 const psConfigList = ref<PsConfig[]>([]);
-const {state: psFontList} = model.list(() => api.system.getDictData('sys_ps_font'), void 0, true);
-const {state: psFontConfigList} = model.list(() => api.system.getDictData('comic_ps_font_direction'), void 0, true);
-const {state: psTitleConfigList} = model.list(() => api.system.getDictData('comic_ps_title_config'), void 0, true);
+const {state: psFontList, isReady: isReadyFont} = model.list(() => api.system.getDictData('sys_ps_font'), void 0, true);
+const {
+  state: psFontConfigList,
+  isReady: isReadyDirect
+} = model.list(() => api.system.getDictData('comic_ps_font_direction'), void 0, true);
+const {
+  state: psTitleConfigList,
+  isReady: isReadyTitle
+} = model.list(() => api.system.getDictData('comic_ps_title_config'), void 0, true);
 
 const getConfigList = async function () {
   isLoading.value = true;
@@ -53,31 +59,32 @@ const onSubmit = async function () {
 
 <template>
   <Loading :status="isLoading">
-    <Form class="min-h-150" layout="horizontal" :label-col="labelCol">
+    <Form class="min-h-150" layout="horizontal" :label-col="labelCol" v-if="isReadyFont && isReadyDirect && isReadyTitle">
       <Card class="mt-5 first:mt-0" size="small"
             v-for="item in psConfigList"
             :key="item.id"
             :title="findTitle(item.category)">
         <FormItem label="文字方向">
-          <Cascader
+          <Select
               class="w-full max-w-50"
-              v-model="item.textDirection"
+              v-model:value="item.textDirection"
               size="small"
-              filterable
-              placeholder="请选择" :fieldNames="fieldNames"
+              placeholder="请选择"
+              :fieldNames="fieldNames"
               :options="psFontConfigList.results">
-          </Cascader>
+          </Select>
         </FormItem>
 
         <FormItem label="字体">
           <div class="flex items-center">
             <div class="flex-1 max-w-50">
-              <Cascader class="w-full" v-model="item.font"
-                        size="small"
-                        filterable
-                        placeholder="请选择" :fieldNames="fieldNames"
-                        :options="psFontList.results">
-              </Cascader>
+              <Select class="w-full" v-model:value="item.font"
+                      size="small"
+                      showSearch
+                      placeholder="请选择"
+                      :fieldNames="fieldNames"
+                      :options="psFontList.results">
+              </Select>
             </div>
             <div class="flex-1 max-w-50 ml-5">
               <InputNumber v-model:value="item.fontSize" :min="1" :step="1" :precision="0" size="small"
