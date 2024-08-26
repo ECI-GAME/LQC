@@ -9,3 +9,14 @@ export interface CheckType {
   word: string;                    // 匹配的关键词
   suggestTranslation: string;      // 匹配术语文案
 }
+
+/* 标记电修改记录 */
+export interface DotCheckData {
+  id: number;
+  originalText: string;
+  changeText: string;
+  createTime: number;
+  createBy: string;
+  translationId: number;
+  imageId: number;
+}

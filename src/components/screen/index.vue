@@ -19,12 +19,12 @@ const props = defineProps({
   width: {
     type: Number,
     required: false,
-    default: () => 200
+    default: () => 15
   },
   height: {
     type: Number,
     required: false,
-    default: () => 120
+    default: () => 15
   },
   buttons: {
     type: Array,
@@ -33,21 +33,21 @@ const props = defineProps({
   }
 });
 
-const x = ref<number>(0);
-const y = ref<number>(0);
+const x = ref<number>(props.left);
+const y = ref<number>(props.top);
 const width = ref<number>(props.width);
 const height = ref<number>(props.height);
 
 onMounted(function () {
   if (props.left > 0) {
-    const num = new BigNumber(props.left).minus(new BigNumber(width.value).div(2)).toNumber();
+    const num = new BigNumber(props.left).minus(new BigNumber(width.value)).toNumber();
     if (num > 0) {
       x.value = num;
     }
   }
 
   if (props.top > 0) {
-    const num = new BigNumber(props.top).minus(new BigNumber(height.value).div(2)).toNumber();
+    const num = new BigNumber(props.top).minus(new BigNumber(height.value)).toNumber();
     if (num > 0) {
       y.value = num;
     }

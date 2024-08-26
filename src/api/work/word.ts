@@ -1,6 +1,7 @@
 import * as message from "@ue/message";
-import {Post, Put, validate, required, tryError} from "@js-lion/api";
-import type {CheckType} from "src/types";
+import {PageResult} from "src/utils/model";
+import {Get, Post, Put, validate, required, tryError} from "@js-lion/api";
+import type {DotCheckData, CheckType} from "src/types";
 
 export default class {
   @tryError(false)
@@ -35,5 +36,15 @@ export default class {
     const data: object = {text: keyword, projectId};
     // @ts-ignore
     return {data};
+  }
+
+  // 标记数据修改记录
+  @tryError(new PageResult<DotCheckData>())
+  @Get("/project/image/check/pageList")
+  @validate
+  dotCheckList(@required dotId: string | number, @required imageId: string | number): Promise<PageResult<DotCheckData>> {
+    const params: object = {imageId, translationId: dotId, pageNum: 1, pageSize: 1000};
+    // @ts-ignore
+    return {params};
   }
 }

@@ -12,7 +12,7 @@ import {RecordTabType} from "../config";
 import {Button, Space, Collapse, CollapsePanel} from "ant-design-vue";
 
 import type {PropType} from "vue";
-import type {DotData} from "src/components/preview/config";
+import {DotData, DotMatchType} from "src/components/preview/config";
 
 const $emit = defineEmits(["view", "edit", "success"]);
 
@@ -57,6 +57,17 @@ const onUpdate = function () {
   $emit("success");
 }
 
+const getTitleColor = function (data: DotData) {
+  if (data.matchType) {
+    if (data.matchType === DotMatchType.update) {
+      return "text-green-700";
+    }
+    if (data.matchType === DotMatchType.match || data.matchType === DotMatchType.noUpdate) {
+      return "text-[red]";
+    }
+  }
+}
+
 </script>
 
 <template>
@@ -66,14 +77,10 @@ const onUpdate = function () {
         <template #header>
           <div class="flex items-center justify-between">
             <span>({{ index + 1 }})</span>
-            <template v-if="active === RecordTabType.Word">
-              <span v-if="item.id === 101" class="flex-1 w-1 truncate mr-2 ml-1 text-[red]" :title="item.translatedText">{{ item.translatedText }}</span>
-              <span v-else-if="item.id === 102" class="flex-1 w-1 truncate mr-2 ml-1 text-green-700" :title="item.translatedText">{{ item.translatedText }}</span>
-              <span v-else class="flex-1 w-1 truncate mr-2 ml-1" :title="item.translatedText">{{ item.translatedText }}</span>
-            </template>
-            <template v-else>
-              <span class="flex-1 w-1 truncate mr-2 ml-1" :title="item.remark">{{ item.remark }}</span>
-            </template>
+            <span v-if="active === RecordTabType.Word"
+                  class="flex-1 w-1 truncate mr-2 ml-1"
+                  :class="getTitleColor(item)">{{ item.translatedText }}</span>
+            <span v-else class="flex-1 w-1 truncate mr-2 ml-1" :title="item.remark">{{ item.remark }}</span>
             <Space>
               <Button class="p-0" type="link" @click.stop="onShowDetail(item)">详情</Button>
               <Button v-if="active === RecordTabType.Word"

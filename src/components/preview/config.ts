@@ -21,10 +21,17 @@ export enum DotDataType {
   Comment
 }
 
+export enum DotMatchType {
+  not= 1,
+  match,
+  update,
+  noUpdate
+}
+
 export class DotData {
   public id!: string | number;
   public taskId?: string;
-  public imageId?: string;
+  public imageId!: string | number;
   public imageName?: string;
   public imageFlag: string | number = "1"; // 类型， 默认框内
   public translatedText: string = "";      // 译文
@@ -33,6 +40,7 @@ export class DotData {
   public originalHtml: string = "";
   public coordinateType!: DotDataType;     // 标注类型 1: 带 OCR 翻译的文字录入， 2: 普通的文字录入, 3: 标注
   public remark: string = "";              // 备注
+  public matchType?: DotMatchType;
   constructor(
     public xCorrdinate1: number,
     public yCorrdinate1: number,
