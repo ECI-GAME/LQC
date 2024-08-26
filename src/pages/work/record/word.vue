@@ -12,6 +12,10 @@ defineProps({
     required: true,
     type: Object as PropType<DotData>,
   },
+  projectId: {
+    type: [String, Number],
+    required: true,
+  },
 });
 
 
@@ -27,7 +31,7 @@ defineProps({
   </Descriptions>
   <template v-if="data.matchType">
     <template v-if="data.matchType === DotMatchType.match || data.matchType === DotMatchType.noUpdate">
-      <Tips class="mt-5 deep-[.ant-descriptions-item-content]:text-[red]" :data="data"></Tips>
+      <Tips class="mt-5 deep-[.ant-descriptions-item-content]:text-[red]" :project-id="projectId" :data="data"></Tips>
     </template>
     <template v-else-if="data.matchType === DotMatchType.update">
       <Log class="mt-5 deep-[.ant-descriptions-item-content]:text-green-700" :data="data"></Log>

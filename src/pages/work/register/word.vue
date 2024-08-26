@@ -9,6 +9,7 @@ import {ElImage as Image} from 'element-plus';
 import safeGet from "@fengqiaogang/safe-get";
 import Textarea from "./textarea.vue";
 import Tips from "./tips.vue";
+import {changeTranslationList} from "../config";
 import {Form, FormItem, Select, SelectOption, Button, Spin, Descriptions, DescriptionsItem} from "ant-design-vue";
 
 import type {PropType} from "vue";
@@ -99,18 +100,7 @@ const translateMt = async function () {
 }
 
 const onChangeTranslationList = function (data: string[][]) {
-  const map = new Map<string, string>(translationWord.value ? Object.entries(translationWord.value) : void 0);
-  for (const item of data) {
-    const [key, value] = item;
-    if (!map.has(key)) {
-      map.set(key, value);
-    }
-  }
-  if (map.size > 0) {
-    translationWord.value = Object.fromEntries(map);
-  } else {
-    translationWord.value = void 0;
-  }
+  translationWord.value = changeTranslationList(data, translationWord.value);
 }
 
 </script>
@@ -155,7 +145,8 @@ const onChangeTranslationList = function (data: string[][]) {
                   v-model:html="model.translatedHtml"
                   v-model:text="model.translatedText"></Textarea>
     </FormItem>
-    <Tips v-if="translationWord" class="deep-[.ant-descriptions-item-content]:text-primary" :word="translationWord"></Tips>
+    <Tips v-if="translationWord" class="deep-[.ant-descriptions-item-content]:text-primary"
+          :word="translationWord"></Tips>
     <div class="flex items-center justify-between">
       <Button type="primary" danger @click="onCancel">取消</Button>
       <Button type="primary" @click="onSave">保存</Button>

@@ -1,23 +1,31 @@
 <script setup lang="ts">
+import {ref, onMounted} from "vue";
 import Tips from "../register/tips.vue";
+import {checkWord, changeTranslationList} from "../config";
 
 import type {PropType} from "vue";
 import type {DotData} from "src/components/preview/config";
-
 
 const props = defineProps({
   data: {
     required: true,
     type: Object as PropType<DotData>,
   },
+  projectId: {
+    type: [String, Number],
+    required: true,
+  },
 });
 
-const translationWord = {};
+const translationWord = ref<object>();
 
-// todo 加载时调用关键词检索接口，将结果展示出来
+onMounted(async function () {
+  const res = await checkWord(props.projectId, props.data?.originalHtml);
+  translationWord.value = changeTranslationList(res.translation, translationWord.value);
+})
 
 </script>
 
 <template>
-  <Tips :word="translationWord"></Tips>
+  <Tips v-if="translationWord" :word="translationWord"></Tips>
 </template>

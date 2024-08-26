@@ -1,12 +1,67 @@
+import api from "src/api";
 import * as _ from "lodash-es";
 import * as alias from "src/router/alias";
 import {DBList} from "@fengqiaogang/dblist";
 import safeGet from "@fengqiaogang/safe-get";
 import type {ImageData} from "src/types/image";
 
+import {CheckCode} from "src/types";
+
 export enum RecordTabType {
   Word = "文字翻译",
   Comment = "批注"
+}
+
+const DisableColor = "#FF0000";
+const DisableStart = `<span style="color: ${DisableColor};"><del>`;
+const DisableEnd = `</del><span>`;
+
+interface CheckWordResut {
+  translation: string[][];
+  html: string | undefined;
+}
+
+/**
+ * @file 关键字检查与判断
+ */
+export const checkWord = async function (project: string | number, keyword?: string): Promise<CheckWordResut> {
+  const translation: string[][] = [];
+  if (keyword && keyword.length > 0) {
+    const res = await api.work.word.check(project, keyword);
+    let end: number = 0;
+    const result: string[] = [];
+    for (const item of res) {
+      const code = String(item.checkTypeCode);
+      if (code === CheckCode.Disable) {
+        const text = keyword.slice(end, item.index - 1);
+        result.push(text + `${DisableStart}${item.word}${DisableEnd}`);
+        end = item.index + _.size(item.word) - 1;
+      } else if (code === CheckCode.Translation) {
+        const text = keyword.slice(end, item.index - 1);
+        result.push(text + `<span style="color: #0EA5E9;">${item.word}<span>`);
+        end = item.index + _.size(item.word) - 1;
+        translation.push([item.suggestTranslation, item.word]);
+      }
+    }
+    if (result.length > 0) {
+      result.push(keyword.slice(end));
+      return {translation, html: result.join("")};
+    }
+  }
+  return {translation, html: void 0};
+}
+export const changeTranslationList = function (data: string[][], originValue?: object) {
+  const map: Map<string, string> = new Map<string, string>(originValue ? Object.entries(originValue) : void 0);
+  for (const item of data) {
+    const [key, value] = item;
+    if (!map.has(key)) {
+      map.set(key, value);
+    }
+  }
+  if (map.size > 0) {
+    return Object.fromEntries(map);
+  }
+  return void 0;
 }
 
 export const pickImage = function <T = ImageData>(list: T[], id: string | number): T | undefined {

@@ -93,7 +93,7 @@ const getTitleColor = function (data: DotData) {
           </div>
         </template>
         <Comment v-if="String(item.coordinateType) === '3'" :data="item" :project-id="projectId" @success="onUpdate"/>
-        <Word v-else :data="item"></Word>
+        <Word v-else :project-id="projectId" :data="item"></Word>
       </CollapsePanel>
     </Collapse>
     <slot>
