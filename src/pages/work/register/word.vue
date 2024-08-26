@@ -2,18 +2,18 @@
 import {ref} from "vue";
 import api from "src/api";
 import {Icon} from "@ue/icon";
-import {useValidate} from "@ue/form";
-import {basename} from "src/utils/image";
-import {preview} from "src/utils/brower/image";
-import {ElImage as Image} from 'element-plus';
-import safeGet from "@fengqiaogang/safe-get";
-import Textarea from "./textarea.vue";
 import Tips from "./tips.vue";
+import {useValidate} from "@ue/form";
+import Textarea from "./textarea.vue";
+import {basename} from "src/utils/image";
+import safeGet from "@fengqiaogang/safe-get";
+import {ElImage as Image} from 'element-plus';
+import {preview} from "src/utils/brower/image";
 import {changeTranslationList} from "../config";
-import {Form, FormItem, Select, SelectOption, Button, Spin, Descriptions, DescriptionsItem} from "ant-design-vue";
+import {DotData, DotMatchType} from "src/components/preview/config";
+import {Button, Card, Form, FormItem, Select, SelectOption, Spin} from "ant-design-vue";
 
 import type {PropType} from "vue";
-import type {DotData} from "src/components/preview/config";
 
 const $emit = defineEmits(["save", "cancel"]);
 const props = defineProps({
@@ -64,9 +64,15 @@ const onSave = async function () {
   let status = await validate();
   if (status) {
     const value = getResult();
-    console.log(value)
-    if (props.data.id) {
-      status = await api.work.word.update({...value, id: props.data.id});
+    if (props.data && props.data.id) {
+      const formValue = {...value, id: props.data.id}
+      if (props.data.matchType && props.data.matchType !== DotMatchType.not) {
+        // 审核 - 编辑
+        status = await api.work.word.updateCheck(formValue);
+      } else {
+        // 正常编辑
+        status = await api.work.word.update(formValue);
+      }
     } else {
       status = await api.work.word.add(value);
     }
@@ -149,7 +155,12 @@ const onChangeTranslationList = function (data: string[][]) {
           :word="translationWord"></Tips>
     <div class="flex items-center justify-between">
       <Button type="primary" danger @click="onCancel">取消</Button>
-      <Button type="primary" @click="onSave">保存</Button>
+      <template v-if="props.data.matchType && props.data.matchType !== DotMatchType.not">
+        <Button type="primary" @click="onSave">提交</Button>
+      </template>
+      <template v-else>
+        <Button type="primary" @click="onSave">保存</Button>
+      </template>
     </div>
   </Form>
 </template>

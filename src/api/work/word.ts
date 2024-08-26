@@ -15,12 +15,25 @@ export default class {
     return {data, callback};
   }
 
+  /** 正常情况下修改标记信息 */
   @tryError(false)
   @message.$error()
   @message.$success("已修改")
   @Put("/project/image/translations")
   @validate
   update(@required data: object): Promise<boolean> {
+    const callback = () => true;
+    // @ts-ignore
+    return {data, callback};
+  }
+
+  /** 审核状态中编辑标记信息 */
+  @tryError(false)
+  @message.$error()
+  @message.$success("已修改")
+  @Put("/project/image/translations")
+  @validate
+  updateCheck(@required data: object): Promise<boolean> {
     const callback = () => true;
     // @ts-ignore
     return {data, callback};

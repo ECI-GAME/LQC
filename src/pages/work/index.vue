@@ -138,6 +138,7 @@ const backOption = function (task: TaskData) {
 
 const onSubmit = async function () {
   const data = {
+    // 必传
     id: taskInfo.value.id,
     taskStatus: taskInfo.value.taskStatus,
     projectNum: projectInfo.value.projectNum,

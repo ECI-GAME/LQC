@@ -35,7 +35,7 @@ export default class extends GraphQL {
   }
 
   /**
-   *
+   * 单张图片标记节点数据的保存
    **/
   @tryError(false)
   @message.$error()
@@ -45,7 +45,7 @@ export default class extends GraphQL {
   onSave(@required workId: string | number): Promise<boolean> {
     const callback = () => true;
     const data = {
-      id: workId,
+      id: workId, // 图片ID
       isFinish: 1
     };
     // @ts-ignore
