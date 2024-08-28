@@ -1,26 +1,18 @@
 <script setup lang="ts">
-import {ref, nextTick} from "vue";
-import api from "src/api";
+import {ref} from "vue";
 import {Icon} from "@ue/icon";
 import BigNumber from "bignumber.js";
-import Cropper from "src/utils/cropper";
-import Screen from "../screen/index.vue";
-import Upload from "src/utils/upload/file";
 import safeGet from "@fengqiaogang/safe-get";
-import * as ImageUtil from "src/utils/image";
-import {format} from "src/utils/upload/common";
 import * as image from "src/utils/brower/image";
+import {DotData, scaleTipFormatter} from "./config";
 import {downloadFile} from "src/utils/brower/download";
-import {ElLoading} from 'element-plus';
 import Loading from "src/components/loading/index.vue";
 import {Badge, Button, Layout, LayoutContent, LayoutHeader, Result, Slider, Space} from "ant-design-vue";
-import {DotButton, DotData, DotDataType, isCheckStatus, scaleTipFormatter} from "./config";
 
 import type {PropType} from "vue";
 import type {ImageData} from "src/types/image";
-import type {Screen as ScreenValue} from "../screen/config";
 
-const $emit = defineEmits(["dot", "switch"]);
+const $emit = defineEmits(["switch", "click"]);
 
 const props = defineProps({
   data: {
@@ -37,15 +29,6 @@ const props = defineProps({
     required: false,
     default: () => false,
   },
-  readOrder: {
-    type: String,
-    required: true,
-  },
-  screenButtons: {
-    required: false,
-    default: () => [],
-    type: Array as PropType<string[]>,
-  }
 });
 
 
@@ -58,11 +41,6 @@ const key = ref<number>(Math.random());
 const imageWidth = ref(0);
 const imageHeight = ref(0);
 const ratio = ref<number>(100);
-const screenStatus = ref<boolean>(false);
-const screenX = ref<number>(0);
-const screenY = ref<number>(0);
-const screenWidth = ref<number>();
-const screenHeight = ref<number>();
 const getScale = function (value: number) {
   let scale = 1;
   if (value > 100) {
@@ -77,6 +55,9 @@ const getScale = function (value: number) {
 
 
 const onCaptureLocation = function (e: Event) {
+  if (props.disabled) {
+    return void 0;
+  }
   // 获取点击事件中的坐标
   const clickX = safeGet<number>(e, "clientX")!;
   const clickY = safeGet<number>(e, "clientY")!;
@@ -86,73 +67,24 @@ const onCaptureLocation = function (e: Event) {
   const rect = container.getBoundingClientRect();
 
   // 计算相对于容器的坐标
-  screenX.value = clickX - rect.left - boxRef.value.scrollLeft;
-  screenY.value = clickY - rect.top - boxRef.value.scrollTop;
-  screenWidth.value = void 0;
-  screenHeight.value = void 0;
-  screenStatus.value = true;
+  const x = clickX - rect.left - boxRef.value.scrollLeft;
+  const y = clickY - rect.top - boxRef.value.scrollTop;
+
+  $emit("click", e, {
+    x,
+    y,
+    width: imageWidth.value,
+    height: imageHeight.value
+  });
 }
 
-// 关闭选区
-const onRemoveScreen = function () {
-  screenStatus.value = false
-}
-
-// 添加标记, 处理打点事件
-const onClickDotButton = async function (res: object) {
-  const type = safeGet<DotButton>(res, "type")!;
-  const data = safeGet<ScreenValue>(res, "value")!;
-
+const scrollValue = function () {
   const scale = getScale(ratio.value);
-  const result = new DotData(
-    Number(new BigNumber(data.x1).plus(boxRef.value.scrollLeft).div(scale).toFixed(2)),
-    Number(new BigNumber(data.y1).plus(boxRef.value.scrollTop).div(scale).toFixed(2)),
-    Number(new BigNumber(data.x2).plus(boxRef.value.scrollLeft).div(scale).toFixed(2)),
-    Number(new BigNumber(data.y2).plus(boxRef.value.scrollTop).div(scale).toFixed(2)),
-    Number(imageWidth.value),
-    Number(imageHeight.value)
-  );
-
-  if (type === DotButton.Crop) {
-    const loading = ElLoading.service({
-      lock: true,
-      text: 'Loading',
-      background: 'rgba(0, 0, 0, 0.7)',
-    })
-    try {
-      const cropper = new Cropper(imageRef.value);
-      // 裁剪获取 base64 图片数据
-      const value = await cropper.cutXY(result.xCorrdinate1, result.yCorrdinate1, result.xCorrdinate2, result.yCorrdinate2);
-      if (value) {
-        // base64 数据转换为 File 对象
-        const img = ImageUtil.base64ToImage(value);
-
-
-        // 上传 File 获取图片地址
-        const upload = new Upload([img]);
-        const [data, text] = await Promise.all([
-          upload.start(),
-          //api.system.ocr(img)
-          api.system.ocr(img, props.readOrder)
-        ]);
-        if (data && data[0]) {
-          const image = format(data[0]);
-          result.imagePath = image.src;
-        }
-        if (text) {
-          result.originalText = text;
-        }
-      }
-    } catch (e) {
-      // todo
-    } finally {
-      setTimeout(() => {
-        loading.close();
-      }, 500);
-    }
-  }
-  $emit("dot", result);
-  onRemoveScreen();
+  return {
+    scale,
+    left: boxRef.value.scrollLeft,
+    top: boxRef.value.scrollTop
+  };
 }
 
 const setBoxScroll = function (dot: DotData) {
@@ -178,7 +110,6 @@ const setBoxScroll = function (dot: DotData) {
 }
 
 const setBoxDot = function (data: DotData) {
-  screenStatus.value = false;
   setBoxScroll(data);
 }
 
@@ -208,7 +139,7 @@ const onReload = function () {
 }
 
 
-defineExpose({setBoxScroll, setBoxDot});
+defineExpose({setBoxScroll, setBoxDot, scrollValue});
 
 </script>
 
@@ -268,7 +199,7 @@ defineExpose({setBoxScroll, setBoxDot});
           <div ref="boxRef" class="h-full overflow-auto w-full select-none ease-in-out"
                :style="`--image-scale: ${getScale(ratio)};`">
             <div class="relative inline-block origin-top-left scale-[var(--image-scale)]">
-              <img ref="imageRef" class="inline-block max-w-[initial]" :src="data.imagePath" alt=""
+              <img ref="imageRef" class="no-drag inline-block max-w-[initial]" :src="data.imagePath" alt=""
                    crossorigin="anonymous" :key="`${ratio}-${key}`"
                    @click="onCaptureLocation" @load="onLoad" @error="onError"/>
               <div>
@@ -282,14 +213,7 @@ defineExpose({setBoxScroll, setBoxDot});
               </div>
             </div>
           </div>
-          <Screen v-if="!disabled && screenStatus && screenButtons.length > 0"
-                  :left="screenX"
-                  :top="screenY"
-                  :width="screenWidth"
-                  :height="screenHeight"
-                  :buttons="screenButtons"
-                  @remove="onRemoveScreen"
-                  @click="onClickDotButton"/>
+          <slot name="extend"></slot>
         </div>
       </LayoutContent>
     </Layout>

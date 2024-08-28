@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {watch, onMounted} from "vue";
 import {checkWord} from "../config";
 import Text from '@tiptap/extension-text'
 import Color from '@tiptap/extension-color';
@@ -40,6 +41,16 @@ const editor = new Editor({
 });
 
 let __html: string;
+onMounted(function () {
+  __html = props.html;
+  watch(() => props.html, function (value) {
+    // 当 value 发生变化时主动修改富文本内容
+    if (value && value !== __html) {
+      editor.commands.setContent(String(value));
+    }
+  })
+})
+
 const onCheckText = async function () {
   const html = editor.getHTML();
   const text = editor.getText();

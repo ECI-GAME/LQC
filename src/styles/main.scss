@@ -26,6 +26,12 @@ h2 {
   @apply text-black;
 }
 
+img.no-drag {
+  user-drag: none;
+  @apply select-none;
+  pointer-events: auto;
+}
+
 .ue-modal-main {
   .ant-modal-content {
     @apply p-0;

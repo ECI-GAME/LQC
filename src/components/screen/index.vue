@@ -1,58 +1,33 @@
 <script setup lang="ts">
-import {Icon} from "@ue/icon";
-import BigNumber from "bignumber.js";
-import {ref, computed, onMounted} from "vue";
+import {ref, computed} from "vue";
 import safeGet from "@fengqiaogang/safe-get";
 
-import type {Screen} from "./config";
-
-const $emit = defineEmits(["click", "remove"]);
+const $emit = defineEmits(["update:x1", "update:y1", "update:x2", "update:y2"]);
 const props = defineProps({
-  left: {
+  x1: {
     type: Number,
     required: true
   },
-  top: {
+  y1: {
     type: Number,
     required: true
   },
-  width: {
+  x2: {
     type: Number,
     required: false,
-    default: () => 15
+    default: () => 0
   },
-  height: {
+  y2: {
     type: Number,
     required: false,
-    default: () => 15
+    default: () => 0
   },
-  buttons: {
-    type: Array,
-    required: false,
-    default: () => [],
-  }
 });
 
-const x = ref<number>(props.left);
-const y = ref<number>(props.top);
-const width = ref<number>(props.width);
-const height = ref<number>(props.height);
-
-onMounted(function () {
-  if (props.left > 0) {
-    const num = new BigNumber(props.left).minus(new BigNumber(width.value)).toNumber();
-    if (num > 0) {
-      x.value = num;
-    }
-  }
-
-  if (props.top > 0) {
-    const num = new BigNumber(props.top).minus(new BigNumber(height.value)).toNumber();
-    if (num > 0) {
-      y.value = num;
-    }
-  }
-});
+const x = ref<number>(props.x1);
+const y = ref<number>(props.y1);
+const width = ref<number>(props.x2 - props.x1);
+const height = ref<number>(props.y2 - props.y1);
 
 const direction = ["left-top", "right-top", "left-bottom", "right-bottom"];
 
@@ -74,6 +49,13 @@ let startTop = 0;
 let resizing = false;
 let dragging = false;
 let currentHandle: string;
+
+const onSync = function () {
+  $emit("update:x1", x.value);
+  $emit("update:y1", y.value);
+  $emit("update:x2", x.value + width.value);
+  $emit("update:y2", y.value + height.value);
+}
 
 const onResize = function (e: Event, type: string) {
   e.stopPropagation();
@@ -158,6 +140,7 @@ const resize = (event: Event) => {
       y.value = startTop - Math.abs(h);
     }
   }
+  onSync();
 };
 
 const startDrag = function (event: Event) {
@@ -180,6 +163,7 @@ const drag = (event: Event) => {
   const dy = safeGet<number>(event, "clientY")! - startY;
   x.value = startLeft + dx;
   y.value = startTop + dy;
+  onSync();
 };
 
 const stopDrag = () => {
@@ -188,40 +172,10 @@ const stopDrag = () => {
   document.removeEventListener('mouseup', stopDrag);
 };
 
-const getValue = function (): Screen {
-  return {
-    x1: x.value,
-    y1: y.value,
-    x2: x.value + width.value,
-    y2: y.value + height.value
-  };
-}
-
-const onClickButton = function (name: string) {
-  $emit("click", {
-    type: name,
-    value: getValue()
-  });
-}
-
-const onRemove = function () {
-  $emit("remove");
-}
 </script>
 
 <template>
   <div class="absolute z-10 top-[var(--screen-y)] left-[var(--screen-x)] " :style="screenStyle">
-    <div class="text-xl absolute left-full top-0 pl-2 -translate-y-1">
-      <template v-for="name in buttons" :key="name">
-        <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary mt-1 first:mt-0">
-          <Icon class="text-primary cursor-pointer" :type="name" @click.stop.prevent="onClickButton(name)"></Icon>
-        </div>
-      </template>
-      <div class="flex bg-white rounded-full p-0.5 border border-solid border-primary mt-1 first:mt-0"
-           @click.stop.prevent="onRemove">
-        <Icon class="text-red-500 cursor-pointer" type="close-circle-fill"></Icon>
-      </div>
-    </div>
     <div class="screen-box ease-in-out cursor-move" @mousedown="startDrag">
       <template v-for="name in direction" :key="name">
         <div class="screen-dot" :class="name" @mousedown="onResize($event, name)"></div>

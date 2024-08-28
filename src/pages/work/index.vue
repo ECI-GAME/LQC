@@ -7,6 +7,7 @@
 import {ref} from "vue";
 import api from "src/api";
 import Switch from "./switch.vue";
+import BigNumber from "bignumber.js";
 import {TaskStatus} from "src/types";
 import Record from "./record/index.vue";
 import * as model from "src/utils/model";
@@ -15,15 +16,14 @@ import {useRoute, useRouter} from "vue-router";
 import RegisterWord from "./register/word.vue";
 import Tab from "src/components/tab/index.vue";
 import RegisterComment from "./register/comment.vue";
+import Screen from "src/components/screen/index.vue";
 import Preview from "src/components/preview/index.vue";
 import TaskTitle from "src/components/task/title.vue";
 import Loading from "src/components/loading/index.vue";
-import {DotButton} from "src/components/preview/config";
-import {DotDataType} from "src/components/preview/config";
 import {filterSuccess, pickImage, RecordTabType} from "./config";
+import {DotDataType, DotData} from "src/components/preview/config";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
 
-import type {DotData} from "src/components/preview/config";
 import type {ImageData, TaskData, Project} from "src/types";
 
 const previewRef = ref();
@@ -158,23 +158,31 @@ const onSubmit = async function () {
   }
 }
 
-const _join_dots = function (list: DotData[], value?: DotData) {
-  if (value) {
-    return [...list, value];
-  }
-  return list;
+const onClickImage = function (e: Event, data: { x: number, y: number, width: number, height: number }) {
+  dotAddTempValue.value = new DotData(
+    data.x,
+    data.y,
+    data.x,
+    data.y,
+    data.width,
+    data.height
+  );
 }
 
-const getDotButtons = function (action?: string): string[] {
-  const list: string[] = [];
-  if (action && action === RecordTabType.Word) {
-    // 文字翻译
-    list.push(DotButton.Crop, DotButton.Location);
-  } else if (action && action === RecordTabType.Comment) {
-    // 批注
-    list.push(DotButton.Location);
+const calcDotValue = function (data: DotData): DotData {
+  if (data.id) {
+    return data;
   }
-  return list;
+  const preview = previewRef.value;
+  const scroll = preview.scrollValue();
+  return new DotData(
+    Number(new BigNumber(data.xCorrdinate1).plus(scroll.left).div(scroll.scale).toFixed(2)),
+    Number(new BigNumber(data.yCorrdinate1).plus(scroll.top).div(scroll.scale).toFixed(2)),
+    Number(new BigNumber(data.xCorrdinate2).plus(scroll.left).div(scroll.scale).toFixed(2)),
+    Number(new BigNumber(data.yCorrdinate2).plus(scroll.top).div(scroll.scale).toFixed(2)),
+    data.imageWidth,
+    data.imageHeight,
+  );
 }
 
 </script>
@@ -208,13 +216,18 @@ const getDotButtons = function (action?: string): string[] {
                    class="h-full"
                    :disabled="!!dotAddTempValue"
                    :data="currentFile"
-                   :dots="_join_dots(dots.results, dotAddTempValue)"
+                   :dots="dots.results"
                    :key="currentFile.id"
-                   :read-order="projectInfo.readOrder"
-                   :screen-buttons="getDotButtons(recordActive)"
-                   @dot="onChangeDot">
+                   @click="onClickImage">
             <template #operate>
               <Switch :current="currentFile" :list="state.results"></Switch>
+            </template>
+            <template #extend="scope">
+              <Screen v-if="dotAddTempValue && !dotAddTempValue.id"
+                      v-model:x1="dotAddTempValue.xCorrdinate1"
+                      v-model:y1="dotAddTempValue.yCorrdinate1"
+                      v-model:x2="dotAddTempValue.xCorrdinate2"
+                      v-model:y2="dotAddTempValue.yCorrdinate2"/>
             </template>
           </Preview>
         </LayoutContent>
@@ -240,10 +253,11 @@ const getDotButtons = function (action?: string): string[] {
                                    :projectId="taskInfo.projectId"
                                    @save="onUpDataDots"
                                    @cancel="onCancelDot"></RegisterComment>
-                  <RegisterWord v-else
-                                :data="dotAddTempValue"
+                  <RegisterWord v-else-if="currentFile"
+                                :data="calcDotValue(dotAddTempValue)"
                                 :file="currentFile"
                                 :projectId="taskInfo.projectId"
+                                :read-order="projectInfo.readOrder"
                                 @save="onUpDataDots"
                                 @cancel="onCancelDot"></RegisterWord>
                 </Card>

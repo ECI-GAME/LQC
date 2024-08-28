@@ -5,12 +5,6 @@ export const DotType = {
   "2": "框外"
 }
 
-
-export enum DotButton {
-  Crop = "font-size",
-  Location = "location-fill"
-}
-
 export const scaleTipFormatter = function (value: string | number): string {
   return `${value}%`;
 }

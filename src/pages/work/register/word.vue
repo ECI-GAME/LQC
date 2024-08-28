@@ -1,19 +1,25 @@
 <script setup lang="ts">
-import {ref} from "vue";
 import api from "src/api";
 import {Icon} from "@ue/icon";
 import Tips from "./tips.vue";
+import {ref, toRaw} from "vue";
 import {useValidate} from "@ue/form";
 import Textarea from "./textarea.vue";
+import {ElLoading} from 'element-plus';
+import Cropper from "src/utils/cropper";
 import {basename} from "src/utils/image";
+import Upload from "src/utils/upload/file";
+import * as ImageUtil from "src/utils/image";
 import safeGet from "@fengqiaogang/safe-get";
 import {ElImage as Image} from 'element-plus';
 import {preview} from "src/utils/brower/image";
+import {format} from "src/utils/upload/common";
 import {changeTranslationList} from "../config";
 import {DotData, DotMatchType} from "src/components/preview/config";
-import {Button, Card, Form, FormItem, Select, SelectOption, Spin} from "ant-design-vue";
+import {Button, Card, Form, FormItem, Select, SelectOption, Spin, Space} from "ant-design-vue";
 
 import type {PropType} from "vue";
+import type {ImageData} from "src/types";
 
 const $emit = defineEmits(["save", "cancel"]);
 const props = defineProps({
@@ -24,18 +30,25 @@ const props = defineProps({
     }
   },
   file: {
-    type: Object,
+    type: Object as PropType<ImageData>,
     required: true,
   },
   projectId: {
     type: [String, Number],
     required: true,
   },
+  readOrder: {
+    type: String,
+    required: true,
+  },
 });
 
-const {formRef, validate} = useValidate();
+const originImageRef = ref();
 const translationWord = ref<object>();
+const {formRef, validate} = useValidate();
+
 const model = ref({
+  imagePath: props.data.imagePath,
   imageFlag: String(props.data.imageFlag || 1), // 类型
   translatedText: props.data.translatedText,          // 译文
   translatedHtml: props.data.translatedHtml,
@@ -89,8 +102,6 @@ const spinning = ref<boolean>(false);
 const translateUuid = ref<number>(Math.random());
 //google机翻接口
 const translateMt = async function () {
-  console.log(model.value.originalText);
-  console.log(props.file.taskId);
   spinning.value = true
   const fromData = {
     'taskId': props.file.taskId,
@@ -109,6 +120,58 @@ const onChangeTranslationList = function (data: string[][]) {
   translationWord.value = changeTranslationList(data, translationWord.value);
 }
 
+const getBgPosition = function (src: string, dot: DotData) {
+  return {
+    'width': `${dot.xCorrdinate2 - dot.xCorrdinate1}px`,
+    'height': `${dot.yCorrdinate2 - dot.yCorrdinate1}px`,
+    'background-image': `url('${src}')`,
+    'background-size': `${dot.imageWidth}px ${dot.imageHeight}px`,
+    'background-position': `${dot.xCorrdinate1 * -1}px ${dot.yCorrdinate1 * -1}px`,
+  };
+}
+
+const onOCR = async function (dot: DotData) {
+  const loading = ElLoading.service({
+    lock: true,
+    text: 'Loading',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+  try {
+    const cropper = new Cropper(originImageRef.value);
+    // 裁剪获取 base64 图片数据
+    const value = await cropper.cutXY(dot.xCorrdinate1, dot.yCorrdinate1, dot.xCorrdinate2, dot.yCorrdinate2);
+    if (value) {
+      // base64 数据转换为 File 对象
+      const img = ImageUtil.base64ToImage(value);
+      const res = {...toRaw(model.value)};
+      // 上传 File 获取图片地址
+      const upload = new Upload([img]);
+      const [data, text] = await Promise.all([
+        upload.start(),
+        api.system.ocr(img, props.readOrder)
+      ]);
+      if (data && data[0]) {
+        const image = format(data[0]);
+        res.imagePath = image.src;
+      }
+      if (text) {
+        res.originalText = text;
+        res.originalHtml = text;
+      }
+      if (data || text) {
+        model.value = res;
+      }
+    }
+  } catch (e) {
+    console.log(e);
+    // todo
+  } finally {
+    setTimeout(() => {
+      loading.close();
+    }, 500);
+  }
+}
+
 </script>
 
 <template>
@@ -119,12 +182,26 @@ const onChangeTranslationList = function (data: string[][]) {
         <SelectOption value="2">框外</SelectOption>
       </Select>
     </FormItem>
-    <FormItem v-if="data.imagePath">
-      <a class="block" :href="preview(data.imagePath)" target="_blank">
-        <Card class="deep-[.ant-card-body]:p-1">
-          <Image class="w-full h-30" :src="data.imagePath" fit="cover"/>
-        </Card>
-      </a>
+    <template v-if="data.id">
+      <FormItem v-if="data.imagePath">
+        <a class="block" :href="preview(data.imagePath)" target="_blank">
+          <Card class="deep-[.ant-card-body]:p-1">
+            <Image class="w-full h-30" :src="data.imagePath" fit="cover"/>
+          </Card>
+        </a>
+      </FormItem>
+    </template>
+    <FormItem v-else-if="file">
+      <Card class="deep-[.ant-card-body]:p-1">
+        <div class="h-30 overflow-hidden flex items-center justify-center">
+          <div class="bg-no-repeat" :style="getBgPosition(file.imagePath, data)"></div>
+        </div>
+      </Card>
+      <div class="relative h-[0.25] z-[0] invisible overflow-hidden">
+        <div class="absolute left-0 top-0" :style="`width: ${data.imageWidth}px; height: ${data.imageHeight}px;`">
+          <img ref="originImageRef" class="block" :src="file.imagePath" crossorigin="anonymous"/>
+        </div>
+      </div>
     </FormItem>
 
     <FormItem class="deep-[label]:w-full">
@@ -135,7 +212,9 @@ const onChangeTranslationList = function (data: string[][]) {
           </div>
           <div>
             <Spin :spinning="spinning">
-              <Icon class="text-xl text-primary cursor-pointer" type="font-size" @Click="translateMt"
+              <Icon class="text-xl text-primary cursor-pointer"
+                    type="font-size"
+                    @Click="translateMt"
                     :loading="true"></Icon>
             </Spin>
           </div>
@@ -147,14 +226,21 @@ const onChangeTranslationList = function (data: string[][]) {
                 @translation="onChangeTranslationList"></Textarea>
     </FormItem>
     <FormItem label="译文">
-        <Textarea :key="translateUuid" :project-id="projectId"
+        <Textarea :key="translateUuid"
+                  :project-id="projectId"
                   v-model:html="model.translatedHtml"
                   v-model:text="model.translatedText"></Textarea>
     </FormItem>
     <Tips v-if="translationWord" class="deep-[.ant-descriptions-item-content]:text-primary"
           :word="translationWord"></Tips>
     <div class="flex items-center justify-between">
-      <Button type="primary" danger @click="onCancel">取消</Button>
+      <template v-if="data.id">
+        <Button type="primary" danger @click="onCancel">取消</Button>
+      </template>
+      <Space v-else>
+        <Button type="primary" danger @click="onCancel">取消</Button>
+        <Button type="primary" @click="onOCR(data)">OCR</Button>
+      </Space>
       <template v-if="props.data.matchType && props.data.matchType !== DotMatchType.not">
         <Button type="primary" @click="onSave">提交</Button>
       </template>
