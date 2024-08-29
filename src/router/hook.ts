@@ -12,8 +12,8 @@ export const beforeEach = function (to: RouteLocationNormalized, from: RouteLoca
   if (!upload) {
     upload = uploadStore();
   }
-  if (upload) {
-    // upload.hidden();
+  if (upload && upload.hidden) {
+    upload.hidden();
   }
 
   const matched = to.matched;

@@ -70,13 +70,19 @@ export const uploadStore = defineStore("upload", {
       this.$patch({status, map});
     },
     hidden() {
-      this.status = 0;
+      if (this.status !== 0) {
+        this.status = 0;
+      }
     },
     small() {
-      this.status = 1;
+      if (this.status !== 1) {
+        this.status = 1;
+      }
     },
     large() {
-      this.status = 2;
+      if (this.status !== 2) {
+        this.status = 2;
+      }
     }
   }
 });

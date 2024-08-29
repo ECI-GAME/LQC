@@ -5,10 +5,10 @@ import * as _ from "lodash-es";
 import * as model from "src/utils/model";
 import {useValidate, rules} from "@ue/form";
 import safeGet from "@fengqiaogang/safe-get";
+import {DotData, DotDataType} from "src/components/preview/config";
 import {Form, FormItem, Cascader, Textarea, Button} from "ant-design-vue";
 
 import type {PropType} from "vue";
-import type {DotData} from "src/components/preview/config";
 
 const $emit = defineEmits(["save", "cancel"]);
 const props = defineProps({
@@ -56,7 +56,7 @@ const getResult = function () {
     yCorrdinate2: props.data.yCorrdinate2,
     imageWidth: props.data.imageWidth,
     imageHeight: props.data.imageHeight,
-    coordinateType: props.data.coordinateType,
+    coordinateType: DotDataType.Comment,
   };
   return {...data, imageFlag: _.last(data.imageFlag)};
 };

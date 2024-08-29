@@ -24,7 +24,7 @@ export enum DotMatchType {
 
 export class DotData {
   public id!: string | number;
-  public taskId!: string;
+  public taskId!: string | number;
   public imageId!: string | number;
   public imageName?: string;
   public imageFlag: string | number = "1"; // 类型， 默认框内

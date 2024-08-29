@@ -2,23 +2,21 @@
 import api from "src/api";
 import {Icon} from "@ue/icon";
 import Tips from "./tips.vue";
+import type {PropType} from "vue";
 import {ref, toRaw} from "vue";
 import {useValidate} from "@ue/form";
 import Textarea from "./textarea.vue";
-import {ElLoading} from 'element-plus';
+import {ElImage as Image, ElLoading} from 'element-plus';
 import Cropper from "src/utils/cropper";
+import * as ImageUtil from "src/utils/image";
 import {basename} from "src/utils/image";
 import Upload from "src/utils/upload/file";
-import * as ImageUtil from "src/utils/image";
 import safeGet from "@fengqiaogang/safe-get";
-import {ElImage as Image} from 'element-plus';
 import {preview} from "src/utils/brower/image";
 import {format} from "src/utils/upload/common";
 import {changeTranslationList} from "../config";
-import {DotData, DotMatchType} from "src/components/preview/config";
-import {Button, Card, Form, FormItem, Select, SelectOption, Spin, Space} from "ant-design-vue";
-
-import type {PropType} from "vue";
+import {DotData, DotDataType, DotMatchType} from "src/components/preview/config";
+import {Button, Card, Form, FormItem, Select, SelectOption, Space, Spin} from "ant-design-vue";
 import type {ImageData} from "src/types";
 
 const $emit = defineEmits(["save", "cancel"]);
@@ -57,20 +55,29 @@ const model = ref({
 });
 
 const getResult = function () {
-  return {
+  const data = {
     ...model.value,
-    taskId: safeGet<string | number>(props.file, "taskId"),  //任务ID
-    imageId: safeGet<string | number>(props.file, "imageId"),     //图片ID
-    imageName: props.data.imageName || basename(props.data.imagePath),    //图片名称
-    imagePath: props.data.imagePath,              //图片路径
+    imageName: void 0,
+    taskId: safeGet<string | number>(props.file, "taskId")!,  //任务ID
+    imageId: safeGet<string | number>(props.file, "imageId")!,     //图片ID
+    // imageName: props.data.imageName || basename(props.data.imagePath),    //图片名称
+    // imagePath: props.data.imagePath,              //图片路径
     xCorrdinate1: props.data.xCorrdinate1,
     yCorrdinate1: props.data.yCorrdinate1,
     xCorrdinate2: props.data.xCorrdinate2,
     yCorrdinate2: props.data.yCorrdinate2,
     imageWidth: props.data.imageWidth,
     imageHeight: props.data.imageHeight,
-    coordinateType: props.data.coordinateType,
-  };
+  } as DotData;
+  if (data.imagePath) {
+    // 有图片则证明为 OCR
+    data.imageName = props.data.imageName || basename(data.imagePath);
+    data.coordinateType = DotDataType.Ocr;
+  } else {
+    // 普遍标记
+    data.coordinateType = DotDataType.Word;
+  }
+  return data;
 };
 
 const onSave = async function () {
