@@ -10,11 +10,9 @@ const store = uploadStore();
 
 <template>
   <div class="fixed right-0 bottom-0 z-[99999]">
-    <Card class="upload-log" size="small">
-      <div  class="overflow-hidden w-110">
-        <template v-if="store.status === 2">
-          <Item v-for="(data, key) in store.map" :data="data" :key="key"></Item>
-        </template>
+    <Card class="upload-log" size="small" v-if="store.status === 2">
+      <div class="overflow-hidden w-110">
+        <Item v-for="(data, key) in store.map" :data="data" :key="key"></Item>
       </div>
     </Card>
     <div class="absolute top-2 right-2">
