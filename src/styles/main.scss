@@ -13,6 +13,10 @@
 
 @import "@ue/modal/dist/index.css";
 
+#gtx-trans {
+  display: none !important;
+}
+
 :root {
   --screen-value: 100vh;
 }

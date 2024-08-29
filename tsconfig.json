@@ -32,6 +32,7 @@
     "noEmit": true,
     "skipDefaultLibCheck": true,
     "types": [
+      "uuid",
       "vue",
       "node",
       "vite/client",

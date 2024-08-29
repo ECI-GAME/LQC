@@ -2,12 +2,20 @@
  * @file 监听路由变化
  */
 
-
+import {uploadStore} from "src/store";
 import * as RouterAlias from "src/router/alias";
-import type { NavigationGuardNext, RouteLocationNormalized, RouteLocationNormalizedLoaded } from "vue-router";
+import type {NavigationGuardNext, RouteLocationNormalized, RouteLocationNormalizedLoaded} from "vue-router";
 
+let upload: any;
 
-export const beforeEach = function(to: RouteLocationNormalized, from: RouteLocationNormalizedLoaded, next: NavigationGuardNext) {
+export const beforeEach = function (to: RouteLocationNormalized, from: RouteLocationNormalizedLoaded, next: NavigationGuardNext) {
+  if (!upload) {
+    upload = uploadStore();
+  }
+  if (upload) {
+    // upload.hidden();
+  }
+
   const matched = to.matched;
   if (matched && matched.length > 0) {
     document.title = to.name as string;

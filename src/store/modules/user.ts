@@ -5,6 +5,7 @@
 
 import api from "src/api";
 import {defineStore} from "pinia";
+
 import {UserInfo} from "types/user";
 
 interface State {

@@ -3,14 +3,17 @@
  * @author svon.me@gmail.com
  */
 
-import * as _ from "../index";
+
 import * as R2Config from "./r2";
 import {Result, Status} from "./res";
+import {uploadStore} from "src/store";
 import safeGet from "@fengqiaogang/safe-get";
+import {filePath, getFileMeta} from "./config";
 import {
   CompleteMultipartUploadCommand,
   CreateMultipartUploadCommand,
-  HeadObjectCommand, PutObjectCommand,
+  HeadObjectCommand,
+  PutObjectCommand,
   S3Client,
   UploadPartCommand
 } from "@aws-sdk/client-s3";
@@ -23,31 +26,6 @@ class FileChunk {
   }
 }
 
-const getFileMeta = function (file: File) {
-  const name: string = encodeURIComponent(file.name);
-  return {
-    // 文件基础信息
-    // Key Value 均为 String 类型
-    name,                 // 名称
-    size: String(file.size),                 // 大小
-    type: String(file.type),                 // 类型
-    lastmodified: String(file.lastModified), // 最后修改时间
-  }
-}
-
-const fileMd5 = function (file: File): string {
-  const meta = getFileMeta(file);
-  const value = _.UUIDV5(meta.name, meta.size, meta.type, meta.lastmodified);
-  return value ? value : _.UUID();
-}
-
-const filePath = function (file: File): string {
-  const md5: string = fileMd5(file);
-  const name: string = _.MD5(file.name);
-  const index: number = file.name.lastIndexOf(".");
-  const suffix: string = file.name.slice(index + 1);
-  return `${md5}/${name}.${suffix}`;
-}
 
 const getContentDisposition = function (file: File) {
   if (file && file.name) {
@@ -55,6 +33,8 @@ const getContentDisposition = function (file: File) {
   }
   return "attachment";
 }
+
+let log: any;
 
 export default class Client extends S3Client {
   private readonly files: File[] = [];        // 需要上传的文件列表
@@ -75,17 +55,31 @@ export default class Client extends S3Client {
     super(config);
     this.files = files;
   }
+
   // 绑定回调事件
   on(callback: ChangeCallback) {
     if (callback) {
       this.event.add(callback);
     }
   }
+
   private onChange(file: File, progress: number = 0, res?: Result) {
+    if (!log) {
+      log = uploadStore();
+    }
+    if (log) {
+      const reload = () => {
+        if (res && res.status === Status.abnormal) {
+          return this.multipartUpload(file);
+        }
+      }
+      log.change(file, progress, res, reload);
+    }
     for (const callback of this.event) {
       callback(file, Math.min(progress, 100), res);
     }
   }
+
   async hasObject(file: File, path: string = filePath(file)): Promise<Result | undefined> {
     try {
       const command = new HeadObjectCommand({
