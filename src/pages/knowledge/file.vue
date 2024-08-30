@@ -9,7 +9,7 @@ import {onMounted, ref, reactive} from 'vue';
 import {ElSelect, ElOption} from "element-plus";
 import {FileData} from "src/utils/upload/common";
 import Upload from "src/components/upload/index.vue";
-import {Table, Form, InputSearch, Button, FormProps, message} from "ant-design-vue";
+import {Table, Form, FormItem, InputSearch, Button, FormProps, message} from "ant-design-vue";
 
 const props = defineProps({
   projectId: {
@@ -115,7 +115,7 @@ onMounted(async () => {
 <template>
   <div>
     <Form layout="inline" :model="formState" @finish="handleFinish" @finishFailed="handleFinishFailed">
-      <FromItem>
+      <FormItem>
 
         <ElSelect v-model="fromData.versionId" placeholder="请选择画册" class="w-50" clearable>
           <ElOption
@@ -125,27 +125,24 @@ onMounted(async () => {
               :value="item.versionId">
           </ElOption>
         </ElSelect>
-      </FromItem>
-      <FromItem>
+      </FormItem>
+      <FormItem>
 
         <InputSearch v-model:value="fromData.searchValue" placeholder="请输入条件" enter-button allow-clear
                      @search="onSearch"
                      class="w-100 float-left"/>
-      </FromItem>
-      <FromItem>
+      </FormItem>
+      <FormItem>
 
         <Upload :multiple="true" @success="onSuccess" @abnormal="errorMethod" class="ml-3"
                 v-model:loading="isOnloading">
           <Button :loading="isOnloading">资源上传</Button>
         </Upload>
-      </FromItem>
-
+      </FormItem>
     </Form>
 
     <Table class="mt-5" :loading="isLoading" :data-source="state.results" :columns="columns" :bordered="true">
       <template #bodyCell="{ column, text, record }">
-
-
         <template v-if="column.key === 'action'">
                     <span class="inline-block">
                         <Icon class="text-xl text-primary cursor-pointer" type="download"></Icon>

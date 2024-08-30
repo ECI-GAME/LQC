@@ -12,7 +12,7 @@ import * as model from "src/utils/model";
 import {ElSelect, ElOption} from "element-plus"
 import {onCreate} from "src/utils/textResource";
 import Authorization from "src/libs/http/config/authorization";
-import {Table, Form, InputSearch, Button, FormProps, Upload, message, Pagination} from "ant-design-vue";
+import {Table, Form, FormItem, InputSearch, Button, FormProps, Upload, message, Pagination} from "ant-design-vue";
 
 const props = defineProps({
   projectId: {

@@ -59,10 +59,10 @@ const onUpdate = function () {
 
 const getTitleColor = function (data: DotData) {
   if (data.matchType) {
-    if (data.matchType === DotMatchType.update) {
+    if (String(data.matchType) === String(DotMatchType.update)) {
       return "text-green-700";
     }
-    if (data.matchType === DotMatchType.match || data.matchType === DotMatchType.noUpdate) {
+    if (String(data.matchType) === String(DotMatchType.match) || String(data.matchType) === String(DotMatchType.noUpdate)) {
       return "text-[red]";
     }
   }
