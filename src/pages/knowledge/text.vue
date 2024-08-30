@@ -3,46 +3,51 @@
 /**
  * @file 知识库
  */
-import {onMounted, ref, reactive} from 'vue';
+
 
 import api from "src/api";
 import {Icon} from "@ue/icon";
-import {API_BASE} from "src/config";
+import Version from "./comp/version.vue";
 import * as model from "src/utils/model";
-import {ElSelect, ElOption} from "element-plus"
+import {computed, ref, reactive} from 'vue';
+import safeGet from "@fengqiaogang/safe-get";
 import {onCreate} from "src/utils/textResource";
+import Pagination from "src/components/page/index.vue";
+import {API_BASE, TOKEN_KEY, TOKEN_NAME} from "src/config";
 import Authorization from "src/libs/http/config/authorization";
-import {Table, Form, FormItem, InputSearch, Button, FormProps, Upload, message, Pagination} from "ant-design-vue";
+import {Table, Form, FormItem, InputSearch, Button, Upload, message} from "ant-design-vue";
+
+
+import type { UploadChangeParam, UploadProps } from "ant-design-vue";
 
 const props = defineProps({
+  versionId: {
+    type: [String, Number],
+    required: false,
+  },
   projectId: {
     type: [String, Number],
     required: true,
   }
-})
-
-
-const pageNumber = ref(1)
-const versionOption = ref([])
-
-interface FormState {
-  typeId: number
-  searchValue: string;
-  versionId: number
-
-}
-
-const formState = reactive<FormState>({
-  typeId: props.projectId,
-  searchValue: '',
 });
 
-const handleFinish: FormProps['onFinish'] = values => {
-  console.log(values, formState);
-};
-const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
-  console.log(errors);
-};
+
+class FormState {
+  searchValue?: string;
+  versionId?: number;
+
+  constructor() {
+    if (props.versionId) {
+      this.versionId = Number(props.versionId);
+    }
+  }
+}
+
+const pageSize = ref<number>(10);
+const pageNumber = ref<number>(1);
+const formState = reactive<FormState>(new FormState());
+const textExportTemplate = ref<string>(`${API_BASE}project/text/export/textTmp`);
+const textUploadResource = ref<string>(`${API_BASE}eci-comic/project/text/upload/textResource`);
 
 
 const columns = [
@@ -56,56 +61,43 @@ const columns = [
   {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
   {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
 ];
+
+
+const {state, execute: onLoad, isLoading} = model.list<object>(function () {
+  return api.knowLedge.textList(pageNumber.value, props.projectId, formState.versionId, formState.searchValue, pageSize.value);
+}, new model.PageResult<object>([]), true);
+
+
 const onSearch = () => {
-  onLoad()
-  console.log(state.value);
-
-}
-const exportTemple = () => {
-  //api.project.exportTextResource()
-  window.open(API_BASE + '/project/text/export/textTmp')
+  pageNumber.value = 1;
+  onLoad(100);
 }
 
-const importTemple = () => {
-  let fromData = {}
-  // file
-  // projectNum
-  api.project.importTextResource()
-}
-const {state, execute: onLoad, isLoading} = model.list<object>(
-  function () {
+const changePage = () => onLoad(100);
 
-    //return api.knowLedge.textList(1, formState.typeId);
-    return api.knowLedge.textList(pageNumber.value, formState.typeId, formState.versionId, formState.searchValue);
-  },
-  new model.PageResult<object>([]),
-  true
-);
 
-onMounted(async () => {
-  try {
-    versionOption.value = await api.project.getVersionDict(props.projectId);
-    console.log(versionOption.value);
-  } catch (error) {
-    console.error('Error fetching project info:', error);
-  }
+const fileList = ref([]);
+const uploadData = computed(function () {
+  return {'projectId': props.projectId};
 });
 
+
+const headers = computed(function () {
+  const header = Authorization(TOKEN_KEY, TOKEN_NAME);
+  return {
+    [TOKEN_NAME]: safeGet<string>(header, "Authorization")
+  };
+});
+
+
 const nweTextRource = async function () {
-  const status = await onCreate(props.projectId);
+  const status = await onCreate(props.projectId as number);
   if (status) {
-    onLoad(100);
+    await onLoad(100);
   }
 }
-const fileList = ref([]);
-const uploadData = {'projectId': props.projectId}
-const headers = {'Authorization': Authorization('TOKEN', 'Authorization').Authorization}
-
-console.log('header');
 
 const handleChange = (info: UploadChangeParam) => {
-  console.log(info);
-
   if (info.code != 200) {
     message.error(info.msg);
   } else {
@@ -116,12 +108,7 @@ const handleChange = (info: UploadChangeParam) => {
   return
 };
 
-const beforeUpload = (file: UploadProps['fileList'][number]) => {
-  console.log(file.name);
-  console.log(file.name.indexOf('xlsx') > -1);
-  console.log(file.name.indexOf('xlsx'));
-
-
+const beforeUpload = (file: File) => {
   const isJpgOrPng = file.name.indexOf('xlsx') > -1;
   if (!isJpgOrPng) {
     fileList.value = []
@@ -137,40 +124,29 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   return isJpgOrPng && isLt2M;
 };
 
-const changePage = function (page) {
-  pageNumber.value = page
-  onLoad()
-}
+
 </script>
 <template>
   <div>
-    <Form layout="inline" :model="formState" @finish="handleFinish" @finishFailed="handleFinishFailed">
-      <FromItem>
-
-        <ElSelect v-model="formState.versionId" placeholder="请选择画册" class="w-50" clearable>
-          <ElOption
-              v-for="item in versionOption"
-              :key="item.versionId"
-              :label="item.verisonName"
-              :value="item.versionId">
-          </ElOption>
-        </ElSelect>
-      </FromItem>
-      <FromItem>
-
+    <Form layout="inline" :model="formState">
+      <FormItem>
+        <Version class="w-50" v-model:value="formState.versionId" :project-id="projectId"></Version>
+      </FormItem>
+      <FormItem>
         <InputSearch v-model:value="formState.searchValue" :allow-clear="true" placeholder="请输入条件" enter-button
                      @search="onSearch"
                      class="w-100 float-left"/>
-      </FromItem>
-      <FromItem class="ml-3">
-        <Button type="primary" class="bg-neutral-600" @click="exportTemple">导出</Button>
-
-      </FromItem>
-      <FromItem class="ml-3">
+      </FormItem>
+      <FormItem class="ml-3">
+        <a class="inline-block" :href="textExportTemplate">
+          <Button type="primary" class="bg-neutral-600">导出</Button>
+        </a>
+      </FormItem>
+      <FormItem class="ml-3">
         <Upload
             v-model:file-list="fileList"
             name="file"
-            action="http://192.168.15.30:9999/eci-comic/project/text/upload/textResource"
+            :action="textUploadResource"
             :headers="headers"
             :data="uploadData"
             :show-upload-list="false"
@@ -179,31 +155,28 @@ const changePage = function (page) {
         >
           <Button type="primary" class="bg-violet-600">导入</Button>
         </Upload>
-
-
-      </FromItem>
-      <FromItem class="ml-3">
+      </FormItem>
+      <FormItem class="ml-3">
         <Button type="primary" class="bg-blue-600" @click="nweTextRource">新增</Button>
-
-      </FromItem>
+      </FormItem>
 
     </Form>
 
-    <Table class="mt-5" :loading="isLoading" :data-source="state.results" :pagination="false" :columns="columns"
+    <Table class="mt-5"
+           :loading="isLoading"
+           :data-source="state.results"
+           :pagination="false"
+           :columns="columns"
            :bordered="true">
       <template #bodyCell="{ column, text, record }">
-
-
         <template v-if="column.key === 'action'">
-                    <span class="inline-block">
-                        <Icon class="text-xl text-primary cursor-pointer" type="edit-square"></Icon>
-                    </span>
+          <span class="inline-block">
+            <Icon class="text-xl text-primary cursor-pointer" type="edit-square"></Icon>
+          </span>
         </template>
       </template>
     </Table>
-    <br/>
-    <Pagination v-model:current="pageNumber" class="float-right" :total="state.total" show-less-items
-                @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
+    <Pagination v-model:page="pageNumber" v-model:size="pageSize" :total="state.total" @click="changePage"></Pagination>
   </div>
 
 </template>

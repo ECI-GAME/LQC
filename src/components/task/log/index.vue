@@ -3,7 +3,7 @@ import {ref} from "vue";
 import api from "src/api";
 import Details from "./details.vue";
 import * as model from "src/utils/model";
-import {Divider, List, ListItem} from "ant-design-vue";
+import {List, ListItem} from "ant-design-vue";
 import Pagination from "src/components/page/index.vue";
 
 import type {LogData} from "src/types";

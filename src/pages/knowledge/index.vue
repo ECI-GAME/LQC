@@ -29,7 +29,7 @@ const isComp = function (type: string) {
 }
 
 const getRouteValue = function (type: string) {
-  return {name: alias.Knowledge.name, params: {...route.params, type}};
+  return {name: alias.Knowledge.name, params: {...route.params, type}, query: route.query};
 }
 </script>
 

@@ -11,7 +11,7 @@ import {$error, $success} from "@ue/message"
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 
-import type {Project, PsConfig} from "src/types";
+import type {Project, PsConfig, VersionData} from "src/types";
 
 export default class extends Graphql {
   /**
@@ -274,12 +274,17 @@ export default class extends Graphql {
   }
 
 
-  //删除人员信息
+  //版本列表
+  @tryError(new PageResult<VersionData>())
   @Get("project/getVersionDict/:projectId")
   @validate
-  getVersionDict(data: number | string) {
-    const params = {projectId: data};
-    return {data, params};
+  getVersionDict(@required projectId: number | string): Promise<PageResult<VersionData>> {
+    const params = {projectId};
+    const callback = function (res: VersionData[]) {
+      return new PageResult<VersionData>(res);
+    }
+    // @ts-ignore
+    return {params, callback};
   }
 
 

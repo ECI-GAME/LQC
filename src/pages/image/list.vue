@@ -120,7 +120,9 @@ const changePage = function(page){
 }
 onMounted(async () => {
   try {
-    versionOption.value = await api.project.getVersionDict(route.params.projectId);
+    const res = await api.project.getVersionDict(route.params.projectId as string);
+    versionOption.value = res.results;
+
     console.log(versionOption.value);
     
     if(versionOption.value.length==0){

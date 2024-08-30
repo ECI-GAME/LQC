@@ -21,3 +21,11 @@ export interface Project {
   timeCount: string;
   readOrder: string;
 }
+
+
+export interface VersionData {
+  projectNum: string;
+  verisonName: string;
+  versionId: number;
+  versionStatus: number;
+}

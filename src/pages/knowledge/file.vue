@@ -2,29 +2,47 @@
 /**
  * @file 知识库
  */
+
 import api from "src/api";
 import {Icon} from "@ue/icon";
+import {ref, reactive} from 'vue';
 import * as model from "src/utils/model";
-import {onMounted, ref, reactive} from 'vue';
-import {ElSelect, ElOption} from "element-plus";
+import Version from "./comp/version.vue";
 import {FileData} from "src/utils/upload/common";
 import Upload from "src/components/upload/index.vue";
-import {Table, Form, FormItem, InputSearch, Button, FormProps, message} from "ant-design-vue";
+import Pagination from "src/components/page/index.vue";
+import {Table, Form, FormItem, InputSearch, Button, message} from "ant-design-vue";
 
 const props = defineProps({
   projectId: {
     type: [String, Number],
     required: true,
-  }
+  },
+  versionId: {
+    type: [String, Number],
+    required: false,
+  },
 })
 
-const isOnloading = ref<boolean>(false);
-const versionOption = ref([])
-const versionInfo = ref({})
-const fromData = ref({
-  searchValue: "",
-})
+class FormState {
+  searchValue?: string;
+  versionId?: number;
+
+  constructor() {
+    if (props.versionId) {
+      this.versionId = Number(props.versionId);
+    }
+  }
+}
+
+
 let fileInfo: any[] = [];
+const versionInfo = ref({});
+const pageSize = ref<number>(10);
+const pageNumber = ref<number>(1);
+const isUploading = ref<boolean>(false);
+const fromData = ref<FormState>(new FormState());
+
 
 interface FormState {
   typeId: number
@@ -38,14 +56,6 @@ const formState = reactive({
   fileType: ''
 });
 
-const handleFinish: FormProps['onFinish'] = values => {
-  console.log(values, formState);
-};
-const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
-  console.log(errors);
-};
-
-
 const columns = [
   {title: "关联项目", dataIndex: 'projectName', key: 'projectName'},
   {title: "关联版本", dataIndex: 'versionName', key: 'versionName'},
@@ -56,21 +66,19 @@ const columns = [
   {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
   {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
 ];
+
+const {state, execute: onLoad, isLoading} = model.list<object>(function () {
+  return api.knowLedge.list(pageNumber.value, props.projectId, fromData.value.versionId, fromData.value.searchValue, "1", pageSize.value);
+}, new model.PageResult<object>([]), true);
+
+
 const onSearch = () => {
-  onLoad()
-  console.log(state.value);
-
+  pageNumber.value = 1;
+  onLoad(100);
 }
-const {state, execute: onLoad, isLoading} = model.list<object>(
-  function () {
 
-    //return api.knowLedge.list(1, formState.typeId);
-    console.log(fromData.value);
-    return api.knowLedge.list(1, props.projectId, fromData.value.versionId, fromData.value.searchValue, "1");
-  },
-  new model.PageResult<object>([]),
-  true
-);
+const changePage = () => onLoad(100);
+
 //文件上传
 const onSuccess = async function (files: FileData[]) {
 
@@ -99,49 +107,37 @@ const onSuccess = async function (files: FileData[]) {
 
 }
 
-const errorMethod = (files: FileData[]) => {
-  console.log('upload error');
-  files = []
-}
-onMounted(async () => {
-  try {
-    versionOption.value = await api.project.getVersionDict(props.projectId);
-    console.log(versionOption.value);
-  } catch (error) {
-    console.error('Error fetching project info:', error);
-  }
-});
 </script>
 <template>
   <div>
-    <Form layout="inline" :model="formState" @finish="handleFinish" @finishFailed="handleFinishFailed">
+    <Form layout="inline" :model="formState">
       <FormItem>
-
-        <ElSelect v-model="fromData.versionId" placeholder="请选择画册" class="w-50" clearable>
-          <ElOption
-              v-for="item in versionOption"
-              :key="item.versionId"
-              :label="item.verisonName"
-              :value="item.versionId">
-          </ElOption>
-        </ElSelect>
+        <Version class="w-50" v-model:value="fromData.versionId" :project-id="projectId"></Version>
       </FormItem>
       <FormItem>
-
-        <InputSearch v-model:value="fromData.searchValue" placeholder="请输入条件" enter-button allow-clear
+        <InputSearch v-model:value="fromData.searchValue"
+                     placeholder="请输入条件"
+                     enter-button
+                     allow-clear
                      @search="onSearch"
                      class="w-100 float-left"/>
       </FormItem>
       <FormItem>
-
-        <Upload :multiple="true" @success="onSuccess" @abnormal="errorMethod" class="ml-3"
-                v-model:loading="isOnloading">
-          <Button :loading="isOnloading">资源上传</Button>
+        <Upload :multiple="true"
+                @success="onSuccess"
+                class="ml-3"
+                v-model:loading="isUploading">
+          <Button :loading="isUploading">资源上传</Button>
         </Upload>
       </FormItem>
     </Form>
 
-    <Table class="mt-5" :loading="isLoading" :data-source="state.results" :columns="columns" :bordered="true">
+    <Table class="mt-5"
+           :loading="isLoading"
+           :data-source="state.results"
+           :columns="columns"
+           :bordered="true"
+           :pagination="false">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.key === 'action'">
                     <span class="inline-block">
@@ -150,6 +146,8 @@ onMounted(async () => {
         </template>
       </template>
     </Table>
+
+    <Pagination v-model:page="pageNumber" v-model:size="pageSize" :total="state.total" @click="changePage"></Pagination>
   </div>
 
 </template>
