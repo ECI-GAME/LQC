@@ -4,8 +4,8 @@ import UploadLog from "./upload/log.vue";
 <template>
   <div class="layout-view h-screen-f">
     <slot></slot>
+    <UploadLog></UploadLog>
   </div>
-  <UploadLog></UploadLog>
 </template>
 
 <style scoped lang="scss">
