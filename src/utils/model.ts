@@ -5,6 +5,7 @@
 
 import * as _ from "lodash-es";
 import {useAsyncState} from "@vueuse/core";
+import safeGet from "@fengqiaogang/safe-get";
 import type {UseAsyncStateReturn} from "@vueuse/core";
 
 /**
@@ -13,24 +14,24 @@ import type {UseAsyncStateReturn} from "@vueuse/core";
 export class PageResult<T = object> {
   results: T[];   // 列表数据
   total: number;  // 总数量
-  constructor(res: T[] = [], total: number = 0) {
+  constructor(res: object | T[] = [], total: number = 0) {
     if (res && Array.isArray(res)) {
       this.results = Array.isArray(res) ? res : [res];
       this.total = Math.max(this.results.length, total);
     } else if (res && typeof res === "object") {
       if (_.hasIn(res, "rows")) {
-        this.results = _.get(res, "rows");
+        this.results = safeGet<T[]>(res, "rows") || [];
       } else if (_.hasIn(res, "results")) {
-        this.results = _.get(res, "results");
+        this.results = safeGet<T[]>(res, "results") || [];
       } else if (_.hasIn(res, "items")) {
-        this.results = _.get(res, "items");
+        this.results = safeGet<T[]>(res, "items") || [];
       } else {
-        this.results = [res];
+        this.results = [res as T];
       }
       if (_.hasIn(res, "total")) {
-        this.total = _.get(res, "total");
+        this.total = safeGet<number>(res, "total")!;
       } else {
-        this.total = Math.max(res["total"] || 0, this.results.length, total);
+        this.total = Math.max(safeGet<number>(res, "total") || 0, this.results.length, total);
       }
     } else {
       this.results = [];

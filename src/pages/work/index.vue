@@ -20,6 +20,7 @@ import Screen from "src/components/screen/index.vue";
 import Preview from "src/components/preview/index.vue";
 import TaskTitle from "src/components/task/title.vue";
 import Loading from "src/components/loading/index.vue";
+import TaskLog from "src/components/task/log/button.vue";
 import {filterSuccess, pickImage, RecordTabType} from "./config";
 import {DotDataType, DotData} from "src/components/preview/config";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
@@ -195,6 +196,7 @@ const calcDotValue = function (data: DotData): DotData {
         <!-- 右侧操作按钮 -->
         <template #operate="{ task }">
           <Space>
+            <TaskLog :task-id="taskInfo.id"></TaskLog>
             <template v-if="state.total > 0 && filterSuccess(state.results).length===state.total">
               <Button type="primary" @click="onSubmit">提交</Button>
             </template>

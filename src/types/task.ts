@@ -25,3 +25,10 @@ export interface TaskData {
   createBy: string;
   versionName: string;
 }
+
+export interface LogData {
+  handlerName: string;
+  taskName: string;
+  nodeName: string;
+  startTime: string;
+}

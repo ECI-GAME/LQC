@@ -4,9 +4,11 @@ import safeGet from "@fengqiaogang/safe-get";
 import {$error, $success} from "@ue/message"
 import {Get, Gql, post, tryError, validate, required, Put} from "@js-lion/api";
 
+import GraphQL from "../graphql";
+
 import type {TaskData} from "src/types/task";
 
-export default class {
+export default class extends GraphQL {
 
   //任务列表查询
   @tryError([])
@@ -133,5 +135,21 @@ export default class {
   updateImageInfo(data: object) {
     // @ts-ignore
     return {data};
+  }
+
+  /**
+   * 根据任务ID查询操作日志记录
+   */
+  @validate
+  async getLogList<T>(@required id: string | number, pageNum: number = 1, pageSize: number = 10): Promise<PageResult<T>> {
+    const name: string = "getProjectTaskNodeRecordsList";
+    const query = {
+      "input": `{ taskId: ${id}, pageNum: ${pageNum}, pageSize: ${pageSize} }`
+    };
+    const res = await this.graphQL<{ rows: T[], total: number }>(name, [query], ["total", "rows"]);
+    if (res) {
+      return new PageResult<T>(res);
+    }
+    return new PageResult<T>();
   }
 }

@@ -8,7 +8,8 @@ import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
 import {RouterLink, useRoute} from "vue-router";
 import TaskTitle from "src/components/task/title.vue";
-import {Checkbox, Table, Button, Card, Space, Breadcrumb, BreadcrumbItem, Row, Col} from "ant-design-vue";
+import TaskLog from "src/components/task/log/button.vue";
+import {Checkbox, Table, Button, Card, Space} from "ant-design-vue";
 
 import type {TaskData} from "src/types/task";
 
@@ -68,9 +69,9 @@ const columns = [
   <div>
     <Card>
       <div class="flex items-center justify-between">
-        <TaskTitle v-if="isReady" :task-id="route.params.taskId" :data="stateData" />
+        <TaskTitle v-if="isReady" :task-id="route.params.taskId" :data="stateData"/>
         <Space size="large">
-          <Button type="default">操作记录</Button>
+          <TaskLog :task-id="route.params.taskId"></TaskLog>
           <Button>知识库</Button>
           <Button type="primary">提交</Button>
         </Space>
