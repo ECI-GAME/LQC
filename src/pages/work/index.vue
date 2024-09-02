@@ -92,6 +92,20 @@ const onChangeTabValue = function () {
   onUpDataDots();
 }
 
+const getKnowledgeUrl = function () {
+  const url = {
+    name: alias.Knowledge.name,
+    params: {
+      projectId: taskInfo.value.projectId,
+    },
+    query: {
+      versionId: taskInfo.value.versionId
+    }
+  };
+  const page = router.resolve(url);
+  return page.fullPath;
+}
+
 // 打点（描点）
 const onChangeDot = async function (data: DotData) {
   if (recordActive.value === RecordTabType.Comment) {
@@ -197,6 +211,9 @@ const calcDotValue = function (data: DotData): DotData {
         <template #operate="{ task }">
           <Space>
             <TaskLog :task-id="taskInfo.id"></TaskLog>
+            <a :href="getKnowledgeUrl()" target="_blank">
+              <Button>知识库</Button>
+            </a>
             <template v-if="state.total > 0 && filterSuccess(state.results).length===state.total">
               <Button type="primary" @click="onSubmit">提交</Button>
             </template>

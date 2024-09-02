@@ -42,6 +42,8 @@ const getRouteValue = function (type: string) {
         </template>
       </TabPane>
     </Tabs>
-    <component :is="isComp(activeKey)" :project-id="route.params.projectId"></component>
+    <component :is="isComp(activeKey)"
+               :project-id="route.params.projectId"
+               :version-id="route.query.versionId"></component>
   </div>
 </template>

@@ -78,7 +78,7 @@ const formatImageName = (imageName: string) => {
 <template>
   <div>
     <Form layout="inline" :model="fromData">
-      <FormItem>
+      <FormItem v-if="!props.versionId">
         <Version class="w-50" v-model:value="fromData.versionId" :project-id="projectId"></Version>
       </FormItem>
       <FormItem>

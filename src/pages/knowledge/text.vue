@@ -129,7 +129,7 @@ const beforeUpload = (file: File) => {
 <template>
   <div>
     <Form layout="inline" :model="formState">
-      <FormItem>
+      <FormItem v-if="!props.versionId">
         <Version class="w-50" v-model:value="formState.versionId" :project-id="projectId"></Version>
       </FormItem>
       <FormItem>

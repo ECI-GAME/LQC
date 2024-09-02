@@ -6,7 +6,7 @@ import api from "src/api";
 import {Icon} from "@ue/icon";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
-import {RouterLink, useRoute} from "vue-router";
+import {RouterLink, useRoute, useRouter} from "vue-router";
 import TaskTitle from "src/components/task/title.vue";
 import TaskLog from "src/components/task/log/button.vue";
 import {Checkbox, Table, Button, Card, Space} from "ant-design-vue";
@@ -14,6 +14,7 @@ import {Checkbox, Table, Button, Card, Space} from "ant-design-vue";
 import type {TaskData} from "src/types/task";
 
 const route = useRoute();
+const router = useRouter();
 
 const {state: stateData, isReady} = model.result<TaskData>(() => {
   return api.task.getTaskInfoById(route.params.taskId as string);
@@ -63,6 +64,21 @@ const columns = [
   {title: "最近处理时间", dataIndex: 'dealTime', key: 'dealTime', align: "center"},
   {title: "操作", dataIndex: 'fileId', key: 'action', align: "center"},
 ];
+
+const getKnowledgeUrl = function () {
+  const url = {
+    name: alias.Knowledge.name,
+    params: {
+      projectId: stateData.value.projectId,
+    },
+    query: {
+      versionId: stateData.value.versionId
+    }
+  };
+  const page = router.resolve(url);
+  return page.fullPath;
+}
+
 </script>
 
 <template>
@@ -72,7 +88,9 @@ const columns = [
         <TaskTitle v-if="isReady" :task-id="route.params.taskId" :data="stateData"/>
         <Space size="large">
           <TaskLog :task-id="route.params.taskId"></TaskLog>
-          <Button>知识库</Button>
+          <a v-if="isReady" :href="getKnowledgeUrl()" target="_blank">
+            <Button>知识库</Button>
+          </a>
           <Button type="primary">提交</Button>
         </Space>
       </div>
