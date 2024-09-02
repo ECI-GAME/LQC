@@ -3,19 +3,20 @@ import Menu from "./menu/index.vue";
 import Content from "./content.vue";
 import {useRoute} from "vue-router";
 import * as alias from "src/router/alias";
-import {PageType} from "src/router/common";
-import {defineComponent, ref, h, watch} from "vue";
+import {defineComponent, ref, h} from "vue";
 
-const fullPage = function () {
-  return (<Content></Content>);
+type ChangeMenu = (off: boolean) => void;
+
+const fullPage = function (status: boolean, change: ChangeMenu) {
+  return (<Content status={status} change={change}></Content>);
 }
 
-const autoPage = function (status: boolean, change: (off: boolean) => void) {
+const autoPage = function (status: boolean, change: ChangeMenu) {
   return [
     <div className="float-left h-full w-[var(--layout-menu-width)]">
-      <Menu class="h-full w-full" status={status} change={change}></Menu>
+      <Menu class="h-full w-full" status={status}></Menu>
     </div>,
-    fullPage(),
+    fullPage(status, change),
   ];
 }
 
@@ -41,19 +42,12 @@ export default defineComponent({
         }
       }
     }
-
-    watch(route, function () {
-      if (route.meta && route.meta.type === PageType.work) {
-        onChangeMenuWidth(true);
-      }
-    })
-
     return () => {
       let style: any;
       let value;
       if (route.name === alias.NotFount.name) {
         style = `--layout-menu-width: 0px`;
-        value = [fullPage()];
+        value = [fullPage(menuOff.value, onChangeMenuWidth)];
       } else {
         style = `--layout-menu-width: ${menuWidth.value}px`;
         value = autoPage(menuOff.value, onChangeMenuWidth);
