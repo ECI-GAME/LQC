@@ -4,11 +4,8 @@
  * @author svon.me@gamil.com
  **/
 
-import api from "src/api";
-import * as model from "src/utils/model";
+import Dict from "../dict/index.vue";
 import safeGet from "@fengqiaogang/safe-get";
-
-import type {LanguageData} from "src/types";
 
 const props = defineProps({
 // 如果 value 为空时, source & target 应为语言枚举值
@@ -28,27 +25,10 @@ const props = defineProps({
   },
 });
 
-const {state} = model.list<LanguageData>(function () {
-    return api.system.getDictData<LanguageData>('comic_language_type');
-  },
-  new model.PageResult<LanguageData>([]),
-  true
-);
+const DictTypeValue = "comic_language_type";
 
-
-//语言映射
-const pickLanguage = function (key: string, data?: object,) {
-  let text = "-";
-  const value = data ? safeGet<string>(data, key) : key;
-  if (value) {
-    for (const element of state.value.results) {
-      if (value === element.code) {
-        text = element.dictLabel;
-        break;
-      }
-    }
-  }
-  return text;
+const pickLanguageValue = function (key: string, data?: object,) {
+  return data ? safeGet<string>(data, key) : key;
 }
 
 
@@ -56,13 +36,9 @@ const pickLanguage = function (key: string, data?: object,) {
 
 <template>
   <span>
-    <slot name="source" :list="state.results">
-      <span class="language-source">{{ pickLanguage(source, value) }}</span>
-    </slot>
+    <Dict :type="DictTypeValue" name="code" :value="pickLanguageValue(source, value)"></Dict>
     <span>-></span>
-    <slot name="target" :list="state.results">
-      <span class="language-target">{{ pickLanguage(target, value) }}</span>
-    </slot>
+    <Dict :type="DictTypeValue" name="code" :value="pickLanguageValue(target, value)"></Dict>
   </span>
 </template>
 

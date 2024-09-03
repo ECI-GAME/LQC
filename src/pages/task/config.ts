@@ -1,10 +1,11 @@
 import * as modal from "@ue/modal";
-import {Input,InputNumber, RangePicker, Select, message} from "ant-design-vue";
+import {Input, InputNumber, RangePicker, Select, message} from "ant-design-vue";
 
 
 import api from "src/api";
-import { ref,onMounted } from "vue";
-import ImageShow  from "./imageShow.vue";
+import {ref, onMounted} from "vue";
+import ImageShow from "./imageShow.vue";
+
 export const columns = [
   {title: "任务名称", dataIndex: 'taskName', key: 'taskName'},
   {title: "状态", dataIndex: 'taskStatus', key: 'taskStatus', align: "center"},
@@ -17,18 +18,18 @@ export const columns = [
 ];
 
 
-let versionInfo=ref([]);
-let persons=ref([]);
-let nodes=ref([]);
-let taskInfo=ref([]);
+let versionInfo = ref([]);
+let persons = ref([]);
+let nodes = ref([]);
+let taskInfo = ref([]);
 const languageInfos = ref([]);
 const taskStatusOption = ref([]);
 
-let versionId =ref(0)
+let versionId = ref(0)
 let formImages = [];
 //提交
-const onSubmit =async function (formData: object) {
-  if(formImages.length===0){
+const onSubmit = async function (formData: object) {
+  if (formImages.length === 0) {
     message.error('请至少选择一张图片后提交!')
     return
   }
@@ -46,17 +47,17 @@ const onSubmit =async function (formData: object) {
   formData.sourceLanguage = versionInfo.value.languagePair.split("->")[0]
   formData.targetLanguage = versionInfo.value.languagePair.split("->")[1]
   formData.handlerName = gethandlerName(formData.handlerId)
-  
-  const code = await api.task.submitTask(formData);  
-  if(code===false){
+
+  const code = await api.task.submitTask(formData);
+  if (code === false) {
     return false
-  }else{
+  } else {
     return true
   }
 };
 //更新
-const onUpdate =async function (formData: object) {
- 
+const onUpdate = async function (formData: object) {
+
   const date = new Date(formData.timeDay[0].$d);
   const formattedDate1 = formatDate(date);
   const date1 = new Date(formData.timeDay[1].$d);
@@ -65,42 +66,42 @@ const onUpdate =async function (formData: object) {
   formData.estimatedEndDate = formattedDate2
   formData.id = taskInfo.value.id
   console.log('2');
-  const code = await api.task.updateTask(formData);  
-  if(code===false){
+  const code = await api.task.updateTask(formData);
+  if (code === false) {
     return false
-  }else{
+  } else {
     return true
   }
 };
-const gethandlerName = function(handlerId) {
+const gethandlerName = function (handlerId) {
   const person = persons.value.find(s => s.handlerId === handlerId);
   return person ? person.empName : '';
 };
 
 //图片资源保存
-const onImageShow =  async function () {
+const onImageShow = async function () {
   const res = await modal.confirm(ImageShow, {
     width: 650,
-    height:400,
+    height: 400,
     title: "图片选择",
   }, {
     versionId: versionInfo.value.id,
     projectNum: versionInfo.value.projectNum,
-    taskId: taskInfo.value.id||0
+    taskId: taskInfo.value.id || 0
   })
-  if(res.imageIds.length>0){
+  if (res.imageIds.length > 0) {
     formImages = res.imageIds
   }
   return false;
-  
+
 };
 //查询当前版本的所有节点
 const fetchNodeInfo = async () => {
   try {
     nodes.value = await api.task.getTaskInfoNodeById(versionId.value);
-    if(nodes.value.length==0){
+    if (nodes.value.length == 0) {
       message.error('当前任务还未配置流程节点，请联系PM进行配置')
-      
+
     }
     console.log(nodes.value[0].id);
     fetchPersonInfo(nodes.value[0].id);
@@ -112,7 +113,7 @@ const fetchNodeInfo = async () => {
 //初始化人员
 const fetchPersonInfo = async (nodeId) => {
   try {
-    persons.value = await api.task.getTaskInfoPersonById(versionId.value,nodeId);
+    persons.value = await api.task.getTaskInfoPersonById(versionId.value, nodeId);
   } catch (error) {
     console.error("Failed to fetch language:", error);
   }
@@ -145,7 +146,6 @@ const changePariLanguage = (source: string) => {
 //---语言字典结束
 
 
-
 const fetchTaskStatusInfo = async () => {
   try {
     const res = await api.system.getDictData('comic_task_status');
@@ -156,18 +156,17 @@ const fetchTaskStatusInfo = async () => {
 };
 
 
-
-const changeLabel = function(value:string){
+const changeLabel = function (value: string) {
   let dictLabel = ''
-  taskStatusOption.value.forEach(e=>{
-  
-    if(value == Number(e.dictValue)){
+  taskStatusOption.value.forEach(e => {
+
+    if (value == Number(e.dictValue)) {
       dictLabel = e.dictLabel
     }
-    
+
   })
   console.log(dictLabel);
-  
+
   return dictLabel
 }
 
@@ -183,21 +182,20 @@ function formatDate(date) {
 }
 
 onMounted(function () {
- fetchTaskStatusInfo()
+  fetchTaskStatusInfo()
 });
-export const onCreate =async function (param1:number,type:number) {
-  
-  if(type==1){
+export const onCreate = async function (param1: number, type: number) {
+
+  if (type == 1) {
     versionId.value = param1
     taskInfo.value = []
-  }else{
-    taskInfo.value =await api.task.getTaskInfoById(param1)
+  } else {
+    taskInfo.value = await api.task.getTaskInfoById(param1)
     versionId.value = taskInfo.value.versionId
-    
+
   }
-  
-  
-  
+
+
   fetchNodeInfo();
   versionInfo.value = await api.version.geVersionInfoById(versionId.value)
   return modal.form([
@@ -205,31 +203,31 @@ export const onCreate =async function (param1:number,type:number) {
     {
       key: "taskName",
       label: "任务名称",
-      value:taskInfo.value.taskName,
+      value: taskInfo.value.taskName,
       component: Input,
     }
-  ,
+    ,
     [
       {
-        key:"taskLanguage",
+        key: "taskLanguage",
         label: "语言对",
         component: Select,
-        value:changePariLanguage(versionInfo.value.languagePair),
-        props:{
-          disabled:true
+        value: changePariLanguage(versionInfo.value.languagePair),
+        props: {
+          disabled: true
         }
       },
       {
-        key:"taskLabel",
+        key: "taskLabel",
         label: "任务状态",
         component: Input,
-        value:taskInfo.value.taskStatus?changeLabel(taskInfo.value.taskStatus):'草稿',
-        props:{
-          disabled:true
+        value: taskInfo.value.taskStatus ? changeLabel(taskInfo.value.taskStatus) : '草稿',
+        props: {
+          disabled: true
 
         }
       }
-        
+
     ],
     {
       key: "timeDay",
@@ -243,42 +241,42 @@ export const onCreate =async function (param1:number,type:number) {
     },
     [
       {
-        key:"handlerId",
+        key: "handlerId",
         label: "处理人",
         component: Select,
         value: taskInfo.value.handlerId,
-        props:{
-          fieldNames: { label: "empName", value: "handlerId" },
+        props: {
+          fieldNames: {label: "empName", value: "handlerId"},
           options: persons
         }
       },
       {
-        key:"taskOrder",
+        key: "taskOrder",
         label: "任务顺序",
         value: taskInfo.value.taskOrder,
         component: InputNumber,
-        
-        props:{
-          style:{
-            width:'100%'
+
+        props: {
+          style: {
+            width: '100%'
           }
         }
       },
     ],
     {
-      key:"remarks",
+      key: "remarks",
       label: "备注",
       value: taskInfo.value.remarks,
       component: Input.TextArea,
     },
-   
+
   ], {
     title: "新建任务",
     width: 480,
     buttonClassName: ["pb-5 "],
-    okText: type==1?"提交":"更新",
-    onOk: type==1?onSubmit:onUpdate,
-    otherText : "图片资源",
+    okText: type == 1 ? "提交" : "更新",
+    onOk: type == 1 ? onSubmit : onUpdate,
+    otherText: "图片资源",
     otherOk: onImageShow,
   });
 }

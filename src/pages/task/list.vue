@@ -2,27 +2,17 @@
 /**
  * @file 任务列表
  */
+
 import api from "src/api";
-import * as model from "src/utils/model";
 import {ref} from 'vue';
-import Page from "src/components/page/index.vue";
-import {onCreate, columns} from "./config";
-import * as alias from "src/router/alias";
-import {RouterLink, useRoute} from "vue-router";
-import {
-  Table,
-  Button,
-  Card,
-  Form,
-  FormItem,
-  Input,
-  Space,
-  Progress,
-  Breadcrumb,
-  BreadcrumbItem,
-  Tag
-} from "ant-design-vue";
 import {Icon} from "@ue/icon";
+import * as alias from "src/router/alias";
+import {onCreate, columns} from "./config";
+import * as model from "src/utils/model";
+import {RouterLink, useRoute} from "vue-router";
+import Page from "src/components/page/index.vue";
+import Dict from "src/components/dict/index.vue";
+import {Table, Button, Card, Form, FormItem, Input, Space, Progress, Tag} from "ant-design-vue";
 
 
 const route = useRoute();
@@ -94,7 +84,6 @@ const changeProcess = function (doneCount: number, allCount: number) {
           <Input/>
         </FormItem>
         <FormItem>
-
           <Space>
             <Button type="primary" @click="searchInfo">搜索</Button>
             <Button>重置</Button>
@@ -102,7 +91,6 @@ const changeProcess = function (doneCount: number, allCount: number) {
         </FormItem>
       </Form>
     </Card>
-
 
     <Card class="mt-5">
       <Space size="large">
@@ -120,9 +108,7 @@ const changeProcess = function (doneCount: number, allCount: number) {
               <Button type="link" class="px-0">{{ text }}</Button>
             </RouterLink>
           </template>
-          <template v-else-if="column.key === 'taskStatus'">
-            <span>{{ changeStatus(record.taskStatus) }}</span>
-          </template>
+          <Dict v-else-if="column.key === 'taskStatus'" type="comic_task_status" :value="text"></Dict>
           <template v-else-if="column.key === 'handlerName'">
             <template v-for="name in text.split(';')" :key="name">
               <Tag v-if="name" color="blue">{{ name }}</Tag>
