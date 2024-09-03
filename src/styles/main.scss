@@ -46,6 +46,15 @@ img.no-drag {
   }
 }
 
+.clearfix {
+  zoom: 1;
+  &:after {
+    display: block;
+    content: "";
+    clear: both;
+  }
+}
+
 /* 富文本 */
 .tiptap-box {
   img {

@@ -41,7 +41,7 @@ export const VersionImage: RouteRecordBase = {
 
 export const TaskList: RouteRecordBase = {
   name: "Project Task List",
-  path: "/task/:projectId/:versionId",
+  path: "/task/:projectId?/:versionId?",
   meta: {
     breadcrumb: "task/list.vue"
   },

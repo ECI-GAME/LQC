@@ -134,8 +134,6 @@ const onCreate = async function (
     title: (data.id ? "修改项目" : "新建项目"),
     width: 480,
     buttonClassName: ["pb-5", "px-5"],
-    textAlign: "right",
-    okText: "Submit",
     onOk: onSubmit
   });
 }

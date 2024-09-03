@@ -29,3 +29,11 @@ export interface VersionData {
   versionId: number;
   versionStatus: number;
 }
+
+export interface ProjectImage {
+  fileId: number;
+  filePath: string;
+  fileName: string;
+
+  [key: string]: string | number;
+}

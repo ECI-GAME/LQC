@@ -6,10 +6,13 @@ import {ref} from 'vue';
 import api from "src/api";
 import * as model from "src/utils/model";
 import Version from "./comp/version.vue";
+import {ElImage as Image} from "element-plus";
 import {FileData} from "src/utils/upload/common";
 import Upload from "src/components/upload/index.vue";
 import Pagination from "src/components/page/index.vue";
-import {Form, FormItem, InputSearch, Button, message, Card, Image, Row, Col, Empty} from "ant-design-vue";
+import {Form, FormItem, InputSearch, Button, message, Card, Empty} from "ant-design-vue";
+
+import type {ProjectImage} from "src/types";
 
 const props = defineProps({
   versionId: {
@@ -41,9 +44,9 @@ const fromData = ref<FormState>(new FormState());
 const pageSize = ref<number>(10);
 const pageNumber = ref<number>(1);
 
-const {state, execute: onLoad} = model.list<object>(function () {
-  return api.knowLedge.list(pageNumber.value, props.projectId, fromData.value.versionId, fromData.value.searchValue, "2", pageSize.value);
-}, new model.PageResult<object>([]), true);
+const {state, execute: onLoad} = model.list<ProjectImage>(function () {
+  return api.knowLedge.list<ProjectImage>(pageNumber.value, props.projectId, fromData.value.versionId, fromData.value.searchValue, "2", pageSize.value);
+}, new model.PageResult<ProjectImage>([]), true);
 
 const onSearch = () => {
   pageNumber.value = 1;
@@ -51,6 +54,10 @@ const onSearch = () => {
 }
 
 const changePage = () => onLoad(100);
+
+const getPreviewList = function (list: ProjectImage[]): string[] {
+  return list.map((item: ProjectImage) => item.filePath);
+}
 
 //文件上传
 const onSuccess = async function (files: FileData[]) {
@@ -70,9 +77,6 @@ const onSuccess = async function (files: FileData[]) {
   fileInfo = []
   onSearch();
 }
-const formatImageName = (imageName: string) => {
-  return imageName.length > 10 ? imageName.substring(0, 10) + '...' : imageName;
-};
 
 </script>
 <template>
@@ -93,19 +97,20 @@ const formatImageName = (imageName: string) => {
     </Form>
 
     <template v-if="state.total > 0">
-      <Card class="mt-5">
-        <Row>
-          <Col :span="3" v-for="item in state.results">
-            <Card style="width:150px" class="mb-5">
-              <Image
-                  style="margin-left:5px ;height: 150px; width: auto; display: flex;flex-wrap: wrap;justify-content: flex-start;"
-                  :src="item.filePath"/>
-              <span>{{ formatImageName(item.fileName) }}</span>
-            </Card>
-          </Col>
-
-        </Row>
-      </Card>
+      <div class="clearfix">
+        <div class="mt-5 float-left w-60" v-for="(item, index) in state.results" :key="item.fileId">
+          <div class="h-70 mr-5 rounded-md overflow-hidden">
+            <Image class="w-full h-full"
+                   :src="item.filePath"
+                   fit="cover"
+                   crossorigin="anonymous"
+                   :initial-index="index"
+                   :preview-teleported="true"
+                   :preview-src-list="getPreviewList(state.results)"/>
+          </div>
+          <div class="text-center pt-1">{{ item.fileName }}</div>
+        </div>
+      </div>
 
       <Pagination v-model:page="pageNumber" v-model:size="pageSize" :total="state.total"
                   @click="changePage"></Pagination>

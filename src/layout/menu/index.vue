@@ -23,6 +23,7 @@ const onChangeMenu = function ({key}: { key: string }) {
     const page = router.resolve({name: key});
     router.push(page);
   } catch (e) {
+    console.log(e)
     // todo
   }
 }
@@ -70,5 +71,4 @@ const onChangeMenu = function ({key}: { key: string }) {
     }
   }
 }
-
 </style>
