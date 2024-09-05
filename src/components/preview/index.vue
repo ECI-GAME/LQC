@@ -148,14 +148,14 @@ defineExpose({setBoxScroll, setBoxDot, scrollValue});
     <Layout class="h-full">
       <LayoutHeader class="bg-white h-[initial] leading-[initial] px-2 border-b border-gray border-solid">
         <div class="flex items-center">
-          <Space>
+          <div class="flex-1 flex items-center">
             <Button class="px-0" type="link" @click="downloadFile(data.imagePath)" :disabled="isLoading || isLoadError">
               <Space :size="4">
                 <Icon class="text-xl flex" type="download"></Icon>
                 <span>下载</span>
               </Space>
             </Button>
-            <a class="inline-block" :href="image.preview(data.imagePath)" target="_blank">
+            <a class="inline-block mx-3" :href="image.preview(data.imagePath)" target="_blank">
               <Button class="px-0" type="link" :disabled="isLoading || isLoadError">
                 <Space :size="4">
                   <Icon class="text-xl flex" type="expend"></Icon>
@@ -163,7 +163,8 @@ defineExpose({setBoxScroll, setBoxDot, scrollValue});
                 </Space>
               </Button>
             </a>
-          </Space>
+            <span class="flex-1 w-1 truncate">{{ data.imageName }}</span>
+          </div>
           <div class="w-20 flex-1 flex justify-end pl-10 pr-2">
             <Slider class="w-100 max-w-full"
                     :min="30"

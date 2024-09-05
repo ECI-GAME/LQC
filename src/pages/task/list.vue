@@ -44,7 +44,7 @@ const onCreateTask = async function () {
 }
 
 const editFrom = async function (value: TaskData) {
-  const status = await onEdit(value);;
+  const status = await onEdit(value);
   if (status) {
     await onLoad(100);
   }
