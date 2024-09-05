@@ -30,6 +30,7 @@ export default class {
     return {data, params};
   }
 
+
   /**
    * 用户详情
    * @returns UserIfno
@@ -37,8 +38,12 @@ export default class {
   @tryError(void 0)
   @Get("/system/emp/getuser")
   async info(): Promise<UserInfo> {
+    const callback = (data: UserInfo): UserInfo => {
+      const apps = ["lqa_game", "ecis_comic"];
+      return {...data, apps};
+    }
     // @ts-ignore
-    return {};
+    return {callback};
   }
 
 }

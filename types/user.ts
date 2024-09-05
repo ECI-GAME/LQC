@@ -1,5 +1,6 @@
 // 用户信息
-export class UserInfo{
+export class UserInfo {
+  apps: string[] = [];
   role: string | null = null;
   dashboard: string | null = null;
   lang: string | null = null;

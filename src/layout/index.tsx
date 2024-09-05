@@ -2,6 +2,7 @@ import View from "./view.vue";
 import Menu from "./menu/index.vue";
 import Content from "./content.vue";
 import {useRoute} from "vue-router";
+import {userStore} from "src/store";
 import * as alias from "src/router/alias";
 import {defineComponent, ref, h} from "vue";
 
@@ -29,6 +30,10 @@ const MenuWidth = {
 export default defineComponent({
   name: "Layout",
   setup: function () {
+    const user = userStore();
+    if (user.isOnlyLQA()) {
+
+    }
     const route = useRoute();
     const menuWidth = ref(MenuWidth.on);
     const menuOff = ref<boolean>(false);
