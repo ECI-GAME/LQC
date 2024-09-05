@@ -13,7 +13,7 @@ export default class extends GraphQL {
   //任务列表查询
   @tryError([])
   @Gql("/graphql")
-  async list(pageNum: number = 1, versionId?: number, pageSize: number = 20): Promise<PageResult<object>> {
+  async list<T = object>(pageNum: number = 1, versionId?: number | string, pageSize: number = 20): Promise<PageResult<T>> {
     const data: string = `{
       getProjectTasksList (input: { pageNum: ${pageNum},versionId:${versionId || 0}, pageSize: ${pageSize} }) {
         code
@@ -36,9 +36,10 @@ export default class extends GraphQL {
   @$success("操作成功")
   @post("/project/tasks/submit")
   @validate
-  submitTask(data: object) {
+  submitTask(data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
   //提交任务
@@ -47,9 +48,10 @@ export default class extends GraphQL {
   @$success("操作成功")
   @Put("/project/tasks/")
   @validate
-  updateTask(data: object) {
+  updateTask(@required data: TaskData): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
   //根据ID查询画册信息
@@ -67,23 +69,33 @@ export default class extends GraphQL {
   @cache(1000 * 3)
   @Get("/project/tasks/:id")
   @validate
-  getTaskInfoById(@required taskId: number | string): Promise<TaskData> {
-    const params = {id: taskId};
+  getTaskInfoById(@required projectId: number | string): Promise<TaskData> {
+    const params = {id: projectId};
     // @ts-ignore
     return {params};
   }
 
-  //根据ID查询画册信息
+  //根据版本ID和节点ID获取操作人员列表
+  @tryError([])
   @Get("/project/task/person/versionId/:id/:nodeId")
   @validate
-  getTaskInfoPersonById(data: number, nodeId: number) {
-    const params = {id: data, nodeId: nodeId};
-    // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
+  async getTaskInfoPersonById<T = object>(@required versionId: number | string, nodeId?: number | string): Promise<T[]> {
+    if (nodeId) {
+      const params = {id: versionId, nodeId: nodeId};
+      // @ts-ignore
+      return {params};
+    } else {
+      // 获取当前版本下的所有节点
+      const nodes = await this.getTaskInfoNodeById(versionId);
+      // 默认取第一个节点ID
+      const id = safeGet<string | number>(nodes, "[0].id");
+      if (id) {
+        const params = {id: versionId, nodeId: id};
+        // @ts-ignore
+        return {params};
+      }
     }
-    // @ts-ignore
-    return {data, params};
+    return Promise.reject(new Error("node id 不能为空"));
   }
 
 
@@ -115,12 +127,11 @@ export default class extends GraphQL {
   }
 
   //根据ID查询画册信息
-  @tryError({})
+  @tryError([])
   @Get("/project/methods/versionId/:id")
   @validate
-  getTaskInfoNodeById(@required id: number | string): Promise<object> {
+  getTaskInfoNodeById<T = object>(@required id: number | string): Promise<T[]> {
     const params = {id: id};
-
     // @ts-ignore
     return {params};
   }
@@ -132,9 +143,10 @@ export default class extends GraphQL {
   @$success("操作成功")
   @post("/project/images/changeImage")
   @validate
-  updateImageInfo(data: object) {
+  updateImageInfo(data: Array<object>): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
   /**

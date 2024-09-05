@@ -14,9 +14,9 @@ defineProps({
   }
 });
 
-const convert = function (text: string) {
+const convert = function (text?: string) {
   // 拆分数据
-  const [source = "", target = ""] = text.split("->");
+  const [source = "", target = ""] = (text || "").split("->");
   // 构造数据
   return {
     sourceLanguage: String(source).trim(),

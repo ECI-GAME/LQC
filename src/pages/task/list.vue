@@ -7,66 +7,47 @@ import api from "src/api";
 import {ref} from 'vue';
 import {Icon} from "@ue/icon";
 import * as alias from "src/router/alias";
-import {onCreate, columns} from "./config";
+import {columns, useTask} from "./config";
 import * as model from "src/utils/model";
 import {RouterLink, useRoute} from "vue-router";
+
+import Tags from "./comp/tag.vue";
+import Progress from "./comp/progress.vue";
+import Time from "src/components/time/index.vue";
 import Page from "src/components/page/index.vue";
 import Dict from "src/components/dict/index.vue";
-import {Table, Button, Card, Form, FormItem, Input, Space, Progress, Tag} from "ant-design-vue";
+import {Table, Button, Card, Form, FormItem, Input, Space} from "ant-design-vue";
 
+import type {TaskData} from "src/types";
 
 const route = useRoute();
-const pageNumber = ref(1)
-const versionId: number = route.params.versionId as any;
+const pageNumber = ref(1);
+const {create: onCreate, edit: onEdit} = useTask(route.params.versionId as string);
 
-// 初始化集合
-const {state, execute: onLoad, isLoading} = model.list<object>(function () {
-    return api.task.list(pageNumber.value, versionId);
+// 任务列表
+const {state, execute: onLoad, isLoading} = model.list<TaskData>(function () {
+    return api.task.list<TaskData>(pageNumber.value, route.params.versionId as string);
   },
-  new model.PageResult<object>([]),
+  new model.PageResult<TaskData>([]),
   true
 );
-
-const {state: taskStatus} = model.list<object>(function () {
-    return api.system.getDictData('comic_task_status');
-  },
-  new model.PageResult<object>([]),
-  true
-);
-
 
 const searchInfo = () => {
   onLoad(100)
 }
 const onCreateTask = async function () {
-  console.log(versionId);
-  const res = await onCreate(versionId, 1);
-  console.log(res);
+  const version = route.params.versionId as string;
+  const res = await onCreate(version);
   if (res) {
     await onLoad(100); // 100 毫秒后刷新列表
   }
 }
 
-const editFrom = async function (id: number) {
-  const status = await onCreate(id, 2);
-
+const editFrom = async function (value: TaskData) {
+  const status = await onEdit(value);;
   if (status) {
-    onLoad(100);
+    await onLoad(100);
   }
-}
-//状态映射
-const changeStatus = function (dict: String) {
-  for (const element of taskStatus.value.results) {
-    if (dict === element.dictValue) {
-      return element.dictLabel;
-    }
-  }
-  return '-';
-}
-
-//进度计算
-const changeProcess = function (doneCount: number, allCount: number) {
-  return (doneCount / allCount) * 100;
 }
 </script>
 
@@ -109,23 +90,17 @@ const changeProcess = function (doneCount: number, allCount: number) {
             </RouterLink>
           </template>
           <Dict v-else-if="column.key === 'taskStatus'" type="comic_task_status" :value="text"></Dict>
-          <template v-else-if="column.key === 'handlerName'">
-            <template v-for="name in text.split(';')" :key="name">
-              <Tag v-if="name" color="blue">{{ name }}</Tag>
-            </template>
-          </template>
-          <template v-else-if="column.key === 'doneCnt'">
-            <Progress :percent="changeProcess(record.doneCnt,record.totalCnt)" status="active" :showInfo="true"
-                      :format="() => `${record.doneCnt} /${record.totalCnt}`"/>
-          </template>
+          <Time v-else-if="column.key === 'time'" :value="text"></Time>
+          <Tags v-else-if="column.key === 'tags'" :value="text"></Tags>
+          <Progress v-else-if="column.key === 'progress'" :total="record.totalCnt" :value="record.doneCnt"/>
           <template v-else-if="column.key === 'action'">
-            <span class="inline-block">
-              <Icon class="text-xl text-primary cursor-pointer" type="edit-square" @click="editFrom(record.id)"></Icon>
-                            <RouterLink
-                                :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }">
-                              <Icon class="text-xl text-primary cursor-pointer ml-2" type="table"></Icon>
-                          </RouterLink>
-            </span>
+            <Space class="text-xl text-primary">
+              <Icon class="cursor-pointer" type="edit-square" @click="editFrom(record)"></Icon>
+              <RouterLink
+                  :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }">
+                <Icon type="table"></Icon>
+              </RouterLink>
+            </Space>
           </template>
           <template v-else>{{ text || "--" }}</template>
         </template>

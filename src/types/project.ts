@@ -30,10 +30,15 @@ export interface VersionData {
   versionStatus: number;
 }
 
-export interface ProjectImage {
+export interface ProjectImage extends VersionData{
   fileId: number;
   filePath: string;
   fileName: string;
+
+  id: string | number;
+  taskId: string | number;
+  imageName: string;
+  originalImagePath: string;
 
   [key: string]: string | number;
 }

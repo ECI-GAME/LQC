@@ -5,11 +5,16 @@ export const TaskStatus = {
   CHECK: ["15", "16", "17"],
 }
 
-
-export interface TaskData {
+export interface VersionInfo {
   id: number;
-  projectId: number;
   projectNum: string;
+  languagePair: string;
+  versionName: string;
+}
+
+export interface TaskData extends VersionInfo {
+  taskId?: string | number;
+  projectId: number;
   versionId: number;
   taskType: string;
   taskName: string;
@@ -17,10 +22,10 @@ export interface TaskData {
   estimatedEndDate: string;
   sourceLanguage: string;
   targetLanguage: string;
-  handlerId: string | null;
+  handlerId?: string;
   handlerName: string;
   taskOrder: number;
-  remarks: string | null;
+  remarks?: string;
   taskStatus: string;
   createBy: string;
   versionName: string;

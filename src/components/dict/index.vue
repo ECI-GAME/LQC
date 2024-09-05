@@ -19,6 +19,10 @@ const props = defineProps({
     type: [String, Number],
     required: false,
   },
+  autoValue: {
+    type: [String, Number],
+    required: false,
+  },
   name: {
     type: String,
     required: false,
@@ -60,5 +64,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <span>{{ pickValue(value) }}</span>
+  <span>{{ pickValue(value) || autoValue }}</span>
 </template>

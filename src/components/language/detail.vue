@@ -31,7 +31,6 @@ const pickLanguageValue = function (key: string, data?: object,) {
   return data ? safeGet<string>(data, key) : key;
 }
 
-
 </script>
 
 <template>
