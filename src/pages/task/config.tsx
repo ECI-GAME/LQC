@@ -112,7 +112,7 @@ const onTaskModal = function (data: TaskData, persons: object[], config: ModalPr
 
 export const useTask = function (versionId: string | number) {
   const {state: persons} = model.list<object>(async function () {
-    const res = api.task.getTaskInfoPersonById(versionId);
+    const res = await api.task.getTaskInfoPersonById(versionId);
     return new model.PageResult<object>(res);
   }, new model.PageResult<object>(), true);
 
@@ -120,7 +120,8 @@ export const useTask = function (versionId: string | number) {
     return api.version.geVersionInfoById<VersionInfo>(versionId);
   }, {} as VersionInfo, true);
 
-  const create = async function (versionId: string | number) {
+  const create = async function () {
+    console.log(persons.value.results)
     return onTaskModal({...info.value, versionId} as TaskData, persons.value.results, {
       width: 480,
       title: "新建任务",

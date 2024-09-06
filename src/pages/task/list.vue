@@ -36,8 +36,7 @@ const searchInfo = () => {
   onLoad(100)
 }
 const onCreateTask = async function () {
-  const version = route.params.versionId as string;
-  const res = await onCreate(version);
+  const res = await onCreate();
   if (res) {
     await onLoad(100); // 100 毫秒后刷新列表
   }

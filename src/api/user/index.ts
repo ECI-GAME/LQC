@@ -4,6 +4,7 @@
  */
 
 import {$success, $error} from "@ue/message";
+import safeGet from "@fengqiaogang/safe-get";
 import {tryError, Post, Get, validate, required} from "@js-lion/api";
 
 import type {UserInfo} from "types/user";
@@ -39,7 +40,7 @@ export default class {
   @Get("/system/emp/getuser")
   async info(): Promise<UserInfo> {
     const callback = (data: UserInfo): UserInfo => {
-      const apps = ["lqa_game", "ecis_comic"];
+      const apps = safeGet<string[]>(data, "systemType") || ["lqa_game", "ecis_comic"];
       return {...data, apps};
     }
     // @ts-ignore
