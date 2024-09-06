@@ -121,7 +121,6 @@ export const useTask = function (versionId: string | number) {
   }, {} as VersionInfo, true);
 
   const create = async function () {
-    console.log(persons.value.results)
     return onTaskModal({...info.value, versionId} as TaskData, persons.value.results, {
       width: 480,
       title: "新建任务",

@@ -3,6 +3,7 @@
  * @author svon.me@gmail.com
  */
 
+import * as _ from "lodash-es";
 import {$success, $error} from "@ue/message";
 import safeGet from "@fengqiaogang/safe-get";
 import {tryError, Post, Get, validate, required} from "@js-lion/api";
@@ -40,7 +41,12 @@ export default class {
   @Get("/system/emp/getuser")
   async info(): Promise<UserInfo> {
     const callback = (data: UserInfo): UserInfo => {
-      const apps = safeGet<string[]>(data, "systemType") || ["lqa_game", "ecis_comic"];
+      let apps = ["lqa_game", "ecis_comic"];
+      const text = safeGet<string>(data, "systemType");
+      if (text) {
+        const list = _.map(text.split(":"), (value: string) => _.trim(value));
+        apps = _.compact(list);
+      }
       return {...data, apps};
     }
     // @ts-ignore
