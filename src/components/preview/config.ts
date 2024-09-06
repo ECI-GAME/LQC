@@ -16,10 +16,10 @@ export enum DotDataType {
 }
 
 export enum DotMatchType {
-  not= 1,
-  match,
-  update,
-  noUpdate
+  not = "1",
+  match = "2",
+  update = "3",
+  noUpdate = "4",
 }
 
 export class DotData {
@@ -35,6 +35,7 @@ export class DotData {
   public coordinateType!: DotDataType;     // 标注类型 1: 带 OCR 翻译的文字录入， 2: 普通的文字录入, 3: 标注
   public remark: string = "";              // 备注
   public matchType?: DotMatchType;
+
   constructor(
     public xCorrdinate1: number,
     public yCorrdinate1: number,
