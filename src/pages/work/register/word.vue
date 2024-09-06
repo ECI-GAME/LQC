@@ -2,6 +2,7 @@
 import api from "src/api";
 import {Icon} from "@ue/icon";
 import Tips from "./tips.vue";
+import * as _ from "lodash-es";
 import type {PropType} from "vue";
 import {ref, toRaw} from "vue";
 import {useValidate} from "@ue/form";
@@ -62,12 +63,12 @@ const getResult = function () {
     imageId: safeGet<string | number>(props.file, "imageId")!,     //图片ID
     // imageName: props.data.imageName || basename(props.data.imagePath),    //图片名称
     // imagePath: props.data.imagePath,              //图片路径
-    xCorrdinate1: props.data.xCorrdinate1,
-    yCorrdinate1: props.data.yCorrdinate1,
-    xCorrdinate2: props.data.xCorrdinate2,
-    yCorrdinate2: props.data.yCorrdinate2,
-    imageWidth: props.data.imageWidth,
-    imageHeight: props.data.imageHeight,
+    xCorrdinate1: _.toInteger(props.data.xCorrdinate1),
+    yCorrdinate1: _.toInteger(props.data.yCorrdinate1),
+    xCorrdinate2: _.toInteger(props.data.xCorrdinate2),
+    yCorrdinate2: _.toInteger(props.data.yCorrdinate2),
+    imageWidth: _.toInteger(props.data.imageWidth),
+    imageHeight: _.toInteger(props.data.imageHeight),
   } as DotData;
   if (data.imagePath) {
     // 有图片则证明为 OCR

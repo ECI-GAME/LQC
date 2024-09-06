@@ -50,12 +50,12 @@ const getResult = function () {
     ...formData.value,
     taskId: safeGet<string | number>(props.file, "taskId"),  //任务ID
     imageId: safeGet<string | number>(props.file, "imageId"),     //图片ID
-    xCorrdinate1: props.data.xCorrdinate1,
-    yCorrdinate1: props.data.yCorrdinate1,
-    xCorrdinate2: props.data.xCorrdinate2,
-    yCorrdinate2: props.data.yCorrdinate2,
-    imageWidth: props.data.imageWidth,
-    imageHeight: props.data.imageHeight,
+    xCorrdinate1: _.toInteger(props.data.xCorrdinate1),
+    yCorrdinate1: _.toInteger(props.data.yCorrdinate1),
+    xCorrdinate2: _.toInteger(props.data.xCorrdinate2),
+    yCorrdinate2: _.toInteger(props.data.yCorrdinate2),
+    imageWidth: _.toInteger(props.data.imageWidth),
+    imageHeight: _.toInteger(props.data.imageHeight),
     coordinateType: DotDataType.Comment,
   };
   return {...data, imageFlag: _.last(data.imageFlag)};
