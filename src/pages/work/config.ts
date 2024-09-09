@@ -12,10 +12,6 @@ export enum RecordTabType {
   Comment = "批注"
 }
 
-const DisableColor = "#FF0000";
-const DisableStart = `<span style="color: ${DisableColor};"><del>`;
-const DisableEnd = `</del><span>`;
-
 interface CheckWordResut {
   translation: string[][];
   html: string | undefined;
@@ -34,7 +30,7 @@ export const checkWord = async function (project: string | number, keyword?: str
       const code = String(item.checkTypeCode);
       if (code === CheckCode.Disable) {
         const text = keyword.slice(end, item.index - 1);
-        result.push(text + `${DisableStart}${item.word}${DisableEnd}`);
+        result.push(text + `<s>${item.word}</s>`);
         end = item.index + _.size(item.word) - 1;
       } else if (code === CheckCode.Translation) {
         const text = keyword.slice(end, item.index - 1);
