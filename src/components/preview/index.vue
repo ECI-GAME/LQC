@@ -4,7 +4,7 @@ import {Icon} from "@ue/icon";
 import BigNumber from "bignumber.js";
 import safeGet from "@fengqiaogang/safe-get";
 import * as image from "src/utils/brower/image";
-import {DotData, scaleTipFormatter} from "./config";
+import {DotDataType, DotData, scaleTipFormatter} from "./config";
 import {downloadFile} from "src/utils/brower/download";
 import Loading from "src/components/loading/index.vue";
 import {Badge, Button, Layout, LayoutContent, LayoutHeader, Result, Slider, Space} from "ant-design-vue";
@@ -206,9 +206,10 @@ defineExpose({setBoxScroll, setBoxDot, scrollValue});
               <div>
                 <template v-for="(item, index) in dots" :key="index">
                   <span
-                      class="inline-block cursor-pointer absolute left-[var(--dot-x)] top-[var(--dot-y)]"
+                      class="inline-block cursor-pointer absolute left-[var(--dot-x)] top-[var(--dot-y)] transform -translate-x-1/2 -translate-y-1/2"
                       :style="`--dot-x: ${item.xCorrdinate1 || 0}px; --dot-y: ${item.yCorrdinate1 || 0}px;`">
-                    <Badge :count="index + 1" color="blue"></Badge>
+                    <Badge v-if="String(item.coordinateType) === String(DotDataType.Comment)" :count="index + 1" color="orange"></Badge>
+                    <Badge v-else :count="index + 1" color="blue"></Badge>
                   </span>
                 </template>
               </div>

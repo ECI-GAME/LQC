@@ -57,6 +57,7 @@ const onCheckText = async function () {
   const str = String(text).trim();
   if (str && str.length > 0 && html !== __html) {
     const res = await checkWord(props.projectId, html);
+    console.log(res.html);
     if (res.translation) {
       $emit("translation", res.translation);
     }
@@ -71,7 +72,10 @@ const onCheckText = async function () {
   $emit("update:text", text);
 }
 editor.on("create", onCheckText);
-editor.on("blur", onCheckText);
+// editor.on("blur", onCheckText);
+
+defineExpose({scan: onCheckText});
+
 </script>
 
 <template>

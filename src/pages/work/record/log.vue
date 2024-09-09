@@ -28,7 +28,7 @@ const {state} = model.list<DotCheckData>(async function () {
 </script>
 
 <template>
-  <Descriptions class="mb-5 deep-[th]:hidden" :column="1" :bordered="true" size="small">
+  <Descriptions v-if="state.total > 0" class="mb-5 deep-[th]:hidden" :column="1" :bordered="true" size="small">
     <template v-for="item in state.results" :key="item.id">
       <DescriptionsItem>
         <span>{{ item.createBy }}</span>

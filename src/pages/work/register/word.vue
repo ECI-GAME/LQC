@@ -43,6 +43,7 @@ const props = defineProps({
 });
 
 const originImageRef = ref();
+const translationRef = ref();
 const translationWord = ref<object>();
 const {formRef, validate} = useValidate();
 
@@ -180,6 +181,13 @@ const onOCR = async function (dot: DotData) {
   }
 }
 
+const onScanWord = function () {
+  const comp = translationRef.value;
+  if (comp && comp.scan) {
+    comp.scan();
+  }
+}
+
 </script>
 
 <template>
@@ -218,17 +226,16 @@ const onOCR = async function (dot: DotData) {
           <div>
             <span>原文</span>
           </div>
-          <div>
+          <Space class="text-primary cursor-default">
+            <Icon type="securityscan" class="text-xl cursor-pointer" @click="onScanWord"></Icon>
             <Spin :spinning="spinning">
-              <Icon class="text-xl text-primary cursor-pointer"
-                    type="font-size"
-                    @Click="translateMt"
-                    :loading="true"></Icon>
+              <Icon class="cursor-pointer" :size="20" type="font-size" @Click="translateMt"></Icon>
             </Spin>
-          </div>
+          </Space>
         </div>
       </template>
-      <Textarea :project-id="projectId"
+      <Textarea ref="translationRef"
+                :project-id="projectId"
                 v-model:html="model.originalHtml"
                 v-model:text="model.originalText"
                 @translation="onChangeTranslationList"></Textarea>
