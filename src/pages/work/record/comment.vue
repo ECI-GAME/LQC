@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import api from "src/api";
 import {ref, toRaw} from "vue";
+import {useCreateBy} from "../config";
 import * as model from "src/utils/model";
 import {useValidate, rules} from "@ue/form";
 import {DBList} from "@fengqiaogang/dblist";
@@ -35,6 +36,7 @@ class FormData {
   }
 }
 
+const {isCreateBy} = useCreateBy();
 const {formRef, validate} = useValidate();
 const formData = ref<FormData>(new FormData());
 
@@ -99,7 +101,7 @@ const onSubmit = async function () {
     <Descriptions class="deep-[table]:!table-fixed" :column="1" :bordered="true" size="small">
       <DescriptionsItem label="类别">{{ getTypeValue(data.imageFlag) }}</DescriptionsItem>
       <DescriptionsItem label="备注">{{ data.remark || "--" }}</DescriptionsItem>
-      <template v-if="String(data['solutionStatus']) !== '1'">
+      <template v-if="String(data['solutionStatus']) !== '1' && !isCreateBy(data)">
         <!-- 0:未解决 1: 已解决 -->
         <DescriptionsItem label="方案">
           <FormItem class="mb-0 deep-[.ant-form-show-help]:hidden" name="solution" :rules="rules.array()">

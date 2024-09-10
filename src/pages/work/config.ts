@@ -1,11 +1,13 @@
 import api from "src/api";
 import * as _ from "lodash-es";
+import {userStore} from "src/store";
 import * as alias from "src/router/alias";
 import {DBList} from "@fengqiaogang/dblist";
 import safeGet from "@fengqiaogang/safe-get";
 import type {ImageData} from "src/types/image";
 
 import {CheckCode} from "src/types";
+import type {DotData} from "src/components/preview/config";
 
 export enum RecordTabType {
   Word = "文字翻译",
@@ -16,6 +18,21 @@ interface CheckWordResut {
   translation: string[][];
   html: string | undefined;
 }
+
+export const useCreateBy = function () {
+  const user = userStore();
+  const isCreateBy = function (data: DotData): boolean {
+    const id = safeGet<string>(data, "createBy");
+    if (id) {
+      const value = user.info.eid;
+      return value === id;
+    }
+    return false;
+  }
+
+  return {isCreateBy};
+}
+
 
 /**
  * @file 关键字检查与判断

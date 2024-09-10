@@ -5,6 +5,7 @@ import * as _ from "lodash-es";
 import * as model from "src/utils/model";
 import {useValidate, rules} from "@ue/form";
 import safeGet from "@fengqiaogang/safe-get";
+import {DBList} from "@fengqiaogang/dblist";
 import {DotData, DotDataType} from "src/components/preview/config";
 import {Form, FormItem, Cascader, Textarea, Button} from "ant-design-vue";
 
@@ -30,19 +31,31 @@ const props = defineProps({
 
 
 const {formRef, validate} = useValidate();
-const formData = ref({
-  imageFlag: void 0,        // 类型
-  remark: "",               // 备注
+const formData = ref<{ imageFlag?: number[]; remark?: string }>({
+  imageFlag: void 0,         // 类型
+  remark: props.data.remark, // 备注
 });
 
-const fieldNames = ref({
+const fieldNames = {
   value: "id",
   label: "errorTypeName",
   children: "childrenList"
-})
+};
 // 任务明细列表
-const {state: typeList} = model.list<object>(function () {
-  return api.project.projectErrorType(props.projectId);
+const {state: typeList} = model.list<object>(async function () {
+  const res = await api.project.projectErrorType(props.projectId);
+  if (props.data.imageFlag) {
+    const db = new DBList([], fieldNames.value);
+    db.insert(res.results, fieldNames.children);
+    const parents = db.parentDeepFlatten({[db.primary]: [Number(props.data.imageFlag), String(props.data.imageFlag)]});
+    const list = parents.map((item: object) => safeGet<number>(item, fieldNames.value));
+    const value = _.compact(_.reverse(list));
+    formData.value = {
+      imageFlag: value,
+      remark: props.data.remark,
+    };
+  }
+  return res;
 }, new model.PageResult<object>(), true);
 
 const getResult = function () {

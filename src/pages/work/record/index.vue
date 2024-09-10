@@ -8,8 +8,9 @@ import {ref} from "vue";
 import api from "src/api";
 import Word from "./word.vue";
 import Comment from "./comment.vue";
-import {RecordTabType} from "../config";
-import {Button, Space, Collapse, CollapsePanel} from "ant-design-vue";
+import {ElButton as Button} from "element-plus";
+import {RecordTabType, useCreateBy} from "../config";
+import {Space, Collapse, CollapsePanel} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import {DotData, DotMatchType} from "src/components/preview/config";
@@ -35,6 +36,7 @@ const props = defineProps({
   },
 });
 
+const {isCreateBy} = useCreateBy();
 const activeKey = ref<string | number>();
 
 // 查看图片描点位置
@@ -44,6 +46,13 @@ const onShowDetail = function (data: DotData) {
 
 const onEditDetail = function (data: DotData) {
   $emit("edit", data.id);
+}
+
+const onRemoveDetail = async function (data: DotData) {
+  const status = await api.work.word.remove(data.id);
+  if (status) {
+    onUpdate();
+  }
 }
 
 const onSave = async function () {
@@ -77,19 +86,25 @@ const getTitleColor = function (data: DotData) {
         <template #header>
           <div class="flex items-center justify-between">
             <span>({{ index + 1 }})</span>
-            <span v-if="active === RecordTabType.Word"
-                  class="flex-1 w-1 truncate mr-2 ml-1"
-                  :class="getTitleColor(item)">{{ item.translatedText }}</span>
-            <span v-else class="flex-1 w-1 truncate mr-2 ml-1" :title="item.remark">{{ item.remark }}</span>
-            <Space>
-              <Button class="p-0" type="link" @click.stop="onShowDetail(item)">详情</Button>
-              <Button v-if="active === RecordTabType.Word"
-                      class="p-0"
-                      type="link"
-                      :danger="true"
-                      @click.stop="onEditDetail(item)">编辑
-              </Button>
-            </Space>
+            <template v-if="active === RecordTabType.Word">
+              <!--标记-->
+              <span class="flex-1 w-1 truncate mr-2 ml-1" :class="getTitleColor(item)">{{ item.translatedText }}</span>
+              <Space>
+                <Button class="p-0" type="primary" link @click.stop="onShowDetail(item)">详情</Button>
+                <Button class="p-0" type="warning" link :danger="true" @click.stop="onEditDetail(item)">编辑</Button>
+              </Space>
+            </template>
+            <template v-else>
+              <!--批注-->
+              <span class="flex-1 w-1 truncate mr-2 ml-1" :title="item.remark">{{ item.remark }}</span>
+              <Space>
+                <Button class="p-0" type="primary" link @click.stop="onShowDetail(item)">详情</Button>
+                <template v-if="isCreateBy(item)">
+                  <Button class="p-0" type="warning" link @click.stop="onEditDetail(item)">编辑</Button>
+                  <Button class="p-0" type="danger" link @click.stop="onRemoveDetail(item)">删除</Button>
+                </template>
+              </Space>
+            </template>
           </div>
         </template>
         <Comment v-if="String(item.coordinateType) === '3'" :data="item" :project-id="projectId" @success="onUpdate"/>

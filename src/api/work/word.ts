@@ -1,9 +1,21 @@
 import * as message from "@ue/message";
 import {PageResult} from "src/utils/model";
-import {Get, Post, Put, validate, required, tryError} from "@js-lion/api";
+import {Get, Post, Delete, Put, validate, required, tryError} from "@js-lion/api";
 import type {DotCheckData, CheckType} from "src/types";
 
 export default class {
+  @tryError(false)
+  @message.$error()
+  @message.$success("已删除")
+  @Delete("/project/image/translations/:id")
+  @validate
+  remove(@required nodeId: string | number): Promise<boolean> {
+    const params = {id: nodeId};
+    const callback = () => true;
+    // @ts-ignore
+    return {params, callback};
+  }
+
   @tryError(false)
   @message.$error()
   @message.$success("已保存")
