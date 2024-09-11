@@ -2,7 +2,6 @@
 import {computed} from "vue";
 import * as _ from "lodash-es";
 import {useItems} from "./config";
-import * as alias from "src/router/alias";
 import {PageType} from "src/router/common";
 import safeGet from "@fengqiaogang/safe-get";
 import {useRouter, useRoute, RouterLink} from "vue-router";
@@ -61,7 +60,7 @@ const onChangeMenu = function (data: object) {
        :class="{ 'off': status }">
     <Layout class="h-full">
       <LayoutHeader class="bg-white h-[initial] leading-[initial] p-0">
-        <RouterLink :to="{ name: alias.Home.name }"
+        <RouterLink to="/"
                     class="h-[var(--header-value)] flex items-center justify-center border-b border-solid border-[var(--border-color)]">
           <b class="text-2xl logo-text">
             <span class="mr-2">Project</span>
