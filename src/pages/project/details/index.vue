@@ -34,8 +34,6 @@ const onCreateVersion = async function () {
 }
 const showValue = ref('')
 const showLabel = function(value:string){
-  console.log(readOptions.value.results);
-  
   readOptions.value.results.forEach(s=>{
     if(s.dictValue == value){
       showValue.value =  s.dictLabel

@@ -7,8 +7,12 @@ import {PageType} from "./common";
 import type {RouteRecordBase} from "types/common";
 
 export const Home: RouteRecordBase = {
-  name: "dashboard",
-  path: "/dashboard"
+  name: "/home/table/index",
+  path: "/dashboard",
+  meta: {
+    title: "Dashboard",
+    type: PageType.dashboard,
+  }
 }
 
 export const NotFount: RouteRecordBase = {
@@ -18,14 +22,19 @@ export const NotFount: RouteRecordBase = {
 
 
 export const ProjectList: RouteRecordBase = {
-  name: "Project List",
-  path: "/project/list"
+  name: "/project/info/table/index",
+  path: "/project/list",
+  meta: {
+    type: PageType.project,
+    title: "Project List"
+  }
 }
 
 export const ProjectDetails: RouteRecordBase = {
   name: "Project Details",
   path: "/project/:projectId",
   meta: {
+    type: PageType.project,
     breadcrumb: "project/details.vue"
   },
 }
@@ -43,6 +52,8 @@ export const TaskList: RouteRecordBase = {
   name: "Project Task List",
   path: "/task/:projectId?/:versionId?",
   meta: {
+    type: PageType.task,
+    title: "Task List",
     breadcrumb: "task/list.vue"
   },
 }
@@ -51,6 +62,8 @@ export const TaskDetails: RouteRecordBase = {
   name: "Project Task Details",
   path: "/task/detail/:versionId/:taskId",
   meta: {
+    type: PageType.task,
+    title: "Task Details",
     breadcrumb: "task/details.vue"
   },
 }
@@ -58,6 +71,8 @@ export const NodeConfig: RouteRecordBase = {
   name: "Project Node Config",
   path: "/node/:projectId",
   meta: {
+    type: PageType.project,
+    title: "Project Configuration",
     breadcrumb: "project/node.vue"
   },
 }
@@ -65,6 +80,8 @@ export const Knowledge: RouteRecordBase = {
   name: "Knowledge Config",
   path: "/knowledge/:projectId/:type?",
   meta: {
+    type: PageType.project,
+    title: "Project Configuration",
     breadcrumb: "project/knowledge.vue"
   },
 }
@@ -73,6 +90,8 @@ export const PsTypeConfig: RouteRecordBase = {
   name: "Ps Config",
   path: "/psTypeConfig/:projectId",
   meta: {
+    type: PageType.project,
+    title: "Project Configuration",
     breadcrumb: "project/psconfig.vue"
   },
 }

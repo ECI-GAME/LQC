@@ -4,6 +4,8 @@
  */
 
 import * as alias from "./alias";
+import safeGet from "@fengqiaogang/safe-get";
+import {useItems} from "../layout/menu/config";
 import type {Router, RouteRecordRaw} from "vue-router";
 import {createRouter as _createRouter, createWebHistory} from "vue-router";
 
@@ -11,8 +13,16 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/",
     component: () => import("src/layout/index"),
-    redirect: {
-      name: alias.Home.name
+    redirect: () => {
+      // 获取左侧菜单列表
+      const {list} = useItems();
+      // 获取第一个菜单的信息
+      const name = safeGet<string>(list.value, "[0].name");
+      if (name) {
+        return {name};
+      }
+      // 默认值
+      return {name: alias.Home.name};
     },
     children: [
       {
@@ -43,13 +53,13 @@ const routes: RouteRecordRaw[] = [
         ...alias.TaskDetails,
         component: () => import("src/pages/task/detail/details.vue"),
       },
-      
+
       // 任务明细
       {
         ...alias.Psd,
         component: () => import("src/pages/psd/index.vue"),
       },
-      
+
       // 人员节点配置
       {
         ...alias.NodeConfig,
@@ -76,7 +86,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import("src/pages/remarkTypeConfig/index.vue"),
       }
 
-    
+
     ],
   },
   {

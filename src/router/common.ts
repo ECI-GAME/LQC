@@ -1,4 +1,6 @@
 export enum PageType {
   work = "Work",
-  normal = "Normal"
+  project = "Project",
+  task = "Task",
+  dashboard = "Dashboard"
 }

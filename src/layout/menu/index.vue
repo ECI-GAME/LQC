@@ -1,7 +1,10 @@
 <script setup lang="tsx">
 import {computed} from "vue";
-import {items} from "./config";
+import * as _ from "lodash-es";
+import {useItems} from "./config";
 import * as alias from "src/router/alias";
+import {PageType} from "src/router/common";
+import safeGet from "@fengqiaogang/safe-get";
 import {useRouter, useRoute, RouterLink} from "vue-router";
 import {Menu, Layout, LayoutHeader, LayoutContent} from "ant-design-vue";
 
@@ -14,24 +17,48 @@ const props = defineProps({
 
 const route = useRoute();
 const router = useRouter();
+const {list: items} = useItems();
+
+const hasTask = computed(function () {
+  const some = _.find(items.value, {key: PageType.task});
+  return !!some;
+});
+
 const selectedKeys = computed(function () {
+  const value = route.meta?.type;
+  if (value) {
+    if (value === PageType.task) {
+      if (hasTask.value) {
+        return [value];
+      } else {
+        return [PageType.project];
+      }
+    }
+    if (value === PageType.work) {
+      if (hasTask.value) {
+        return [PageType.work];
+      } else {
+        return [PageType.project];
+      }
+    }
+    return [value];
+  }
   return [];
 });
 
-const onChangeMenu = function ({key}: { key: string }) {
-  try {
-    const page = router.resolve({name: key});
+const onChangeMenu = function (data: object) {
+  const name = safeGet<string>(data, "item.name");
+  const page = router.resolve({name});
+  if (page) {
     router.push(page);
-  } catch (e) {
-    console.log(e)
-    // todo
   }
 }
 
 </script>
 
 <template>
-  <div class="h-full border-r border-solid border-[var(--border-color)] menu-box ease-in-out" :class="{ 'off': status }">
+  <div class="h-full border-r border-solid border-[var(--border-color)] menu-box ease-in-out"
+       :class="{ 'off': status }">
     <Layout class="h-full">
       <LayoutHeader class="bg-white h-[initial] leading-[initial] p-0">
         <RouterLink :to="{ name: alias.Home.name }"
@@ -47,7 +74,7 @@ const onChangeMenu = function ({key}: { key: string }) {
               :items="items"
               mode="inline"
               :inline-collapsed="status"
-              v-model:selectedKeys="selectedKeys"
+              :selectedKeys="selectedKeys"
               @select="onChangeMenu"></Menu>
       </LayoutContent>
     </Layout>

@@ -4,12 +4,12 @@
  */
 
 import application from "./app.vue";
-import { createPinia } from "pinia";
-import { createApp as create } from "vue";
-import { createRouter } from "src/router/";
-import { beforeEach } from "src/router/hook";
+import {createPinia} from "pinia";
+import {createApp as create} from "vue";
+import {createRouter} from "src/router/";
+import {beforeEach} from "src/router/hook";
 
-import type { App } from "vue";
+import type {App} from "vue";
 
 /**
  * @file 创建 Vue 实例
@@ -20,9 +20,14 @@ export function createApp() {
   const store = createPinia();
   app.use(store);
 
-  const router = createRouter();
-  router.beforeEach(beforeEach);
+  const isReady = async function () {
+    const router = createRouter();
+    router.beforeEach(beforeEach);
+    app.use(router);
 
-  app.use(router);
-  return { app, router };
+    await router.isReady();
+
+    return router;
+  }
+  return {app, isReady};
 }

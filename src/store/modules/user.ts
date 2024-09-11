@@ -11,13 +11,15 @@ import {LQC_NAME, LQA_NAME, SYSTEM_NAME} from "src/config/app";
 import {UserInfo} from "types/user";
 
 interface State {
-  info: UserInfo
+  info: UserInfo;
+  menus: object[];
 }
 
 
 export const userStore = defineStore("user", {
   state(): State {
     return {
+      menus: [],
       info: new UserInfo()
     };
   },
@@ -44,9 +46,13 @@ export const userStore = defineStore("user", {
   actions: {
     // 获取用户信息
     async loadUserInfo() {
-      const res = await api.user.info();
+      const [res, menus] = await Promise.all([
+        api.user.info(),
+        api.Common.getMenus()
+      ]);
       if (res) {
         this.$patch({
+          menus,
           info: res
         });
       } else {

@@ -18,7 +18,7 @@ export const beforeEach = function (to: RouteLocationNormalized, from: RouteLoca
 
   const matched = to.matched;
   if (matched && matched.length > 0) {
-    document.title = to.name as string;
+    document.title = (to.meta?.title || to.name) as string;
     next();
   } else {
     // 如果当前路由无匹配状态，则默认跳转至 404 页面

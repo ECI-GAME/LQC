@@ -26,14 +26,12 @@ const main = async function () {
     cancelText: "取消"
   });
   // 构造 Vue App 对象
-  const {app, router} = createApp();
+  const {app, isReady} = createApp();
   // 构造 Store 数据
   const user = userStore();
   // 初始化基础数据
-  await Promise.all([
-    user.loadUserInfo(), // 获取用户信息
-    router.isReady()     // 加载路由
-  ]);
+  await user.loadUserInfo(); // 获取用户信息
+  await isReady();     // 加载路由
   // 挂载 vue 到 dom 对象上
   app.mount(`#${AppName}`);
 };
