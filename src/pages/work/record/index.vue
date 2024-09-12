@@ -6,8 +6,11 @@
 
 import {ref} from "vue";
 import api from "src/api";
+import * as _ from "lodash-es";
 import Word from "./word.vue";
+import {Icon} from "@ue/icon";
 import Comment from "./comment.vue";
+import sure from "src/utils/tips/sure";
 import {ElButton as Button} from "element-plus";
 import {RecordTabType, useCreateBy} from "../config";
 import {Space, Collapse, CollapsePanel} from "ant-design-vue";
@@ -34,6 +37,11 @@ const props = defineProps({
     type: [String, Number],
     required: true,
   },
+  // 图片流程节点状态
+  imageStatus: {
+    type: [String, Number],
+    required: false,
+  }
 });
 
 const {isCreateBy} = useCreateBy();
@@ -49,7 +57,10 @@ const onEditDetail = function (data: DotData) {
 }
 
 const onRemoveDetail = async function (data: DotData) {
-  const status = await api.work.word.remove(data.id);
+  let status = await sure("是否确认删除?");
+  if (status) {
+    status = await api.work.word.remove(data.id);
+  }
   if (status) {
     onUpdate();
   }
@@ -90,18 +101,39 @@ const getTitleColor = function (data: DotData) {
               <!--标记-->
               <span class="flex-1 w-1 truncate mr-2 ml-1" :class="getTitleColor(item)">{{ item.translatedText }}</span>
               <Space>
-                <Button class="p-0" type="primary" link @click.stop="onShowDetail(item)">详情</Button>
-                <Button class="p-0" type="warning" link :danger="true" @click.stop="onEditDetail(item)">编辑</Button>
+                <Button class="p-0 text-lg" type="success" link @click.stop>
+                  <Icon type="arrowup"></Icon>
+                </Button>
+                <Button class="p-0 text-lg" type="primary" link @click.stop="onShowDetail(item)">
+                  <Icon type="detail"></Icon>
+                </Button>
+                <Button class="p-0 text-lg" type="warning" link @click.stop="onEditDetail(item)">
+                  <Icon type="edit-square"></Icon>
+                </Button>
+                <template v-if="imageStatus && _.includes(['2', '3', '15', '16'], String(imageStatus))">
+                  <Button class="p-0 text-lg" type="danger" link @click.stop="onRemoveDetail(item)">
+                    <Icon type="delete-fill"></Icon>
+                  </Button>
+                </template>
               </Space>
             </template>
             <template v-else>
               <!--批注-->
               <span class="flex-1 w-1 truncate mr-2 ml-1" :title="item.remark">{{ item.remark }}</span>
               <Space>
-                <Button class="p-0" type="primary" link @click.stop="onShowDetail(item)">详情</Button>
+                <Button class="p-0 text-lg" type="success" link @click.stop>
+                  <Icon type="arrowup"></Icon>
+                </Button>
+                <Button class="p-0 text-lg" type="primary" link @click.stop="onShowDetail(item)">
+                  <Icon type="detail"></Icon>
+                </Button>
                 <template v-if="isCreateBy(item)">
-                  <Button class="p-0" type="warning" link @click.stop="onEditDetail(item)">编辑</Button>
-                  <Button class="p-0" type="danger" link @click.stop="onRemoveDetail(item)">删除</Button>
+                  <Button class="p-0 text-lg" type="warning" link @click.stop="onEditDetail(item)">
+                    <Icon type="edit-square"></Icon>
+                  </Button>
+                  <Button class="p-0 text-lg" type="danger" link @click.stop="onRemoveDetail(item)">
+                    <Icon type="delete-fill"></Icon>
+                  </Button>
                 </template>
               </Space>
             </template>
