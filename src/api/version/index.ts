@@ -142,10 +142,10 @@ export default class {
 
   @tryError([])
   @Gql("/graphql")
-  async geVersionImageDetailPage(versionId: number = 0, pageNum: number, pageSize: number = 10, projectId: number, imageName: string = ""): Promise<PageResult<object>> {
+  async geVersionImageDetailPage( versionId: number = 0, projectId: number, pageNum: number, pageSize: number = 10, imageName: string = ""): Promise<PageResult<object>> {
     // 查询用户信息
     const data: string = `{
-      getProjectVersionImagesList (input: { pageNum: ${pageNum}, versionId:${versionId},pageSize: ${pageSize},imageName: "${imageName}" }) {
+      getProjectVersionImagesList (input: { pageNum: ${pageNum},projectId:${projectId}, versionId:${versionId},pageSize: ${pageSize},imageName: "${imageName}" }) {
         code
         rows
         msg

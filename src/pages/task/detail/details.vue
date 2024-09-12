@@ -10,6 +10,10 @@ import {RouterLink, useRoute, useRouter} from "vue-router";
 import TaskTitle from "src/components/task/title.vue";
 import TaskLog from "src/components/task/log/button.vue";
 import {Checkbox, Table, Button, Card, Space} from "ant-design-vue";
+import { ref,computed} from 'vue';
+import {API_BASE, TOKEN_KEY, TOKEN_NAME} from "src/config";
+import Authorization from "src/libs/http/config/authorization";
+import safeGet from "@fengqiaogang/safe-get";
 
 import type {TaskData} from "src/types/task";
 
@@ -79,6 +83,38 @@ const getKnowledgeUrl = function () {
   return page.fullPath;
 }
 
+const headers = computed(function () {
+  const header = Authorization(TOKEN_KEY, TOKEN_NAME);
+  return {
+    [TOKEN_NAME]: safeGet<string>(header, "Authorization")
+  };
+});
+
+const downTxt = function(){
+  console.log(headers.value);
+  const header = Authorization(TOKEN_KEY, TOKEN_NAME);
+  fetch(`${API_BASE}project/image/translations/export?taskId=`+route.params.taskId, {
+        method: 'POST',
+        headers: {"Authorization":safeGet<string>(header, "Authorization")}
+    }) .then(response => {
+        if (response.ok) {
+            return response.blob(); // 获取文件数据
+        }
+        throw new Error('导出失败');
+    })
+    .then(blob => {
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'data.xlsx';  // 指定下载文件名
+        link.click();
+    })
+    .catch(error => {
+        console.error('导出时出错:', error);
+    });
+}
+
+
+
 </script>
 
 <template>
@@ -86,7 +122,9 @@ const getKnowledgeUrl = function () {
     <Card>
       <div class="flex items-center justify-between">
         <TaskTitle v-if="isReady" :task-id="route.params.taskId" :data="stateData"/>
+        
         <Space size="large">
+          <Button type="primary" @click="downTxt" class="bg-neutral-600">文本导出</Button>
           <TaskLog :task-id="route.params.taskId"></TaskLog>
           <a v-if="isReady" :href="getKnowledgeUrl()" target="_blank">
             <Button>知识库</Button>

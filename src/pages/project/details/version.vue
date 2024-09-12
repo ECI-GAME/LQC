@@ -46,24 +46,26 @@ const changeProcess = function (doneCount: number, allCount: number) {
   return (doneCount / allCount) * 100;
 }
 
-const changePage = function (page: number) {
-  pageNumber.value = page
+const changePage = function (page: Object) {
+  
+  pageNumber.value = page.pageNum
   onLoad()
 }
 const onUpdateVersion = async function (versionId:number) {
-
-// 创建项目
-const status = await onCreate(props.projectId as string,1,versionId);
-// 状态判断
-if (status) {
-  window.location.reload();
-}
+  console.log(state)
+  // 创建项目
+  const status = await onCreate(props.projectId as string,1,versionId);
+  // 状态判断
+  if (status) {
+    window.location.reload();
+  }
 }
 </script>
 
 <template>
   <div>
     <Table :data-source="state.results" :pagination="false" :columns="columns" :bordered="true">
+    
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'versionName'">
           <RouterLink :to="{ name: alias.TaskList.name, params: { projectId:projectId,versionId: record.id } }">
@@ -84,6 +86,6 @@ if (status) {
         </template>
       </template>
     </Table>
-    <Page v-model:page="pageNumber" :total="state.total" @click="changePage"></Page>
+    <Page v-model:page="pageNumber" :size="3" :total="state.total" @click="changePage"></Page>
   </div>
 </template>

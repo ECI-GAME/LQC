@@ -9,6 +9,7 @@ import Loading from "src/components/loading/index.vue";
 import LanguageDetail from "src/components/language/detail.vue";
 import {Descriptions, DescriptionsItem, Card, Button, Space} from 'ant-design-vue';
 import {ref} from 'vue';
+import {PlusOutlined,FileImageOutlined,PullRequestOutlined,CloseSquareOutlined,PictureOutlined,ReadOutlined} from "@ant-design/icons-vue";
 
 import type {Project} from "src/types";
 
@@ -64,20 +65,38 @@ const showLabel = function(value:string){
           <DescriptionsItem label="备注" :span="3">{{ projectInfo.remarks }}</DescriptionsItem>
         </Descriptions>
       </Card>
-      <Card class="mt-5" title="配置中心">
+      <Card class="mt-5" title="配置中心" id="proConfig">
         <Space size="large">
           <RouterLink :to="{ name: alias.NodeConfig.name, params: { projectId: projectInfo.id } }">
-            <Button type="primary">流程人员配置</Button>
+            <Button type="primary">
+              
+              <template #icon>
+                <PullRequestOutlined  class="my-0 inline-flex" />
+              </template>
+              流程人员配置</Button>
           </RouterLink>
 
           <RouterLink :to="{ name: alias.RemarkTypeConfig.name, params: { projectId: projectInfo.id } }">
-            <Button type="primary">错误类型配置</Button>
+            <Button type="primary">
+              
+              <template #icon>
+                <CloseSquareOutlined  class="my-0 inline-flex" />
+              </template>
+              错误类型配置</Button>
           </RouterLink>
           <RouterLink :to="{ name: alias.PsTypeConfig.name, params: { projectId: projectInfo.id } }">
-            <Button type="primary">PSD生成配置</Button>
+            <Button type="primary">
+              <template #icon>
+                <PictureOutlined  class="my-0 inline-flex" />
+              </template>
+              PSD生成配置</Button>
           </RouterLink>
           <RouterLink :to="{ name: alias.Knowledge.name, params: { projectId: projectInfo.id } }">
-            <Button type="primary">知识库配置</Button>
+            <Button type="primary">
+              <template #icon>
+                <ReadOutlined  class="my-0 inline-flex" />
+              </template>
+              知识库配置</Button>
           </RouterLink>
         </Space>
       </Card>
@@ -91,9 +110,17 @@ const showLabel = function(value:string){
         <div class="flex items-center justify-between">
           <span>画册管理</span>
           <Space>
-            <Button type="primary" class="ml-2" @click="onCreateVersion">创建画册</Button>
+            <Button type="primary" class="ml-2" @click="onCreateVersion" style="background-color: #400ded;color: white;" >
+              <template #icon>
+                <PlusOutlined  class="my-0 inline-flex" />
+              </template>
+              创建画册</Button>
             <RouterLink :to="{ name: alias.VersionImage.name, params: { projectId: projectInfo.id } }">
-              <Button type="primary" class="ml-2">图片管理</Button>
+              <Button type="primary" class="ml-2">
+                
+                <template #icon>
+                <FileImageOutlined  class="my-0 inline-flex" />
+              </template>图片管理</Button>
             </RouterLink>
             <!-- <Button type="primary" class="ml-2">任务中心</Button> -->
           </Space>
@@ -103,3 +130,15 @@ const showLabel = function(value:string){
     </Card>
   </div>
 </template>
+<style scoped lang="scss">
+
+#proConfig :deep(.ant-btn-primary) {
+    background-color: #28A745 !important; /* 背景颜色 */
+    color: white !important; /* 文字颜色 */
+  }
+  
+  #proConfig :deep(.ant-btn-primary:hover) {
+    background-color: #28A745 !important; /* 背景颜色 */
+    color: #ffffff !important; /* 文字颜色 */
+  }
+</style>

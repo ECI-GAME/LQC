@@ -12,7 +12,7 @@ import {Table, Button, Card, Form, FormItem, Input, Space, Select,message,Breadc
 import Upload from "src/components/upload/index.vue";
 import { FileData } from "src/utils/upload/common";
 import {ElSelect,ElOption} from "element-plus"
-
+import {SearchOutlined,CloudUploadOutlined} from "@ant-design/icons-vue";
 
 const route = useRoute();
 console.log('Project ID = "%s"', route.params.projectId);
@@ -67,7 +67,7 @@ const {state, execute: onLoad, isLoading} = model.list<object>(function () {
   if(fromData.value.imageName==undefined){
       fromData.value.imageName = ""
   }
-  return api.version.geVersionImageDetailPage(fromData.value.versionId,pageNumber.value,10,route.params.projectId,fromData.value.imageName)
+  return api.version.geVersionImageDetailPage(fromData.value.versionId,route.params.projectId,pageNumber.value,10,route.params.projectId,fromData.value.imageName)
 }, new model.PageResult<object>([]), true);
 
 
@@ -159,7 +159,12 @@ onMounted(async () => {
         
         <FormItem>
           <Space>
-            <Button type="primary" @click="searchImage">搜索</Button>
+            <Button type="primary" @click="searchImage" style="background-color: #1E90FF !important;color: white;">
+              <template #icon>
+                <SearchOutlined class="my-0 inline-flex" />
+              </template>
+              搜索
+            </Button>
             <Button>重置</Button>
           </Space>
         </FormItem>
@@ -169,7 +174,12 @@ onMounted(async () => {
     <Card class="mt-5" >
       <Space size="large">
         <Upload :multiple="true" @success="onSuccess" v-model:loading="isOnloading">
-          <Button :loading="isOnloading" :disabled="!fromData.versionId">图片上传</Button>
+          <Button :loading="isOnloading" :disabled="!fromData.versionId" style="background-color: #8a939d !important;color: white;">
+            <template #icon>
+                <CloudUploadOutlined class="my-0 inline-flex" />
+              </template>
+            图片上传
+          </Button>
         </Upload>
             
       </Space>
