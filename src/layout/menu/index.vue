@@ -95,6 +95,21 @@ const onChangeMenu = function (data: object) {
     @at-root .menu-box:not(.off) & {
       @apply px-5;
     }
+    
   }
+
+  :deep(.ant-menu-item-selected) {
+    background-color: #1a73e8 !important; /* 背景颜色 */
+    color: #ffffff !important; /* 文字颜色 */
+  }
+  :deep(.ant-menu-item-selected .ant-menu-title-content) {
+    color: #ffffff !important; /* 文字颜色 */
+  }
+
+  :deep(.ant-menu .ant-menu-title-content) {
+    font-size: 14px;
+    color:#726f6f
+  }
+
 }
 </style>

@@ -14,6 +14,8 @@ import {useProject} from "src/utils/project";
 import Page from "src/components/page/index.vue";
 import LanguageDetail from "src/components/language/detail.vue";
 import {Table, Button, InputSearch} from "ant-design-vue";
+import {PlusOutlined} from "@ant-design/icons-vue";
+
 
 import type {Project} from 'src/types';
 
@@ -67,7 +69,12 @@ const editFrom = async function (data: Project) {
           @search="onSearch"
           class="w-100"
       />
-      <Button type="primary" @click="onCreateProject">新建</Button>
+      <Button  @click="onCreateProject" style="background-color: #400ded;color: white;">
+        <template #icon>
+          <PlusOutlined  class="my-0 inline-flex" />
+        </template>
+        新建
+      </Button>
     </div>
 
     <Table class="mt-5" :loading="isLoading" :pagination="false" :data-source="state.results" :columns="columns"
@@ -92,3 +99,15 @@ const editFrom = async function (data: Project) {
     <Page v-model:page="pageNumber" :total="state.total" @click="onSearch"></Page>
   </div>
 </template>
+
+
+
+<style scoped lang="scss">
+
+  :deep(.ant-input-search-button) {
+    background-color: #1E90FF !important; /* 背景颜色 */
+    color: white !important; /* 文字颜色 */
+  }
+  
+
+</style>

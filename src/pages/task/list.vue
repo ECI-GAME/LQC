@@ -17,6 +17,8 @@ import Time from "src/components/time/index.vue";
 import Page from "src/components/page/index.vue";
 import Dict from "src/components/dict/index.vue";
 import {Table, Button, Card, Form, FormItem, Input, Space} from "ant-design-vue";
+import {SearchOutlined,PlusOutlined} from "@ant-design/icons-vue";
+
 
 import type {TaskData} from "src/types";
 
@@ -65,8 +67,17 @@ const editFrom = async function (value: TaskData) {
         </FormItem>
         <FormItem>
           <Space>
-            <Button type="primary" @click="searchInfo">搜索</Button>
-            <Button>重置</Button>
+            <Button type="primary" @click="searchInfo" style="background-color: #1E90FF !important;color: white;">
+              
+              <template #icon>
+                <SearchOutlined class="my-0 inline-flex" />
+              </template>
+              搜索
+            </Button>
+            <Button>
+              
+              重置
+            </Button>
           </Space>
         </FormItem>
       </Form>
@@ -74,7 +85,11 @@ const editFrom = async function (value: TaskData) {
 
     <Card class="mt-5">
       <Space size="large">
-        <Button @click="onCreateTask" type="primary">新建任务</Button>
+        <Button @click="onCreateTask" type="primary" style="background-color: #400ded !important;color: white;">
+              <template #icon>
+                <PlusOutlined  class="my-0 inline-flex" />
+              </template>
+          新建任务</Button>
         <Button>生成交付文件</Button>
         <Button>归档</Button>
       </Space>
@@ -108,3 +123,4 @@ const editFrom = async function (value: TaskData) {
     </Card>
   </div>
 </template>
+

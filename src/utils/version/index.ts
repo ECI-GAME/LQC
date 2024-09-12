@@ -18,11 +18,6 @@ const fetchLanguageInfo = async () => {
   try {
     const res = await api.system.getDictData('comic_language_type');
     languageInfos.value = res.results;
-    console.log('------');
-    
-    
-    console.log(languageInfos.value);
-    console.log('------');
   } catch (error) {
     console.error("Failed to fetch language:", error);
   }
@@ -41,14 +36,14 @@ const changeLanguage = function (source: String) {
 
 const imageList = []
 
-const onSubmit = function (formData: object) {
+const onSubmit =async function (formData: object) {
   console.log(projectInfo);
   formData.languagePair = projectInfo.sourceLanguage + '->' + projectInfo.targetLanguage
   formData.projectNum = projectInfo.projectNum
   formData.projectVersionImageVos = imageList
   console.log(formData);
 
-  api.version.addVersion(formData)
+  await api.version.addVersion(formData)
   return true;
 };
 
@@ -128,12 +123,15 @@ export const onCreate = async function (projectId: number | string,type:number,v
         multiple: true,
         spinning: true,
         onSuccess: function (files: FileData[]) {
-          imageList.push({
-            'imageName': files[0].fileName,
-            'imageSize': files[0].size,
-            'originalImagePath': files[0].src,
-            'imageType': files[0].type
+          files.forEach(e=>{
+            imageList.push({
+              'imageName': e.fileName,
+              'imageSize': e.size,
+              'originalImagePath': e.src,
+              'imageType': e.type
+            })
           })
+          
         },
 
       },
