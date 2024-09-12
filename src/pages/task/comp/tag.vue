@@ -19,9 +19,11 @@ const list = function (text?: string): string[] {
 </script>
 
 <template>
-  <div>
-    <template v-for="name in list(value)" :key="name">
-      <Tag v-if="name" color="blue">{{ name }}</Tag>
-    </template>
+  <div class="clearfix block">
+    <div class="-ml-2 -mt-2">
+      <div class="ml-2 mt-2 inline-block" v-for="name in list(value)" :key="name">
+        <Tag class="m-0" v-if="name" color="blue">{{ name }}</Tag>
+      </div>
+    </div>
   </div>
 </template>

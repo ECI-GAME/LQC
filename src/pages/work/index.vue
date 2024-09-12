@@ -256,7 +256,7 @@ const calcDotValue = function (data: DotData): DotData {
                  :disabled="!!dotAddTempValue"></Tab>
             <!-- 标记数量大于0或者正在创建标记点数据 -->
             <template v-if="dotAddTempValue || dots.total > 0">
-              <Record v-if="taskInfo && taskInfo.projectId"
+              <Record v-if="currentFile && taskInfo && taskInfo.projectId"
                       @view="onViewLocation"
                       @edit="onEditLocation"
                       @success="onReloadList"
@@ -264,7 +264,8 @@ const calcDotValue = function (data: DotData): DotData {
                       :active="recordActive"
                       :projectId="taskInfo.projectId"
                       :key="recordActive"
-                      :list="dots.results">
+                      :list="dots.results"
+                      :image-status="currentFile.imageStatus">
                 <Card v-if="dotAddTempValue" class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small">
                   <RegisterComment v-if="recordActive === RecordTabType.Comment"
                                    :data="dotAddTempValue"

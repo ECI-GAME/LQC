@@ -4,13 +4,12 @@
  */
 
 import api from "src/api";
-import {ref} from 'vue';
 import {Icon} from "@ue/icon";
 import * as alias from "src/router/alias";
 import {columns, useTask} from "./config";
 import * as model from "src/utils/model";
+import {ref, onMounted, computed} from 'vue';
 import {RouterLink, useRoute} from "vue-router";
-
 import Tags from "./comp/tag.vue";
 import Progress from "./comp/progress.vue";
 import Time from "src/components/time/index.vue";
@@ -22,15 +21,15 @@ import type {TaskData} from "src/types";
 
 const route = useRoute();
 const pageNumber = ref(1);
-const {create: onCreate, edit: onEdit} = useTask(route.params.versionId as string);
+
+const projectId = computed(() => route.params.projectId);
+
+const {versionId, create: onCreate, edit: onEdit, reload: onReload} = useTask();
 
 // 任务列表
 const {state, execute: onLoad, isLoading} = model.list<TaskData>(function () {
-    return api.task.list<TaskData>(pageNumber.value, route.params.versionId as string);
-  },
-  new model.PageResult<TaskData>([]),
-  true
-);
+  return api.task.list<TaskData>(pageNumber.value, versionId.value);
+});
 
 const searchInfo = () => {
   onLoad(100)
@@ -43,11 +42,21 @@ const onCreateTask = async function () {
 }
 
 const editFrom = async function (value: TaskData) {
+  // 重新加载数据
+  await onReload(value.versionId);
   const status = await onEdit(value);
   if (status) {
     await onLoad(100);
   }
 }
+
+onMounted(function () {
+  const version = route.params.versionId as string;
+  if (version) {
+    onReload(version);
+  }
+  searchInfo();
+});
 </script>
 
 <template>
@@ -72,7 +81,7 @@ const editFrom = async function (value: TaskData) {
       </Form>
     </Card>
 
-    <Card class="mt-5">
+    <Card class="mt-5" v-if="projectId">
       <Space size="large">
         <Button @click="onCreateTask" type="primary">新建任务</Button>
         <Button>生成交付文件</Button>
@@ -81,7 +90,7 @@ const editFrom = async function (value: TaskData) {
     </Card>
 
     <Card class="mt-5">
-      <Table :data-source="state.results" :columns="columns" :bordered="true" :loading="isLoading" :pagination="false">
+      <Table :data-source="state.results" :columns="columns" :bordered="true" :loading="isLoading" :pagination="false" table-layout="auto">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'taskName'">
             <RouterLink :to="{ name: alias.Work.name, params:{ taskId: record.id,workId:record.relationId } }">

@@ -49,7 +49,7 @@ export const VersionImage: RouteRecordBase = {
 }
 
 export const TaskList: RouteRecordBase = {
-  name: "Project Task List",
+  name: "/task/list",
   path: "/task/:projectId?/:versionId?",
   meta: {
     type: PageType.task,

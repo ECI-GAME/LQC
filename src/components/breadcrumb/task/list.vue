@@ -14,16 +14,18 @@ const route = useRoute();
 
 <template>
   <Breadcrumb>
-    <BreadcrumbItem>
-      <RouterLink :to="{ name: alias.ProjectList.name }">
-        <span>项目列表</span>
-      </RouterLink>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-      <RouterLink :to="{ name: alias.ProjectDetails.name, params:{ projectId: route.params.projectId } }">
-        <span>项目中心</span>
-      </RouterLink>
-    </BreadcrumbItem>
-    <BreadcrumbItem>任务列表</BreadcrumbItem>
+    <template v-if="route.params.projectId">
+      <BreadcrumbItem>
+        <RouterLink :to="{ name: alias.ProjectList.name }">
+          <span>项目列表</span>
+        </RouterLink>
+      </BreadcrumbItem>
+      <BreadcrumbItem>
+        <RouterLink :to="{ name: alias.ProjectDetails.name, params:{ projectId: route.params.projectId } }">
+          <span>项目中心</span>
+        </RouterLink>
+      </BreadcrumbItem>
+      <BreadcrumbItem>任务列表</BreadcrumbItem>
+    </template>
   </Breadcrumb>
 </template>

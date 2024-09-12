@@ -29,16 +29,14 @@ const selectedKeys = computed(function () {
     if (value === PageType.task) {
       if (hasTask.value) {
         return [value];
-      } else {
-        return [PageType.project];
       }
+      return [PageType.project];
     }
     if (value === PageType.work) {
       if (hasTask.value) {
-        return [PageType.work];
-      } else {
-        return [PageType.project];
+        return [PageType.task];
       }
+      return [PageType.project];
     }
     return [value];
   }
@@ -74,7 +72,7 @@ const onChangeMenu = function (data: object) {
               mode="inline"
               :inline-collapsed="status"
               :selectedKeys="selectedKeys"
-              @select="onChangeMenu"></Menu>
+              @click="onChangeMenu"></Menu>
       </LayoutContent>
     </Layout>
   </div>
