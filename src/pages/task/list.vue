@@ -24,7 +24,7 @@ import type {TaskData} from "src/types";
 const route = useRoute();
 const pageNumber = ref(1);
 
-const projectId = computed(() => route.params.projectId);
+const projectId = computed<string>(() => route.params.projectId as string);
 
 const {versionId, create: onCreate, edit: onEdit, reload: onReload} = useTask();
 

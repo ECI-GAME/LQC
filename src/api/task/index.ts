@@ -9,6 +9,13 @@ import GraphQL from "../graphql";
 import type {TaskData} from "src/types/task";
 
 export default class extends GraphQL {
+  @tryError(new PageResult())
+  @cache(30 * 1000)
+  @Get("/project/getMyProjectList")
+  projectList(): Promise<PageResult<object>> {
+    // @ts-ignore
+    return {};
+  }
 
   //任务列表查询
   @tryError([])

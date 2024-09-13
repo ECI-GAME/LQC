@@ -7,7 +7,6 @@ import api from "src/api";
 import {Icon} from "@ue/icon";
 import {ref, reactive} from 'vue';
 import * as model from "src/utils/model";
-import Version from "./comp/version.vue";
 import {FileData} from "src/utils/upload/common";
 import Upload from "src/components/upload/index.vue";
 import Pagination from "src/components/page/index.vue";
@@ -26,13 +25,6 @@ const props = defineProps({
 
 class FormState {
   searchValue?: string;
-  versionId?: number;
-
-  constructor() {
-    if (props.versionId) {
-      this.versionId = Number(props.versionId);
-    }
-  }
 }
 
 
@@ -68,7 +60,10 @@ const columns = [
 ];
 
 const {state, execute: onLoad, isLoading} = model.list<object>(function () {
-  return api.knowLedge.list(pageNumber.value, props.projectId, fromData.value.versionId, fromData.value.searchValue, "1", pageSize.value);
+  if (props.projectId) {
+    return api.knowLedge.list(pageNumber.value, props.projectId, props.versionId, fromData.value.searchValue, "1", pageSize.value);
+  }
+  return new model.PageResult<object>([]);
 }, new model.PageResult<object>([]), true);
 
 
@@ -81,7 +76,6 @@ const changePage = () => onLoad(100);
 
 //文件上传
 const onSuccess = async function (files: FileData[]) {
-
   files.forEach(s => {
     fileInfo.push({
       'fileName': s.fileName,
@@ -89,12 +83,10 @@ const onSuccess = async function (files: FileData[]) {
       'filePath': s.src,
       'fileType': s.type,
       'projectId': props.projectId,
-      'versionId': versionInfo.value.versionId || 0,
+      'versionId': props || 0,
       "resourceType": '1'
     })
-
   })
-
   const res = await api.project.addKnowLedgeInfo(fileInfo);
   console.log(res);
   if (res) {
@@ -111,9 +103,7 @@ const onSuccess = async function (files: FileData[]) {
 <template>
   <div>
     <Form layout="inline" :model="formState">
-      <FormItem v-if="!props.versionId">
-        <Version class="w-50" v-model:value="fromData.versionId" :project-id="projectId"></Version>
-      </FormItem>
+      <slot name="search"></slot>
       <FormItem>
         <InputSearch v-model:value="fromData.searchValue"
                      placeholder="请输入条件"
@@ -134,7 +124,7 @@ const onSuccess = async function (files: FileData[]) {
 
     <Table class="mt-5"
            :loading="isLoading"
-           :data-source="state.results"
+           :data-source="state.results" g
            :columns="columns"
            :bordered="true"
            :pagination="false">
@@ -146,7 +136,6 @@ const onSuccess = async function (files: FileData[]) {
         </template>
       </template>
     </Table>
-
     <Pagination v-model:page="pageNumber" v-model:size="pageSize" :total="state.total" @click="changePage"></Pagination>
   </div>
 
