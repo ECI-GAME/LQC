@@ -45,9 +45,13 @@ const selectedKeys = computed(function () {
 
 const onChangeMenu = function (data: object) {
   const name = safeGet<string>(data, "item.name");
-  const page = router.resolve({name});
-  if (page) {
-    router.push(page);
+  try {
+    const page = router.resolve({name});
+    if (page) {
+      router.push(page);
+    }
+  } catch (e) {
+    // todo
   }
 }
 

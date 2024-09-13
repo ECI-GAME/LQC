@@ -276,6 +276,7 @@ export default class extends Graphql {
 
   //版本列表
   @tryError(new PageResult<VersionData>())
+  @cache(30 * 1000)
   @Get("project/getVersionDict/:projectId")
   @validate
   getVersionDict(@required projectId: number | string): Promise<PageResult<VersionData>> {

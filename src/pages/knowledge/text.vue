@@ -7,7 +7,6 @@
 
 import api from "src/api";
 import {Icon} from "@ue/icon";
-import Version from "./comp/version.vue";
 import * as model from "src/utils/model";
 import {computed, ref, reactive} from 'vue';
 import safeGet from "@fengqiaogang/safe-get";
@@ -18,7 +17,7 @@ import Authorization from "src/libs/http/config/authorization";
 import {Table, Form, FormItem, InputSearch, Button, Upload, message} from "ant-design-vue";
 
 
-import type { UploadChangeParam, UploadProps } from "ant-design-vue";
+import type {UploadChangeParam, UploadProps} from "ant-design-vue";
 
 const props = defineProps({
   versionId: {
@@ -34,13 +33,6 @@ const props = defineProps({
 
 class FormState {
   searchValue?: string;
-  versionId?: number;
-
-  constructor() {
-    if (props.versionId) {
-      this.versionId = Number(props.versionId);
-    }
-  }
 }
 
 const pageSize = ref<number>(10);
@@ -64,7 +56,10 @@ const columns = [
 
 
 const {state, execute: onLoad, isLoading} = model.list<object>(function () {
-  return api.knowLedge.textList(pageNumber.value, props.projectId, formState.versionId, formState.searchValue, pageSize.value);
+  if (props.projectId) {
+    return api.knowLedge.textList(pageNumber.value, props.projectId, props.versionId, formState.searchValue, pageSize.value);
+  }
+  return new model.PageResult<object>([]);
 }, new model.PageResult<object>([]), true);
 
 
@@ -129,9 +124,7 @@ const beforeUpload = (file: File) => {
 <template>
   <div>
     <Form layout="inline" :model="formState">
-      <FormItem v-if="!props.versionId">
-        <Version class="w-50" v-model:value="formState.versionId" :project-id="projectId"></Version>
-      </FormItem>
+      <slot name="search"></slot>
       <FormItem>
         <InputSearch v-model:value="formState.searchValue" :allow-clear="true" placeholder="请输入条件" enter-button
                      @search="onSearch"

@@ -5,7 +5,6 @@
 import {ref} from 'vue';
 import api from "src/api";
 import * as model from "src/utils/model";
-import Version from "./comp/version.vue";
 import {ElImage as Image} from "element-plus";
 import {FileData} from "src/utils/upload/common";
 import Upload from "src/components/upload/index.vue";
@@ -28,13 +27,6 @@ const props = defineProps({
 
 class FormState {
   searchValue?: string;
-  versionId?: number;
-
-  constructor() {
-    if (props.versionId) {
-      this.versionId = Number(props.versionId);
-    }
-  }
 }
 
 
@@ -45,7 +37,10 @@ const pageSize = ref<number>(10);
 const pageNumber = ref<number>(1);
 
 const {state, execute: onLoad} = model.list<ProjectImage>(function () {
-  return api.knowLedge.list<ProjectImage>(pageNumber.value, props.projectId, fromData.value.versionId, fromData.value.searchValue, "2", pageSize.value);
+  if (props.projectId) {
+    return api.knowLedge.list<ProjectImage>(pageNumber.value, props.projectId, props.versionId, fromData.value.searchValue, "2", pageSize.value);
+  }
+  return new model.PageResult<ProjectImage>([]);
 }, new model.PageResult<ProjectImage>([]), true);
 
 const onSearch = () => {
@@ -68,7 +63,7 @@ const onSuccess = async function (files: FileData[]) {
       'filePath': s.src,
       'fileType': s.type,
       'projectId': props.projectId,
-      'versionId': fromData.value.versionId || 0,
+      'versionId': props.versionId || 0,
       "resourceType": '2'
     })
   })
@@ -82,9 +77,7 @@ const onSuccess = async function (files: FileData[]) {
 <template>
   <div>
     <Form layout="inline" :model="fromData">
-      <FormItem v-if="!props.versionId">
-        <Version class="w-50" v-model:value="fromData.versionId" :project-id="projectId"></Version>
-      </FormItem>
+      <slot name="search"></slot>
       <FormItem>
         <InputSearch v-model:value="fromData.searchValue" placeholder="请输入条件" enter-button allow-clear
                      @search="onSearch" class="w-100 float-left"/>
