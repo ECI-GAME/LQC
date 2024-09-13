@@ -15,16 +15,24 @@ import {Input, InputNumber, RangePicker, message} from "ant-design-vue";
 import type {ModalProps} from "@ue/modal";
 import type {TaskData, VersionInfo} from "src/types";
 
-export const columns = [
-  {title: "任务名称", dataIndex: 'taskName', key: 'taskName'},
-  {title: "状态", dataIndex: 'taskStatus', key: 'taskStatus', align: "center"},
-  {title: "处理人", dataIndex: 'handlerName', key: 'tags', align: "center", width: 180, minWidth: 140, maxWidth: 300},
-  {title: "图片总量", dataIndex: 'totalCnt', key: 'totalCnt', align: "center"},
-  {title: "创建时间", dataIndex: 'createTime', key: 'time', align: "center"},
-  {title: "更新时间", dataIndex: 'lastDealTime', key: 'time', align: "center"},
-  {title: "进度", dataIndex: 'doneCnt', key: 'progress', align: "center"},
-  {title: "操作", dataIndex: 'action', key: 'action', align: "center"},
-];
+export const useColumns = function (projectId?: string | number) {
+  const list: object[] = [
+    {title: "任务名称", dataIndex: 'taskName', key: 'taskName'},
+  ];
+  if (!projectId) {
+    list.push({title: "项目名称", dataIndex: 'projectName', key: 'projectName'});
+  }
+  list.push(
+    {title: "状态", dataIndex: 'taskStatus', key: 'taskStatus', align: "center"},
+    {title: "处理人", dataIndex: 'handlerName', key: 'tags', align: "center", width: 180, minWidth: 140, maxWidth: 300},
+    {title: "图片总量", dataIndex: 'totalCnt', key: 'totalCnt', align: "center"},
+    {title: "创建时间", dataIndex: 'createTime', key: 'time', align: "center"},
+    {title: "更新时间", dataIndex: 'lastDealTime', key: 'time', align: "center"},
+    {title: "进度", dataIndex: 'doneCnt', key: 'progress', align: "center"},
+    {title: "操作", dataIndex: 'action', key: 'action', align: "center"},
+  );
+  return ref<object[]>(list);
+};
 
 const dateFormat: string = "YYYY-MM-DD";
 const onTaskModal = function (data: TaskData, persons: object[], config: ModalProps) {

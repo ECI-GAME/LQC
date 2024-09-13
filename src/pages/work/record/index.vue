@@ -11,6 +11,7 @@ import Word from "./word.vue";
 import {Icon} from "@ue/icon";
 import Comment from "./comment.vue";
 import sure from "src/utils/tips/sure";
+import safeGet from "@fengqiaogang/safe-get";
 import {ElButton as Button} from "element-plus";
 import {RecordTabType, useCreateBy} from "../config";
 import {Space, Collapse, CollapsePanel} from "ant-design-vue";
@@ -73,6 +74,21 @@ const onSave = async function () {
   }
 }
 
+const onSort = async function (data: DotData, index: number) {
+  if (index < 1) {
+    return false;
+  }
+  const prev = props.list[index - 1];
+  const value = new Map<string | number, number>();
+  value.set(data.id, safeGet<number>(data, "orderCnt")! - 1);
+  value.set(prev.id, safeGet<number>(prev, "orderCnt")! + 1);
+  const status = await api.work.word.sort(Object.fromEntries(value));
+  if (status) {
+    onUpdate();
+  }
+}
+
+
 const onUpdate = function () {
   $emit("success");
 }
@@ -101,7 +117,7 @@ const getTitleColor = function (data: DotData) {
               <!--标记-->
               <span class="flex-1 w-1 truncate mr-2 ml-1" :class="getTitleColor(item)">{{ item.translatedText }}</span>
               <Space>
-                <Button class="p-0 text-lg" type="success" link @click.stop>
+                <Button class="p-0 text-lg" type="success" link @click.stop="onSort(item, index)">
                   <Icon type="arrowup"></Icon>
                 </Button>
                 <Button class="p-0 text-lg" type="primary" link @click.stop="onShowDetail(item)">
@@ -121,7 +137,7 @@ const getTitleColor = function (data: DotData) {
               <!--批注-->
               <span class="flex-1 w-1 truncate mr-2 ml-1" :title="item.remark">{{ item.remark }}</span>
               <Space>
-                <Button class="p-0 text-lg" type="success" link @click.stop>
+                <Button class="p-0 text-lg" type="success" link @click.stop="onSort(item, index)">
                   <Icon type="arrowup"></Icon>
                 </Button>
                 <Button class="p-0 text-lg" type="primary" link @click.stop="onShowDetail(item)">

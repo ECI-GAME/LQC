@@ -1,4 +1,5 @@
 import * as message from "@ue/message";
+import loading from "src/utils/loading";
 import {PageResult} from "src/utils/model";
 import {Get, Post, Delete, Put, validate, required, tryError} from "@js-lion/api";
 import type {DotCheckData, CheckType} from "src/types";
@@ -71,5 +72,19 @@ export default class {
     const params: object = {imageId, translationId: dotId, pageNum: 1, pageSize: 1000};
     // @ts-ignore
     return {params};
+  }
+
+  /**
+   * 数据排序
+   **/
+  @tryError(false)
+  @message.$error()
+  @loading()
+  @Post("/project/image/translations/changSort")
+  @validate
+  sort(@required data: object): Promise<boolean> {
+    const callback = () => true;
+    // @ts-ignore
+    return {data, callback};
   }
 }

@@ -6,7 +6,7 @@
 import api from "src/api";
 import {Icon} from "@ue/icon";
 import * as alias from "src/router/alias";
-import {columns, useTask} from "./config";
+import {useColumns, useTask} from "./config";
 import * as model from "src/utils/model";
 import {ref, onMounted, computed} from 'vue';
 import {RouterLink, useRoute} from "vue-router";
@@ -16,7 +16,7 @@ import Time from "src/components/time/index.vue";
 import Page from "src/components/page/index.vue";
 import Dict from "src/components/dict/index.vue";
 import {Table, Button, Card, Form, FormItem, Input, Space} from "ant-design-vue";
-import {SearchOutlined,PlusOutlined} from "@ant-design/icons-vue";
+import {SearchOutlined, PlusOutlined} from "@ant-design/icons-vue";
 
 
 import type {TaskData} from "src/types";
@@ -28,6 +28,7 @@ const projectId = computed(() => route.params.projectId);
 
 const {versionId, create: onCreate, edit: onEdit, reload: onReload} = useTask();
 
+const columns = useColumns(projectId.value);
 // 任务列表
 const {state, execute: onLoad, isLoading} = model.list<TaskData>(function () {
   return api.task.list<TaskData>(pageNumber.value, versionId.value);
@@ -77,14 +78,14 @@ onMounted(function () {
         <FormItem>
           <Space>
             <Button type="primary" @click="searchInfo" style="background-color: #1E90FF !important;color: white;">
-              
+
               <template #icon>
-                <SearchOutlined class="my-0 inline-flex" />
+                <SearchOutlined class="my-0 inline-flex"/>
               </template>
               搜索
             </Button>
             <Button>
-              
+
               重置
             </Button>
           </Space>
@@ -95,17 +96,19 @@ onMounted(function () {
     <Card class="mt-5" v-if="projectId">
       <Space size="large">
         <Button @click="onCreateTask" type="primary" style="background-color: #400ded !important;color: white;">
-              <template #icon>
-                <PlusOutlined  class="my-0 inline-flex" />
-              </template>
-          新建任务</Button>
+          <template #icon>
+            <PlusOutlined class="my-0 inline-flex"/>
+          </template>
+          新建任务
+        </Button>
         <Button>生成交付文件</Button>
         <Button>归档</Button>
       </Space>
     </Card>
 
     <Card class="mt-5">
-      <Table :data-source="state.results" :columns="columns" :bordered="true" :loading="isLoading" :pagination="false" table-layout="auto">
+      <Table :data-source="state.results" :columns="columns" :bordered="true" :loading="isLoading" :pagination="false"
+             table-layout="auto">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'taskName'">
             <RouterLink :to="{ name: alias.Work.name, params:{ taskId: record.id,workId:record.relationId } }">
