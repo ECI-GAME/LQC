@@ -1,6 +1,8 @@
 import cache from "src/utils/cache";
 import {PageResult} from "src/utils/model";
 import {validate, required, Get, Post, tryError} from "@js-lion/api";
+import safeGet from "@fengqiaogang/safe-get";
+import * as message from "@ue/message";
 
 import type { DictItem } from "src/types";
 
@@ -39,5 +41,16 @@ export default class {
 
     // @ts-ignore
     return {data, callback};
+  }
+
+  
+
+
+   //查询角色列表
+  @Get("/system/role/list")
+  getRoleList() {
+    const params = {pageNum: 100,pageSize: 100};
+   
+    return {params};
   }
 }
