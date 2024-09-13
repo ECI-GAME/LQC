@@ -338,4 +338,16 @@ export default class extends Graphql {
     return {data};
   }
 
+   //提交语言内容
+   @tryError(false)
+   @$error()
+   @$success("操作成功")
+   @post("/system/emp/add/project/participants")
+   @validate
+   invitePerson(data: object) {
+     // @ts-ignore
+     return {data};
+   }
+  
+
 }
