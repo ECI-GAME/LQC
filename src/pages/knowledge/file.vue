@@ -10,6 +10,7 @@ import * as model from "src/utils/model";
 import {FileData} from "src/utils/upload/common";
 import Upload from "src/components/upload/index.vue";
 import Pagination from "src/components/page/index.vue";
+import { downloadFile } from "src/utils/brower/download";
 import {Table, Form, FormItem, InputSearch, Button, message} from "ant-design-vue";
 
 const props = defineProps({
@@ -130,9 +131,9 @@ const onSuccess = async function (files: FileData[]) {
            :pagination="false">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.key === 'action'">
-                    <span class="inline-block">
-                        <Icon class="text-xl text-primary cursor-pointer" type="download"></Icon>
-                    </span>
+          <span class="inline-block" @click="downloadFile(record.filePath)">
+              <Icon class="text-xl text-primary cursor-pointer" type="download"></Icon>
+          </span>
         </template>
       </template>
     </Table>

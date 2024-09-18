@@ -4,109 +4,89 @@
  * @file 错误类型配置
  */
 import api from "src/api";
-import { onMounted, ref } from 'vue';
-import { useRoute } from "vue-router";
-import * as alias from "src/router/alias";
 import {Icon} from "@ue/icon";
-
-import { Button, Breadcrumb, BreadcrumbItem, Row, Col,Popconfirm } from "ant-design-vue";
-import { VueDraggableNext } from 'vue-draggable-next';
+import {useRoute} from "vue-router";
+import * as model from "src/utils/model";
+import {onMounted, ref, computed} from 'vue';
+import safeGet from "@fengqiaogang/safe-get";
 import {onCreate} from "src/utils/nodeConfig";
 import {onCreatePerson} from "src/utils/person";
-
+import {VueDraggableNext} from 'vue-draggable-next';
+import {Button, Row, Col, Popconfirm, Empty} from "ant-design-vue";
 
 
 const route = useRoute();
-const projectId = route.params.projectId;
-let methodList = ref([]);
-let personList = ref([]);
+const projectId = computed<string>(() => String(route.params.projectId));
 
-const initMethod = async () => {
-  try {
-    methodList.value = await api.project.getProjectMethodById(projectId);
-    console.log(methodList.value);
-    intPerson()
-  } catch (error) {
-    console.error("Failed to fetch language:", error);
-    
-    
+const active = ref<string | number>();
+const state = ref<object[]>([]);
+
+const {state: personList, execute: onLoadPersons} = model.list(function () {
+  if (active.value) {
+    return api.project.getProjectPersonById(active.value);
   }
-};
-onMounted(() => {
-  initMethod();
- 
+  return [];
+}, new model.PageResult(), false);
 
-});
-let nodeId = 0;
-const intPerson = async () => {
-  if (nodeId === 0) {
-   
-    methodList.value.forEach(e => {
-      if (e.choseEle === 1) {
-        nodeId = e.id
-        console.log('node_id:'+nodeId);
-        console.log('node_id:'+e.id);
-      }
-    })
+const onLoadList = async function () {
+  const list = await api.project.getProjectMethodById(projectId.value);
+  if (list && list.length > 0) {
+    state.value = list;
+    setTimeout(function () {
+      changePerson(list[0]);
+    }, 0);
+  } else {
+    active.value = void 0;
+    state.value = [];
   }
-  personList.value = await api.project.getProjectPersonById(nodeId);
-};
-
-
-
-const log = (event) => {
-  console.log('-----------');
-  console.log(event.moved.newIndex);
-  console.log(event.moved.element);
-
-  console.log(event.moved.element.orderBy);
-  console.log('-----------');
-  console.log(methodList);
-
-};
-const changePerson = function (element) {
-  methodList.value.forEach(e => {
-    e.choseEle = 0
-  });
-  nodeId = element.id
-  element.choseEle = 1
-  console.log(element);
-  console.log(nodeId);
-
-  intPerson()
 }
 
-const deletePerson =async function(id: number){
+onMounted(onLoadList);
+
+const changePerson = function (element: object) {
+  const value = safeGet<string | number>(element, ".id");
+  if (value) {
+    console.log(value);
+    active.value = value;
+    onLoadPersons(500)
+  }
+}
+
+// 删除人员
+const deletePerson = async function (id: number | string) {
   const status = await api.project.deletePerson(id);
-  console.log('status:'+status);
-  await intPerson();
-  
+  if (status) {
+    await onLoadPersons(500);
+  }
 }
 
-const deleteNode =async function(id: number){
+// 删除节点
+const deleteNode = async function (id: number) {
   const status = await api.project.deleteNode(id);
-  console.log('status:'+status);
-  await initMethod();
-  
+  if (status) {
+    await onLoadPersons(500);
+  }
 }
 
+// 添加节点
 const onCreateWorkFlow = async function () {
-  const status = await onCreate(methodList.value,projectId);
+  const status = await onCreate(state.value, projectId.value);
   if (status) {
-    await initMethod();
-  }
-}
-const onCreatePeople = async function () {
-  const status = await onCreatePerson(nodeId);
-  if (status) {
-    await intPerson();
+    await onLoadList();
   }
 }
 
-const saveNodeInfo =async function  (){
-  console.log(methodList.value);
-  
-  await api.project.updateProMethSort(methodList.value)
+// 添加人员
+const onCreatePeople = async function () {
+  const status = await onCreatePerson(active.value);
+  if (status) {
+    await onLoadPersons(500);
+  }
+}
+
+// 保存排序
+const saveNodeInfo = function () {
+  api.project.updateProMethSort(state.value);
 }
 
 </script>
@@ -116,71 +96,68 @@ const saveNodeInfo =async function  (){
     <div class="flex m-10">
       <Row class="w-11/12">
         <Col :span="11">
-        <div class="h-10">
-          <span class="float-left font-bold text-xl">流程节点</span>
-
-          <Button class="float-right bg-blue-700  ms-3" type="primary" @click="onCreateWorkFlow">新增流程节点</Button>
-          <Button class="float-right bg-violet-700" @click="saveNodeInfo" type="primary">保存</Button>
-        </div>
-        <VueDraggableNext class="dragArea list-group w-full cursor-pointer" :list="methodList" @change="log">
-          <div v-for="element in methodList" :key="element.methCode">
-            <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" v-if="element.choseEle == 1"
-              @click="changePerson(element)" style="background-color: blue;color: white;">
-              {{ element.methodName }}
-
-              <Popconfirm
-              title="确认删除该节点信息吗?"
-              ok-text="Yes"
-              cancel-text="No"
-              @confirm="deleteNode(element.id)"
-            >
-            <Icon class="text-xl text-primary cursor-pointer float-right text-white" type="delete" ></Icon>
-            </Popconfirm>
-            </div>
-            <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" @click="changePerson(element)"
-              v-else>
-              {{ element.methodName }}
-
-              <Popconfirm
-              title="确认删除该节点信息吗?"
-              ok-text="Yes"
-              cancel-text="No"
-              @confirm="deleteNode(element.id)"
-            >
-            <Icon class="text-xl text-primary cursor-pointer float-right" type="delete" ></Icon>
-            </Popconfirm>
-            </div>
+          <div class="flex items-center justify-end mb-5">
+            <b class="text-xl mr-auto">流程节点</b>
+            <Button class="mr-5" @click="onCreateWorkFlow">新增流程节点</Button>
+            <Button @click="saveNodeInfo" type="primary">保存</Button>
           </div>
-        </VueDraggableNext>
+
+          <VueDraggableNext class="dragArea list-group w-full cursor-pointer" :list="state">
+            <div v-for="element in state" :key="element.methCode">
+              <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" v-if="element.id == active"
+                   @click="changePerson(element)" style="background-color: blue;color: white;">
+                {{ element.methodName }}
+                <Popconfirm
+                    title="确认删除该节点信息吗?"
+                    ok-text="Yes"
+                    cancel-text="No"
+                    @confirm="deleteNode(element.id)"
+                >
+                  <Icon class="text-xl text-primary cursor-pointer float-right text-white" type="delete"></Icon>
+                </Popconfirm>
+              </div>
+              <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" @click="changePerson(element)"
+                   v-else>
+                {{ element.methodName }}
+                <Popconfirm
+                    title="确认删除该节点信息吗?"
+                    ok-text="Yes"
+                    cancel-text="No"
+                    @confirm="deleteNode(element.id)"
+                >
+                  <Icon class="text-xl text-primary cursor-pointer float-right" type="delete"></Icon>
+                </Popconfirm>
+              </div>
+            </div>
+          </VueDraggableNext>
         </Col>
         <Col :span="1">
         </Col>
         <Col :span="11">
-        <div class="h-10">
-          <span class="float-left font-bold text-xl">人员信息</span>
-          <Button class="float-right bg-blue-700" type="primary" @click="onCreatePeople">添加人员</Button>
-        </div>
+          <div class="flex items-center justify-between mb-5">
+            <b class="text-xl">人员信息</b>
+            <Button type="primary" @click="onCreatePeople" :disabled="!active">添加人员</Button>
+          </div>
 
-        <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" v-for="person in personList"
-          :key="person.handlerId">
-          {{ person.handlerName }}
-          <Popconfirm
-              title="确认删除该人员信息吗?"
-              ok-text="Yes"
-              cancel-text="No"
-              @confirm="deletePerson(person.id)"
-            >
-            <Icon class="text-xl text-primary cursor-pointer float-right" type="delete" ></Icon>
-            </Popconfirm>
-          
-        </div>
-
+          <template v-if="personList.total > 0">
+            <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" v-for="person in personList.results"
+                 :key="person.handlerId">
+              {{ person.handlerName }}
+              <Popconfirm
+                  title="确认删除该人员信息吗?"
+                  ok-text="Yes"
+                  cancel-text="No"
+                  @confirm="deletePerson(person.id)"
+              >
+                <Icon class="text-xl text-primary cursor-pointer float-right" type="delete"></Icon>
+              </Popconfirm>
+            </div>
+          </template>
+          <template v-else>
+            <Empty></Empty>
+          </template>
         </Col>
       </Row>
     </div>
   </div>
 </template>
-
-<style>
-/* Add any necessary styles */
-</style>

@@ -75,7 +75,6 @@ const isReadOnly = function (readonly: Array<string | number> | string | number 
       <template v-for="item in state.results" :key="item.code">
         <SelectOption :value="item.code" :disabled="isReadOnly(readonly, item.code)">{{ item.dictLabel }}</SelectOption>
       </template>
-
     </Select>
   </div>
 </template>

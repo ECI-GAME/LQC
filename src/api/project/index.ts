@@ -102,10 +102,12 @@ export default class extends Graphql {
 
 
   //根据ID查询项目信息
+  @tryError([])
+  @cache(1000 * 60)
   @Get("project/getProjectUser")
   @validate
-  getProjectUserInfoBy() {
-
+  getProjectUserInfoBy<T = object>(): Promise<T[]> {
+    // @ts-ignore
     return {};
   }
 
@@ -116,9 +118,10 @@ export default class extends Graphql {
   @$success("操作成功")
   @post("/project/task/person")
   @validate
-  addProjectUserInfoBy(data: object) {
+  addProjectUserInfoBy(data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
 
@@ -128,9 +131,10 @@ export default class extends Graphql {
   @$success("操作成功")
   @post("/project/methods")
   @validate
-  addProjecMethodInfoBy(data: object) {
+  addProjecMethodInfoBy(data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
 
@@ -140,41 +144,33 @@ export default class extends Graphql {
   @$success("操作成功")
   @Delete("project/methods/:ids")
   @validate
-  deleteNode(data: number) {
-    const params = {ids: data};
+  deleteNode(ids: number): Promise<boolean> {
+    const params = {ids};
     // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
+    const callback = () => true;
     // @ts-ignore
-    return {data, params};
+    return {params, callback};
   }
 
   //根据ID查询项目关联方法
+  @tryError([])
   @Get("project/methods/projectId/:id")
   @validate
-  getProjectMethodById(data: number) {
-    const params = {id: data};
+  getProjectMethodById(id: number | string): Promise<object[]> {
+    const params = {id};
     // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
-    // @ts-ignore
-    return {data, params};
+    return {params};
   }
 
 
   //根据节点ID查询项目关联人员
+  @tryError([])
   @Get("project/task/person/nodeId/:id")
   @validate
-  getProjectPersonById(data: number) {
-    const params = {id: data};
+  getProjectPersonById(id: number | string): Promise<object[]> {
+    const params = {id};
     // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
-    // @ts-ignore
-    return {data, params};
+    return {params};
   }
 
   //删除人员信息
@@ -183,14 +179,12 @@ export default class extends Graphql {
   @$success("操作成功")
   @Delete("project/task/person/:ids")
   @validate
-  deletePerson(data: number) {
-    const params = {ids: data};
+  deletePerson(ids: number | string): Promise<boolean> {
+    const params = {ids};
     // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
+    const callback = () => true;
     // @ts-ignore
-    return {data, params};
+    return {params, callback};
   }
 
   /**
@@ -339,16 +333,16 @@ export default class extends Graphql {
     return {data};
   }
 
-   //提交语言内容
-   @tryError(false)
-   @$error()
-   @$success("操作成功")
-   @post("/system/emp/add/project/participants")
-   @validate
-   invitePerson(data: object) {
-     // @ts-ignore
-     return {data};
-   }
-  
+  //提交语言内容
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
+  @post("/system/emp/add/project/participants")
+  @validate
+  invitePerson(data: object) {
+    // @ts-ignore
+    return {data};
+  }
+
 
 }

@@ -33,15 +33,13 @@ export const iframeDownload = function (url: string) {
 
 // 触发浏览器下载
 export const downloadFile = function (link?: string, name?: string) {
-  // let status;
   let value = link ? normalize(link) : link;
-  // if (value) {
-  //   status = iframeDownload(value);
-  // }
-  // if (!status) {
-  //   status = linkDownload(value, name)
-  // }
-  // return status;
+  if (value) {
+    const status = iframeDownload(value);
+    if (status) {
+      return;
+    }
+  }
   if (value && name) {
     return linkDownload(value, name);
   } else if (value) {

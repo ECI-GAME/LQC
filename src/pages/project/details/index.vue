@@ -1,5 +1,11 @@
 <script setup lang="ts">
+/**
+ * @file 项目详情
+ */
+
+import {ref} from 'vue';
 import api from 'src/api';
+import {Icon} from "@ue/icon";
 import {useRoute} from 'vue-router';
 import Version from './version.vue';
 import * as model from "src/utils/model";
@@ -8,8 +14,7 @@ import {onCreate} from "src/utils/version";
 import Loading from "src/components/loading/index.vue";
 import LanguageDetail from "src/components/language/detail.vue";
 import {Descriptions, DescriptionsItem, Card, Button, Space} from 'ant-design-vue';
-import {ref} from 'vue';
-import {PlusOutlined,FileImageOutlined,PullRequestOutlined,CloseSquareOutlined,PictureOutlined,ReadOutlined} from "@ant-design/icons-vue";
+import {PullRequestOutlined, CloseSquareOutlined, PictureOutlined, ReadOutlined} from "@ant-design/icons-vue";
 
 import type {Project} from "src/types";
 
@@ -17,10 +22,10 @@ const route = useRoute();
 // 构造当前列表数据对象
 const readOptions = ref([])
 const initReadOrder = async function () {
-  readOptions.value =  await api.system.getDictData('comic_image_read_order');
-  
+  readOptions.value = await api.system.getDictData('comic_image_read_order');
+
 }
- 
+
 initReadOrder()
 const {
   state: projectInfo,
@@ -28,19 +33,19 @@ const {
 } = model.result<Project>(() => api.project.getProjectInfoById(route.params.projectId as string), {} as Project, true);
 
 const onCreateVersion = async function () {
-  const status = await onCreate(route.params.projectId as string,0,0);
+  const status = await onCreate(route.params.projectId as string, 0, 0);
   if (status) {
     window.location.reload();
   }
 }
 const showValue = ref('')
-const showLabel = function(value:string){
-  readOptions.value.results.forEach(s=>{
-    if(s.dictValue == value){
-      showValue.value =  s.dictLabel
+const showLabel = function (value: string) {
+  readOptions.value.results.forEach(s => {
+    if (s.dictValue == value) {
+      showValue.value = s.dictLabel
     }
   })
- return showValue.value
+  return showValue.value
 }
 
 </script>
@@ -61,7 +66,7 @@ const showLabel = function(value:string){
             }}
           </DescriptionsItem>
           <DescriptionsItem label="状态">进行中</DescriptionsItem>
-          <DescriptionsItem label="阅读顺序">{{showLabel(projectInfo.readOrder)}}</DescriptionsItem>
+          <DescriptionsItem label="阅读顺序">{{ showLabel(projectInfo.readOrder) }}</DescriptionsItem>
           <DescriptionsItem label="备注" :span="3">{{ projectInfo.remarks }}</DescriptionsItem>
         </Descriptions>
       </Card>
@@ -69,34 +74,37 @@ const showLabel = function(value:string){
         <Space size="large">
           <RouterLink :to="{ name: alias.NodeConfig.name, params: { projectId: projectInfo.id } }">
             <Button type="primary">
-              
               <template #icon>
-                <PullRequestOutlined  class="my-0 inline-flex" />
+                <PullRequestOutlined class="my-0 inline-flex"/>
               </template>
-              流程人员配置</Button>
+              流程人员配置
+            </Button>
           </RouterLink>
 
           <RouterLink :to="{ name: alias.RemarkTypeConfig.name, params: { projectId: projectInfo.id } }">
             <Button type="primary">
-              
+
               <template #icon>
-                <CloseSquareOutlined  class="my-0 inline-flex" />
+                <CloseSquareOutlined class="my-0 inline-flex"/>
               </template>
-              错误类型配置</Button>
+              错误类型配置
+            </Button>
           </RouterLink>
           <RouterLink :to="{ name: alias.PsTypeConfig.name, params: { projectId: projectInfo.id } }">
             <Button type="primary">
               <template #icon>
-                <PictureOutlined  class="my-0 inline-flex" />
+                <PictureOutlined class="my-0 inline-flex"/>
               </template>
-              PSD生成配置</Button>
+              PSD生成配置
+            </Button>
           </RouterLink>
           <RouterLink :to="{ name: alias.Knowledge.name, params: { projectId: projectInfo.id } }">
             <Button type="primary">
               <template #icon>
-                <ReadOutlined  class="my-0 inline-flex" />
+                <ReadOutlined class="my-0 inline-flex"/>
               </template>
-              知识库配置</Button>
+              知识库配置
+            </Button>
           </RouterLink>
         </Space>
       </Card>
@@ -110,19 +118,20 @@ const showLabel = function(value:string){
         <div class="flex items-center justify-between">
           <span>画册管理</span>
           <Space>
-            <Button type="primary" class="ml-2" @click="onCreateVersion" style="background-color: #400ded;color: white;" >
-              <template #icon>
-                <PlusOutlined  class="my-0 inline-flex" />
-              </template>
-              创建画册</Button>
+            <Button class="ml-2" @click="onCreateVersion">
+              <Space>
+                <Icon class="flex" type="plus"/>
+                <span>创建画册</span>
+              </Space>
+            </Button>
             <RouterLink :to="{ name: alias.VersionImage.name, params: { projectId: projectInfo.id } }">
               <Button type="primary" class="ml-2">
-                
-                <template #icon>
-                <FileImageOutlined  class="my-0 inline-flex" />
-              </template>图片管理</Button>
+                <Space>
+                  <Icon class="flex" type="file-image"/>
+                  <span>图片管理</span>
+                </Space>
+              </Button>
             </RouterLink>
-            <!-- <Button type="primary" class="ml-2">任务中心</Button> -->
           </Space>
         </div>
       </template>
@@ -133,12 +142,12 @@ const showLabel = function(value:string){
 <style scoped lang="scss">
 
 #proConfig :deep(.ant-btn-primary) {
-    background-color: #28A745 !important; /* 背景颜色 */
-    color: white !important; /* 文字颜色 */
-  }
-  
-  #proConfig :deep(.ant-btn-primary:hover) {
-    background-color: #28A745 !important; /* 背景颜色 */
-    color: #ffffff !important; /* 文字颜色 */
-  }
+  background-color: #28A745 !important; /* 背景颜色 */
+  color: white !important; /* 文字颜色 */
+}
+
+#proConfig :deep(.ant-btn-primary:hover) {
+  background-color: #28A745 !important; /* 背景颜色 */
+  color: #ffffff !important; /* 文字颜色 */
+}
 </style>
