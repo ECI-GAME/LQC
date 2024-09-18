@@ -4,7 +4,9 @@
  */
 
 import {API} from "@js-lion/api";
+import {VITE_LQA} from "src/config";
 import {APIConfig} from "./config/response";
+import safeGet from "@fengqiaogang/safe-get";
 import {requestCallback, responseCallback} from "./config/index";
 
 import type {AxiosRequestConfig, AxiosResponse} from "axios";
@@ -31,6 +33,14 @@ class HttpConfig {
   }
 }
 
+const onRedirect = function (code?: string | number) {
+  if (code && String(code) === "401") {
+    window.location.href = `${VITE_LQA}/login?referer=${window.location.href}`;
+    return false;
+  }
+  return true;
+}
+
 /**
  *
  * @param axiosConfig Axios 配置信息
@@ -38,18 +48,29 @@ class HttpConfig {
  * @returns
  */
 const http = function (axiosConfig?: AxiosRequestConfig, httpConfig: HttpConfig = new HttpConfig(), ApiConfig?: APIConfig) {
-
   API.addRequest(function (req: AxiosRequestConfig) {
     if (httpConfig.cookieName) {
-      return requestCallback(req, httpConfig.cookieName, httpConfig.authorizationName);
+      try {
+        return requestCallback(req, httpConfig.cookieName, httpConfig.authorizationName);
+      } catch (e) {
+        const code = safeGet<string>(e, "message");
+        onRedirect(code);
+      }
     }
     return req;
   });
 
   API.addResponse(function (res: AxiosResponse) {
-    return responseCallback(ApiConfig ? ApiConfig : new APIConfig(), res);
+    const code = safeGet<string>(res, "data.scode") || safeGet<string>(res, "data.code") || safeGet<string>(res, "status");
+    const status = onRedirect(code);
+    if (status) {
+      return responseCallback(ApiConfig ? ApiConfig : new APIConfig(), res);
+    }
+    return void 0;
   }, function (error: any) {
-    if (error && error.response) {
+    const code = safeGet<string>(error, "status");
+    const status = onRedirect(code);
+    if (status && error && error.response) {
       return Promise.reject(error.response.data);
     }
     return Promise.reject(error);

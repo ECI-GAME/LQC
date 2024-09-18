@@ -24,7 +24,6 @@ const onClick = function ({key}: { key: string }) {
       cancelButtonText: "取消",
       confirmButtonText: "退出",
     }).then(() => {
-      const url = `${VITE_LQC}/logout`;
       window.location.href = `${VITE_LQA}/logout`;
     }).catch(() => {
       //取消退出

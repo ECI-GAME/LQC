@@ -4,21 +4,23 @@
  */
 
 
-import { asyncCheck } from "./response";
+import {asyncCheck} from "./response";
 import Authorization from "./authorization";
-import type { APIConfig } from "./response";
-import type { AxiosRequestConfig, AxiosResponse } from "axios";
+import type {APIConfig} from "./response";
+import type {AxiosRequestConfig, AxiosResponse} from "axios";
 
 // 处理请求前的数据
-export const requestCallback = function(req: AxiosRequestConfig, cookieName: string, authorizationName?: string): AxiosRequestConfig {
-  const value = Authorization(cookieName, authorizationName);
+export const requestCallback = function (req: AxiosRequestConfig, cookieName: string, authorizationName?: string): AxiosRequestConfig {
+  const value = Authorization(cookieName, authorizationName || "token");
   if (value) {
-    req.headers = { ...req.headers, ...value };
+    req.headers = {...req.headers, ...value};
+  } else {
+    throw new Error("401");
   }
   return req;
 }
 // 处理返回数据
-export const responseCallback: any = function(API: APIConfig, res: AxiosResponse) {
+export const responseCallback: any = function (API: APIConfig, res: AxiosResponse) {
   const status = parseInt(res.status as any, 10);
   if (status >= 200 && status < 300) {
     return asyncCheck(API, res);

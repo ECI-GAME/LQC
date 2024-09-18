@@ -69,11 +69,11 @@ const editFrom = async function (data: Project) {
           @search="onSearch"
           class="w-100"
       />
-      <Button  @click="onCreateProject" style="background-color: #400ded;color: white;">
+      <Button type="primary"  @click="onCreateProject">
         <template #icon>
           <PlusOutlined  class="my-0 inline-flex" />
         </template>
-        新建
+        <span>新建</span>
       </Button>
     </div>
 
