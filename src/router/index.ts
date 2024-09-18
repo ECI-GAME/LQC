@@ -22,13 +22,13 @@ const routes: RouteRecordRaw[] = [
         return {name};
       }
       // 默认值
-      return {name: alias.Home.name};
+      return "/404";
     },
     children: [
-      {
-        ...alias.Home,
-        component: () => import("src/pages/dashboard/index.vue"),
-      },
+      // {
+      //   ...alias.Home,
+      //   component: () => import("src/pages/dashboard/index.vue"),
+      // },
       // 项目列表
       {
         ...alias.ProjectList,

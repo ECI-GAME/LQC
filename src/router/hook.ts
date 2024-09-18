@@ -16,6 +16,7 @@ export const beforeEach = function (to: RouteLocationNormalized, from: RouteLoca
     upload.hidden();
   }
 
+
   const matched = to.matched;
   if (matched && matched.length > 0) {
     document.title = (to.meta?.title || to.name) as string;
