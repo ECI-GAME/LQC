@@ -36,6 +36,10 @@ const props = defineProps({
     type: [String, Number],
     required: true,
   },
+  language: {
+    type: String,
+    required: true,
+  },
   readOrder: {
     type: String,
     required: true,
@@ -157,7 +161,7 @@ const onOCR = async function (dot: DotData) {
       const upload = new Upload([img]);
       const [data, text] = await Promise.all([
         upload.start(),
-        api.system.ocr(img, props.readOrder)
+        api.system.ocr(img, props.readOrder,props.language)
       ]);
       if (data && data[0]) {
         const image = format(data[0]);

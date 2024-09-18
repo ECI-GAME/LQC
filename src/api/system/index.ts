@@ -31,10 +31,11 @@ export default class {
   @tryError(void 0)
   @Post("/ocrutil/identify", {responseType: "text"})
   @validate
-  ocr(@required image: File, readOrder: string): Promise<string> {
+  ocr(@required image: File, readOrder: string, language: string): Promise<string> {
     const data = new FormData();
     data.append("file", image);
     data.append("readOrder", readOrder);
+    data.append("language", language);
     const callback = function (value: string) {
       return value;
     }
