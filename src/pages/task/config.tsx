@@ -12,8 +12,16 @@ import Select from "src/components/dict/select.vue";
 import {Input, InputNumber, RangePicker, message} from "ant-design-vue";
 
 
+
 import type {ModalProps} from "@ue/modal";
 import type {TaskData, VersionInfo} from "src/types";
+
+
+export class Search {
+  taskName?: string;  // 任务名称关键字检索
+  taskType?: string | number; // 任务类型状态
+  handlerName?: string; // 操作员名称
+}
 
 export const useColumns = function (projectId?: string | number) {
   const list: object[] = [

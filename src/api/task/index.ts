@@ -18,22 +18,18 @@ export default class extends GraphQL {
   }
 
   //任务列表查询
-  @tryError([])
-  @Gql("/graphql")
-  async list<T = object>(pageNum: number = 1, versionId?: number | string, pageSize: number = 20): Promise<PageResult<T>> {
-    const data: string = `{
-      getProjectTasksList (input: { pageNum: ${pageNum},versionId:${versionId || 0}, pageSize: ${pageSize} }) {
-        code
-        rows
-        msg
-        total
-      }
-    }`;
-    const callback = function (res: object) {
-      return safeGet<object>(res, "getProjectTasksList");
-    }
-    // @ts-ignore
-    return {data, callback};
+  @tryError(new PageResult())
+  async list<T = object>(pageNum: number = 1, versionId: number | string = 0, pageSize: number = 20, query: object = {}): Promise<PageResult<T>> {
+    const apiName = "getProjectTasksList";
+    const input = this.graphQLQuery({
+      ...query,
+      pageNum: Number(pageNum),
+      pageSize: Number(pageSize),
+      versionId: Number(versionId)
+    });
+    const keys = ["code", "rows", "total", "msg"];
+    const res = await this.graphQL<{ rows: T[] }>(apiName, [{input}], keys);
+    return new PageResult<T>(res);
   }
 
 

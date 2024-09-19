@@ -1,3 +1,4 @@
+import * as _ from "lodash-es";
 import safeGet from "@fengqiaogang/safe-get";
 import {Gql, validate, required} from "@js-lion/api";
 
@@ -6,6 +7,27 @@ interface Query {
 }
 
 export default class {
+
+  graphQLQuery(query: object = {}): string {
+    const list: string[] = [];
+
+    const keys = Object.keys(query);
+
+    for (const name of keys) {
+      const value = safeGet<string | number>(query, name)!;
+      if (_.isNil(value)) {
+        continue;
+      }
+      if (_.isNumber(value)) {
+        list.push(`${name}: ${value}`);
+      } else {
+        list.push(`${name}: "${value}"`);
+      }
+    }
+
+    return "{" + list.join(",") + "}";
+  }
+
   @Gql("/graphql")
   @validate
   protected graphQL<T>(@required name: string, @required query: Query[], @required keys: string[]): Promise<T> {
