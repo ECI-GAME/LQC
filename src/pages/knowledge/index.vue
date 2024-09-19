@@ -17,8 +17,8 @@ const list = [
   {key: "3", value: "图片资源"},
 ];
 
-const versionId = ref<string | number>(route.query.versionId as string);
-const projectId = ref<string | number>(route.params.projectId as string);
+const versionId = ref<number | undefined>(route.query.versionId ? Number(route.query.versionId) : void 0);
+const projectId = ref<number | undefined>(route.params.projectId ? Number(route.params.projectId) : void 0);
 const activeKey = ref<string>(String(route.query.type || list[0].key));
 
 const isComp = function (type: string) {
@@ -49,7 +49,8 @@ const getRouteValue = function (type: string) {
                :project-id="projectId"
                :version-id="route.query.versionId">
       <template #search>
-        <Search v-model:project-id="projectId" v-model:version-id="versionId" :is-project="!!route.params.projectId"></Search>
+        <Search v-model:project-id="projectId" v-model:version-id="versionId"
+                :is-project="!!route.params.projectId"></Search>
       </template>
     </component>
   </div>

@@ -225,10 +225,11 @@ export const useTask = function () {
         const person = _.find(persons.value.results, _.pick(res, ["handlerId"]));
         const value: object = {
           ..._.omit(res, ["timeDay"]),
-          estimatedStartDate: `${estimatedStartDate} 00:00:00`,
-          estimatedEndDate: `${estimatedEndDate} 23:59:59`,
           sourceLanguage,
           targetLanguage,
+          id: data.id,
+          estimatedStartDate: `${estimatedStartDate} 00:00:00`,
+          estimatedEndDate: `${estimatedEndDate} 23:59:59`,
           versionId: versionId.value,
           projectNum: info.value.projectNum,
           handlerName: safeGet<string>(person, "empName")

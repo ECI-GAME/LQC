@@ -103,7 +103,10 @@ const getKnowledgeUrl = function () {
     }
   };
   const page = router.resolve(url);
-  return page.fullPath;
+  if (page && page.fullPath) {
+    return page.fullPath;
+  }
+  return "javascript:;";
 }
 
 // 打点（描点）
@@ -210,7 +213,7 @@ const calcDotValue = function (data: DotData): DotData {
         <!-- 右侧操作按钮 -->
         <template #operate="{ task }">
           <Space>
-            <Button type="primary" @click="downTxt" class="bg-neutral-600">文本导出</Button>
+            <Button>文本导出</Button>
             <TaskLog :task-id="taskInfo.id"></TaskLog>
             <a :href="getKnowledgeUrl()" target="_blank">
               <Button>知识库</Button>
