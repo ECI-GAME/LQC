@@ -9,12 +9,14 @@ import api from "src/api";
 import {Icon} from "@ue/icon";
 import {columns} from "./config";
 import Preview from "./preview.vue";
+import Tags from "../task/comp/tag.vue";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
 import safeGet from "@fengqiaogang/safe-get";
 import {RouterLink, useRoute} from "vue-router";
 import Page from "src/components/page/index.vue";
 import {FileData} from "src/utils/upload/common";
+import Dict from "src/components/dict/index.vue";
 import Select from "src/components/dict/select.vue";
 import Upload from "src/components/upload/index.vue";
 import {Table, Button, Card, Form, FormItem, Input, Space, message, Popconfirm} from "ant-design-vue";
@@ -189,7 +191,10 @@ const getVersionList = async function () {
               <Button type="link">{{ text }}</Button>
             </RouterLink>
           </template>
-          <Preview v-else-if="column.key === 'preview'" :value="text" :type="column.dataIndex" :id="record.id"></Preview>
+          <Preview v-else-if="column.key === 'preview'" :value="text" :type="column.dataIndex"
+                   :id="record.id"></Preview>
+          <Dict v-else-if="column.key === 'imageStatus'" type="comic_task_status" :value="text" auto-value="--"></Dict>
+          <Tags v-else-if="column.key === 'handlerName'" :value="text"></Tags>
           <template v-else-if="column.key === 'action'">
           <span class="inline-block">
             <Popconfirm

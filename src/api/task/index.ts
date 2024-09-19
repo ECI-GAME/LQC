@@ -170,6 +170,7 @@ export default class extends GraphQL {
 
   @tryError(void 0)
   @$error()
+  @cache(1000 * 5)
   @Get("/project/image/relation/file/getComparePicture")
   getImageValue(@required imageId: string | number, @required imageType: string): Promise<string | undefined> {
     const params = {id: imageId, type: imageType};
