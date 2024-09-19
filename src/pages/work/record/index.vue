@@ -117,17 +117,17 @@ const getTitleColor = function (data: DotData) {
               <!--标记-->
               <span class="flex-1 w-1 truncate mr-2 ml-1" :class="getTitleColor(item)">{{ item.translatedText }}</span>
               <Space>
-                <Button class="p-0 text-lg" type="success" link @click.stop="onSort(item, index)">
+                <Button class="p-0 text-lg" type="success" link @click.stop="onSort(item, index)" title="向上排序">
                   <Icon type="arrowup"></Icon>
                 </Button>
-                <Button class="p-0 text-lg" type="primary" link @click.stop="onShowDetail(item)">
+                <Button class="p-0 text-lg" type="primary" link @click.stop="onShowDetail(item)" title="查看详情">
                   <Icon type="detail"></Icon>
                 </Button>
-                <Button class="p-0 text-lg" type="warning" link @click.stop="onEditDetail(item)">
+                <Button class="p-0 text-lg" type="warning" link @click.stop="onEditDetail(item)" title="编辑">
                   <Icon type="edit-square"></Icon>
                 </Button>
                 <template v-if="imageStatus && _.includes(['2', '3', '15', '16'], String(imageStatus))">
-                  <Button class="p-0 text-lg" type="danger" link @click.stop="onRemoveDetail(item)">
+                  <Button class="p-0 text-lg" type="danger" link @click.stop="onRemoveDetail(item)" title="删除">
                     <Icon type="delete-fill"></Icon>
                   </Button>
                 </template>
@@ -137,17 +137,17 @@ const getTitleColor = function (data: DotData) {
               <!--批注-->
               <span class="flex-1 w-1 truncate mr-2 ml-1" :title="item.remark">{{ item.remark }}</span>
               <Space>
-                <Button class="p-0 text-lg" type="success" link @click.stop="onSort(item, index)">
+                <Button class="p-0 text-lg" type="success" link @click.stop="onSort(item, index)" title="向上排序">
                   <Icon type="arrowup"></Icon>
                 </Button>
-                <Button class="p-0 text-lg" type="primary" link @click.stop="onShowDetail(item)">
+                <Button class="p-0 text-lg" type="primary" link @click.stop="onShowDetail(item)" title="查看详情">
                   <Icon type="detail"></Icon>
                 </Button>
                 <template v-if="isCreateBy(item)">
-                  <Button class="p-0 text-lg" type="warning" link @click.stop="onEditDetail(item)">
+                  <Button class="p-0 text-lg" type="warning" link @click.stop="onEditDetail(item)" title="编辑">
                     <Icon type="edit-square"></Icon>
                   </Button>
-                  <Button class="p-0 text-lg" type="danger" link @click.stop="onRemoveDetail(item)">
+                  <Button class="p-0 text-lg" type="danger" link @click.stop="onRemoveDetail(item)" title="删除">
                     <Icon type="delete-fill"></Icon>
                   </Button>
                 </template>

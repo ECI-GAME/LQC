@@ -18,7 +18,7 @@ export default class {
       if (_.isNil(value)) {
         continue;
       }
-      if (_.isNumber(value)) {
+      if (_.isNumber(value) || /^\d+$/.test(value)) {
         list.push(`${name}: ${value}`);
       } else {
         list.push(`${name}: "${value}"`);
