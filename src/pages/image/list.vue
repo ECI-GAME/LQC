@@ -1,56 +1,51 @@
 <script setup lang="ts">
 /**
  * @file 图片管理
+ * @author svon.me@gmail.com
  */
- import api from "src/api";
- import * as model from "src/utils/model";
-import { ref,onMounted } from "vue";
+
+import {ref} from "vue";
+import api from "src/api";
 import {Icon} from "@ue/icon";
+import {columns} from "./config";
+import Preview from "./preview.vue";
+import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
+import safeGet from "@fengqiaogang/safe-get";
 import {RouterLink, useRoute} from "vue-router";
-import {Table, Button, Card, Form, FormItem, Input, Space, Select,message,Breadcrumb,BreadcrumbItem,Popconfirm,Pagination} from "ant-design-vue";
+import Page from "src/components/page/index.vue";
+import {FileData} from "src/utils/upload/common";
+import Select from "src/components/dict/select.vue";
 import Upload from "src/components/upload/index.vue";
-import { FileData } from "src/utils/upload/common";
-import {ElSelect,ElOption} from "element-plus"
-import {SearchOutlined,CloudUploadOutlined} from "@ant-design/icons-vue";
+import {Table, Button, Card, Form, FormItem, Input, Space, message, Popconfirm} from "ant-design-vue";
+
 
 const route = useRoute();
-console.log('Project ID = "%s"', route.params.projectId);
-const pageNumber = ref(1)
-const fromData = ref({})
-const tableDate = ref({})
-const versionOption =ref([])
 
+class Search {
+  pageNum: number = 1;
+  pageSize: number = 20;
+  versionId?: string | number;
+  imageName?: string;
+  projectId: string | number;
 
+  constructor() {
+    this.projectId = route.params.projectId as string;
+  }
+}
 
-const confirmDelete =async function (rowInfo:object){
-  if(rowInfo.taskName!=null||rowInfo.taskName!=undefined){
+const search = ref<Search>(new Search());
+const isOnLoading = ref<boolean>(false);
+
+const confirmDelete = async function (rowInfo: object) {
+  if (rowInfo.taskName != null || rowInfo.taskName != undefined) {
     message.warning('当前图片还有任务关联，请先取消关联关系!')
     return
   }
-  
+
   await api.version.deleteImageByVid(rowInfo.id);
   onLoad(100)
 }
-
-
-const columns = [
-  {title: "图片名称", dataIndex: 'imageName', key: 'imageName'},
-  {title: "关联画册", dataIndex: 'versionName', key: 'versionName'},
-  {title: "状态", dataIndex: 'imageStatus', key: 'imageStatus', align: "center"},
-  {title: "当前处理人", dataIndex: 'handlerName', key: 'handlerName', align: "center"},
-  {title: "原图", dataIndex: 'originalImagePath', key: 'originalImagePath', align: "center"},
-  {title: "TEP 图片", dataIndex: 'tepImagePath', key: 'tepImagePath', align: "center"},
-  {title: "PSD生成图片", dataIndex: 'psdPath', key: 'psdPath', align: "center"},
-  {title: "DTP 图片(PSD)", dataIndex: 'dtpImagePath', key: 'dtpImagePath', align: "center"},
-  {title: "QA 图片", dataIndex: 'notesImagePath', key: 'notesImagePath', align: "center"},
-  {title: "归档图片", dataIndex: 'deliveryImagePath', key: 'deliveryImagePath', align: "center"},
-  {title: "关联任务", dataIndex: 'taskName', key: 'image', align: "center"},
-  
-  {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
-];
-
-const isOnloading = ref<boolean>(false);
 
 
 let projectInfo = {};
@@ -64,26 +59,27 @@ const initVersioInfos = async () => {
 initVersioInfos()
 
 const {state, execute: onLoad, isLoading} = model.list<object>(function () {
-  if(fromData.value.imageName==undefined){
-      fromData.value.imageName = ""
-  }
-  return api.version.geVersionImageDetailPage(fromData.value.versionId,route.params.projectId,pageNumber.value,10,route.params.projectId,fromData.value.imageName)
-}, new model.PageResult<object>([]), true);
+  return api.version.geVersionImageDetailPage(
+    search.value.versionId,
+    search.value.projectId,
+    search.value.pageNum,
+    search.value.pageSize,
+    search.value.imageName
+  )
+});
 
 
 let fileInfo: any[] = [];
 const onSuccess = async function (files: FileData[]) {
   var imageCName = '';
   let allImagesValid = true;
-  debugger
   for (const s of files) {
-    const res = await api.version.checkImage(fromData.value.versionId, s.fileName);
-
+    const res = await api.version.checkImage(search.value.versionId!, s.fileName);
     if (res > 0) {
       imageCName = s.fileName;
       message.error("文件名称重复，请重命名：" + imageCName);
       allImagesValid = false;
-      break; 
+      break;
     }
 
     fileInfo.push({
@@ -98,113 +94,109 @@ const onSuccess = async function (files: FileData[]) {
 
   if (allImagesValid && fileInfo.length === files.length) {
     message.success("上传成功");
-    await api.version.addVersionImage(fileInfo); 
+    await api.version.addVersionImage(fileInfo);
     fileInfo = []
     onLoad(100);
-    
+
   }
 }
 
-const openImage = function(data:string){
-  window.open(data)
-}
-const searchImage = async function () {
+const onSearch = function () {
   onLoad(100)
 }
 
-
-
-const changePage = function(page){
-  pageNumber.value = page
-  onLoad()
+const onReset = function () {
+  const tmp = new Search();
+  tmp.versionId = search.value.versionId;
+  search.value = tmp;
+  onSearch();
 }
-onMounted(async () => {
-  try {
-    const res = await api.project.getVersionDict(route.params.projectId as string);
-    versionOption.value = res.results;
 
-    console.log(versionOption.value);
-    
-    if(versionOption.value.length==0){
-      message.warning('请先创建画册！')
-      return
+const fieldNames = {
+  label: "verisonName",
+  value: "versionId"
+};
+const getVersionList = async function () {
+  if (search.value.projectId) {
+    const res = await api.project.getVersionDict(search.value.projectId);
+    const versionId = safeGet<string | number>(res, "results[0].versionId");
+    if (versionId) {
+      const tmp = new Search();
+      tmp.versionId = versionId;
+      search.value = tmp;
+      setTimeout(onSearch);
     }
-    fromData.value.versionId = versionOption.value[0].versionId
-    onLoad()
-  } catch (error) {
-    console.error('Error fetching project info:', error);
+    return res;
   }
-});
-
+  return void 0;
+}
 </script>
 
 <template>
   <div>
-    <Card >
+    <Card>
       <Form layout="inline">
         <FormItem label="画册">
-          <ElSelect v-model="fromData.versionId" placeholder="请选择画册" class="w-50" clearable >
-                    <ElOption
-                    v-for="item in versionOption"
-                    :key="item.versionId"
-                    :label="item.verisonName"
-                    :value="item.versionId"
-                    >
-                    </ElOption>
-                </ElSelect>
+          <div class="w-50">
+            <Select v-model:value="search.versionId"
+                    placeholder="请选择画册"
+                    :field-names="fieldNames"
+                    :options="getVersionList"></Select>
+          </div>
         </FormItem>
         <FormItem label="图片名称">
-          <Input v-model:value="fromData.imageName"/>
+          <Input v-model:value="search.imageName" :allow-clear="true"/>
         </FormItem>
-        
         <FormItem>
           <Space>
-            <Button type="primary" @click="searchImage" style="background-color: #1E90FF !important;color: white;">
-              <template #icon>
-                <SearchOutlined class="my-0 inline-flex" />
-              </template>
-              搜索
+            <Button type="primary" @click="onSearch">
+              <Space>
+                <Icon class="flex text-base" type="search"></Icon>
+                <span>搜索</span>
+              </Space>
             </Button>
-            <Button>重置</Button>
+            <Button @click="onReset">
+              <Space>
+                <Icon class="flex text-base" type="redo"></Icon>
+                <span>重置</span>
+              </Space>
+            </Button>
           </Space>
         </FormItem>
       </Form>
     </Card>
 
-    <Card class="mt-5" >
+    <Card class="mt-5">
       <Space size="large">
-        <Upload :multiple="true" @success="onSuccess" v-model:loading="isOnloading">
-          <Button :loading="isOnloading" :disabled="!fromData.versionId" style="background-color: #8a939d !important;color: white;">
-            <template #icon>
-                <CloudUploadOutlined class="my-0 inline-flex" />
-              </template>
-            图片上传
+        <Upload :multiple="true" @success="onSuccess" v-model:loading="isOnLoading">
+          <Button :loading="isOnLoading" :disabled="!search.versionId">
+            <Space>
+              <Icon class="flex text-base" type="cloud-upload"></Icon>
+              <span>图片上传</span>
+            </Space>
           </Button>
         </Upload>
-            
       </Space>
     </Card>
 
     <Card class="mt-5">
-      <Table v-if="state" :data-source="state.results" :pagination="false" :columns="columns" :bordered="true">
+      <Table v-if="state" :data-source="state.results" :pagination="false" :columns="columns" :loading="isLoading"
+             :bordered="true">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'name'">
-            <RouterLink :to="{ name: alias.TaskDetails.name, params:{ projectId: record.projectId, taskId: record.id } }">
+            <RouterLink
+                :to="{ name: alias.TaskDetails.name, params:{ projectId: record.projectId, taskId: record.id } }">
               <Button type="link">{{ text }}</Button>
             </RouterLink>
           </template>
-          
-          <template v-else-if="['originalImagePath', 'tepImagePath', 'psdPath', 'dtpImagePath', 'notesImagePath', 'deliveryImagePath'].includes(column.key)">
-            <Button v-if="text" type="link" @click="openImage(record[column.key])">预览</Button>
-            <span v-else>待生成</span>
-          </template>
+          <Preview v-else-if="column.key === 'preview'" :value="text" :type="column.dataIndex" :id="record.id"></Preview>
           <template v-else-if="column.key === 'action'">
           <span class="inline-block">
             <Popconfirm
-              title="确认需要删除当前图片信息吗?"
-              ok-text="Yes"
-              cancel-text="No"
-              @confirm="confirmDelete(record)"
+                title="确认需要删除当前图片信息吗?"
+                ok-text="Yes"
+                cancel-text="No"
+                @confirm="confirmDelete(record)"
             >
               <Icon class="text-xl text-primary cursor-pointer" type="delete"></Icon>
             </Popconfirm>
@@ -213,7 +205,7 @@ onMounted(async () => {
           </template>
         </template>
       </Table>
-      <Pagination v-if="state" v-model:current="pageNumber" class="float-right" :total="state.total" show-less-items @change="changePage" :show-total="total => `共 ${state.total} 条`"/>
+      <Page :total="state.total" v-model:page="search.pageNum" :size="search.pageSize" @click="onSearch"></Page>
     </Card>
   </div>
 </template>

@@ -12,7 +12,7 @@ const $emit = defineEmits(["update:value", "change"]);
 const props = defineProps({
   type: {
     type: String,
-    required: true,
+    required: false,
   },
   value: {
     type: [Array, String, Number],

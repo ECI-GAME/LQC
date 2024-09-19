@@ -20,13 +20,13 @@ export default class extends GraphQL {
   //任务列表查询
   @tryError(new PageResult())
   async list<T = object>(pageNum: number = 1, versionId: number | string = 0, pageSize: number = 20, query: object = {}): Promise<PageResult<T>> {
-    const apiName = "getProjectTasksList";
-    const input = this.graphQLQuery({
+    const input = {
       ...query,
       pageNum: Number(pageNum),
       pageSize: Number(pageSize),
       versionId: Number(versionId)
-    });
+    };
+    const apiName = "getProjectTasksList";
     const keys = ["code", "rows", "total", "msg"];
     const res = await this.graphQL<{ rows: T[] }>(apiName, [{input}], keys);
     return new PageResult<T>(res);
@@ -166,5 +166,21 @@ export default class extends GraphQL {
       return new PageResult<T>(res);
     }
     return new PageResult<T>();
+  }
+
+  @tryError(void 0)
+  @$error()
+  @Get("/project/image/relation/file/getComparePicture")
+  getImageValue(@required imageId: string | number, @required imageType: string): Promise<string | undefined> {
+    const params = {id: imageId, type: imageType};
+    const callback = (value: object) => {
+      const src = safeGet<string>(value, "path");
+      if (src) {
+        return src;
+      }
+      return Promise.reject(new Error("预览图片还未生成，请稍后再试。"));
+    };
+    // @ts-ignore
+    return {params, callback};
   }
 }

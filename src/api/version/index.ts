@@ -3,16 +3,15 @@
  * @author svon.me@gmail.com
  */
 
-import {Delete, Get, Gql, Post, Put, post, tryError, validate, required} from "@js-lion/api";
 
+import Graphql from "../graphql";
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 import {$error, $success} from "@ue/message";
+import {Delete, Get, Gql, Post, Put, post, tryError, validate, required} from "@js-lion/api";
 
 
-import type {ProjectImage} from "src/types";
-
-export default class {
+export default class extends Graphql {
   /**
    * 画册集合
    * @returns UserInfo
@@ -64,7 +63,7 @@ export default class {
   @post("/project/images/batchAdd")
   @validate
   addVersionImage(@required data: object): Promise<boolean> {
-    const callback = function() {
+    const callback = function () {
       return true;
     }
     // @ts-ignore
@@ -111,7 +110,7 @@ export default class {
   @validate
   geVersionImageById<T = object>(@required versionId: number | string): Promise<PageResult<T>> {
     const params: object = {versionId};
-    const callback = function(data: T[]) {
+    const callback = function (data: T[]) {
       return new PageResult<T>(data);
     }
     // @ts-ignore
@@ -121,7 +120,7 @@ export default class {
   //图片名称重名检查
   @Post("project/images/checkName")
   @validate
-  checkImage(versionId: number, imageName: string) {
+  checkImage(versionId: number | string, imageName: string) {
     const data = {versionId: versionId, imageName: imageName};
     return {data};
   }
@@ -141,23 +140,12 @@ export default class {
   // }
 
   @tryError([])
-  @Gql("/graphql")
-  async geVersionImageDetailPage( versionId: number = 0, projectId: number, pageNum: number, pageSize: number = 10, imageName: string = ""): Promise<PageResult<object>> {
-    // 查询用户信息
-    const data: string = `{
-      getProjectVersionImagesList (input: { pageNum: ${pageNum},projectId:${projectId}, versionId:${versionId},pageSize: ${pageSize},imageName: "${imageName}" }) {
-        code
-        rows
-        msg
-        total
-      }
-    }`;
-    const callback = function (res: object) {
-      return safeGet<object>(res, "getProjectVersionImagesList");
-    }
-    // @ts-ignore
-    return {data, callback};
+  async geVersionImageDetailPage(versionId: number | string = 0, projectId: number | string, pageNum: number, pageSize: number = 10, imageName?: string): Promise<PageResult<object>> {
+    const name = "getProjectVersionImagesList";
+    const keys = ["code", "rows", "total", "msg"];
+    const input = {
+      pageNum, pageSize, versionId, projectId, imageName
+    };
+    return this.graphQL(name, [{input}], keys);
   }
-
-
 }

@@ -8,24 +8,41 @@ interface Query {
 
 export default class {
 
-  graphQLQuery(query: object = {}): string {
-    const list: string[] = [];
-
-    const keys = Object.keys(query);
-
-    for (const name of keys) {
-      const value = safeGet<string | number>(query, name)!;
-      if (_.isNil(value)) {
-        continue;
+  graphQLQuery(query: object | Array<any> = {}): string {
+    if (_.isArray(query)) {
+      const list: string[] = [];
+      for (const value of query) {
+        if (_.isNil(value)) {
+          continue;
+        }
+        if (_.isNumber(value) || /^\d+$/.test(value)) {
+          list.push(value);
+        } else if (_.isArray(value) || _.isObject(value)) {
+          list.push(this.graphQLQuery(value));
+        } else {
+          list.push(`"${value}"`);
+        }
       }
-      if (_.isNumber(value) || /^\d+$/.test(value)) {
-        list.push(`${name}: ${value}`);
-      } else {
-        list.push(`${name}: "${value}"`);
+      return `[ ${list.join(", ")} ]`;
+    } else {
+      const list: string[] = [];
+      const keys = Object.keys(query);
+      for (const name of keys) {
+        const value = safeGet<string | number>(query, name)!;
+        if (_.isNil(value)) {
+          continue;
+        }
+        if (_.isNumber(value) || /^\d+$/.test(value)) {
+          list.push(`${name}: ${value}`);
+        } else if (_.isArray(value) || _.isObject(value)) {
+          const item = this.graphQLQuery(value);
+          list.push(`${name}: ${item}`);
+        } else {
+          list.push(`${name}: "${value}"`);
+        }
       }
+      return "{ " + list.join(", ") + " }";
     }
-
-    return "{" + list.join(",") + "}";
   }
 
   @Gql("/graphql")
@@ -37,7 +54,16 @@ export default class {
       for (const item of query) {
         const [key] = Object.keys(item);
         const value = item[key];
-        if (typeof value === "string") {
+        if (_.isNil(value)) {
+          continue;
+        }
+        if (_.isArray(value) || _.isObject(value)) {
+          params.push(`${key}: ${this.graphQLQuery(value)}`);
+        } else if (_.isNumber(value)) {
+          params.push(`${key}: ${value}`);
+        } else if (_.isString(value) && /^\d+$/.test(value)) {
+          params.push(`${key}: ${value}`);
+        } else if (_.isString(value)) {
           params.push(`${key}: ${value}`);
         } else {
           params.push(`${key}: ${JSON.stringify(value)}`);
