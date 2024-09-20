@@ -13,6 +13,7 @@ import Upload from "src/components/upload/index.vue";
 import { FileData } from "src/utils/upload/common";
 import {ElSelect,ElOption} from "element-plus"
 import {SearchOutlined,CloudUploadOutlined} from "@ant-design/icons-vue";
+import Dict from "src/components/dict/index.vue";
 
 const route = useRoute();
 console.log('Project ID = "%s"', route.params.projectId);
@@ -198,6 +199,8 @@ onMounted(async () => {
             <Button v-if="text" type="link" @click="openImage(record[column.key])">预览</Button>
             <span v-else>待生成</span>
           </template>
+          <Dict v-else-if="column.key === 'imageStatus'" type="comic_task_status" :value="text"></Dict>
+
           <template v-else-if="column.key === 'action'">
           <span class="inline-block">
             <Popconfirm

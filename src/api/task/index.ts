@@ -20,7 +20,7 @@ export default class extends GraphQL {
   //任务列表查询
   @tryError([])
   @Gql("/graphql")
-  async list<T = object>(pageNum: number = 1, versionId?: number | string, pageSize: number = 20): Promise<PageResult<T>> {
+  async list<T = object>(pageNum: number = 1, versionId?: number | string, pageSize: number = 10): Promise<PageResult<T>> {
     const data: string = `{
       getProjectTasksList (input: { pageNum: ${pageNum},versionId:${versionId || 0}, pageSize: ${pageSize} }) {
         code
@@ -59,6 +59,16 @@ export default class extends GraphQL {
     const callback = () => true;
     // @ts-ignore
     return {data, callback};
+  }
+
+  //根据ID查询画册信息
+  @tryError(new PageResult<object>())
+  @Get("/project/tasks/taskProgress/:id")
+  @validate
+  getTaskProgress(@required taskId: number | string): Promise<PageResult<object>> {
+    const params = {id: taskId};
+    // @ts-ignore
+    return {params};
   }
 
   //根据ID查询画册信息
