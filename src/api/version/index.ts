@@ -60,12 +60,12 @@ export default class extends Graphql {
 
   //添加画册图片
   @tryError(false)
+  @$error()
+  @$success("上传成功")
   @post("/project/images/batchAdd")
   @validate
   addVersionImage(@required data: object): Promise<boolean> {
-    const callback = function () {
-      return true;
-    }
+    const callback = () => true;
     // @ts-ignore
     return {data, callback};
   }
@@ -74,8 +74,8 @@ export default class extends Graphql {
   //根据ID查询画册信息
   @Get("project/version/:id")
   @validate
-  geVersionInfoById<T = object>(data: number | string): Promise<T> {
-    const params = {id: data};
+  geVersionInfoById<T = object>(id: number | string): Promise<T> {
+    const params = {id};
     // @ts-ignore
     return {params};
   }
@@ -86,22 +86,20 @@ export default class extends Graphql {
   @$success("操作成功")
   @Delete("project/images/:id")
   @validate
-  deleteImageByVid(data: number) {
-    const params = {id: data};
-    return {data, params};
+  deleteImageByVid(id: number | string): Promise<boolean> {
+    const params = {id};
+    const callback = () => true;
+    // @ts-ignore
+    return {params, callback};
   }
 
   //查询所有版本信息
   @Get("project/version/versions/:projectId")
   @validate
-  geVersionInfoByPId(data: number) {
-    const params = {projectId: data};
+  geVersionInfoByPId(projectId: number | string) {
+    const params = {projectId};
     // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
-    // @ts-ignore
-    return {data, params};
+    return {params};
   }
 
   //根据ID查询画册图片信息
@@ -117,12 +115,31 @@ export default class extends Graphql {
     return {params, callback};
   }
 
-  //图片名称重名检查
+
+  /** 图片名称重名检查 */
+  @tryError(false)
   @Post("project/images/checkName")
   @validate
-  checkImage(versionId: number | string, imageName: string) {
-    const data = {versionId: versionId, imageName: imageName};
-    return {data};
+  private imageNameCheck(@required versionId: number | string, @required fileName: string): Promise<boolean> {
+    const data = {versionId: versionId, imageName: fileName};
+    const callback = (value: number) => {
+      return !(value || value > 0);
+    }
+    // @ts-ignore
+    return {data, callback};
+  }
+
+  /** 图片名称重名检查 */
+  @$error()
+  @validate
+  async checkImage(@required versionId: number | string, @required fileName: string): Promise<boolean> {
+    const status = await this.imageNameCheck(versionId, fileName);
+    if (status) {
+      return status;
+    } else {
+      const text = `文件名称重复，请重命名：${fileName}`;
+      return Promise.reject(new Error(text));
+    }
   }
 
 

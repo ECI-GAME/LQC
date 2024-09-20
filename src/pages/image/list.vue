@@ -21,6 +21,7 @@ import Select from "src/components/dict/select.vue";
 import Upload from "src/components/upload/index.vue";
 import {Table, Button, Card, Form, FormItem, Input, Space, message, Popconfirm} from "ant-design-vue";
 
+import type {Project} from "src/types";
 
 const route = useRoute();
 
@@ -39,27 +40,13 @@ class Search {
 const search = ref<Search>(new Search());
 const isOnLoading = ref<boolean>(false);
 
-const confirmDelete = async function (rowInfo: object) {
-  if (rowInfo.taskName != null || rowInfo.taskName != undefined) {
-    message.warning('当前图片还有任务关联，请先取消关联关系!')
-    return
-  }
 
-  await api.version.deleteImageByVid(rowInfo.id);
-  onLoad(100)
-}
+// 项目详情
+const {state: project} = model.result<Project>(function () {
+  return api.project.getProjectInfoById(search.value.projectId);
+}, {} as Project, true);
 
-
-let projectInfo = {};
-const initVersioInfos = async () => {
-  try {
-    projectInfo.value = await api.project.getProjectInfoById(route.params.projectId);
-  } catch (error) {
-    console.error("Failed to fetch task status:", error);
-  }
-};
-initVersioInfos()
-
+// 图片列表
 const {state, execute: onLoad, isLoading} = model.list<object>(function () {
   return api.version.geVersionImageDetailPage(
     search.value.versionId,
@@ -70,43 +57,41 @@ const {state, execute: onLoad, isLoading} = model.list<object>(function () {
   )
 });
 
-
-let fileInfo: any[] = [];
-const onSuccess = async function (files: FileData[]) {
-  var imageCName = '';
-  let allImagesValid = true;
-  for (const s of files) {
-    const res = await api.version.checkImage(search.value.versionId!, s.fileName);
-    if (res > 0) {
-      imageCName = s.fileName;
-      message.error("文件名称重复，请重命名：" + imageCName);
-      allImagesValid = false;
-      break;
-    }
-
-    fileInfo.push({
-      'imageName': s.fileName,
-      'imageSize': s.size,
-      'originalImagePath': s.src,
-      'imageType': s.type,
-      'projectNum': projectInfo.value.projectNum,
-      'versionId': fromData.value.versionId || ""
-    });
+// 文件上传入库
+const onUploadSuccess = async function (files: FileData[]) {
+  const list = files.map(function (item: FileData) {
+    return {
+      imageName: item.fileName,
+      imageSize: item.size,
+      originalImagePath: item.src,
+      imageType: item.type,
+      projectNum: project.value.projectNum,
+      versionId: search.value.versionId,
+    };
+  });
+  let status: boolean = false;
+  if (list.length > 0) {
+    status = await api.version.addVersionImage(list)
   }
-
-  if (allImagesValid && fileInfo.length === files.length) {
-    message.success("上传成功");
-    await api.version.addVersionImage(fileInfo);
-    fileInfo = []
-    onLoad(100);
-
+  if (status) {
+    onReset();
   }
 }
 
+// 检测文件石佛上传过
+const onFileAccept = function (file: File): boolean | Promise<boolean> {
+  const versionId = search.value.versionId;
+  if (versionId) {
+    return api.version.checkImage(versionId, file.name);
+  }
+  return false;
+}
+
+// 搜索
 const onSearch = function () {
-  onLoad(100)
+  return onLoad(100)
 }
-
+// 重置
 const onReset = function () {
   const tmp = new Search();
   tmp.versionId = search.value.versionId;
@@ -114,18 +99,35 @@ const onReset = function () {
   onSearch();
 }
 
-const fieldNames = {
-  label: "verisonName",
-  value: "versionId"
-};
+// 删除图片
+const confirmDelete = async function (data: object) {
+  const taskName = safeGet<string>(data, "taskName");
+  if (taskName) {
+    message.warning('当前图片还有任务关联，请先取消关联关系!');
+    return;
+  }
+  let status: boolean = false;
+  const id = safeGet<string | number>(data, "id");
+  if (id) {
+    status = await api.version.deleteImageByVid(id);
+  }
+  if (status) {
+    await onSearch();
+  }
+}
+
+const fieldNames = {label: "verisonName", value: "versionId"};
+// 版本列表
 const getVersionList = async function () {
   if (search.value.projectId) {
     const res = await api.project.getVersionDict(search.value.projectId);
-    const versionId = safeGet<string | number>(res, "results[0].versionId");
+    const versionId = safeGet<string | number>(res.results, `[0].${fieldNames.value}`);
     if (versionId) {
+      // 设置默认值
       const tmp = new Search();
       tmp.versionId = versionId;
       search.value = tmp;
+      // 加载图片列表数据
       setTimeout(onSearch);
     }
     return res;
@@ -137,48 +139,45 @@ const getVersionList = async function () {
 <template>
   <div>
     <Card>
-      <Form layout="inline">
-        <FormItem label="画册">
-          <div class="w-50">
-            <Select v-model:value="search.versionId"
-                    placeholder="请选择画册"
-                    :field-names="fieldNames"
-                    :options="getVersionList"></Select>
-          </div>
-        </FormItem>
-        <FormItem label="图片名称">
-          <Input v-model:value="search.imageName" :allow-clear="true"/>
-        </FormItem>
-        <FormItem>
-          <Space>
-            <Button type="primary" @click="onSearch">
-              <Space>
-                <Icon class="flex text-base" type="search"></Icon>
-                <span>搜索</span>
-              </Space>
-            </Button>
-            <Button @click="onReset">
-              <Space>
-                <Icon class="flex text-base" type="redo"></Icon>
-                <span>重置</span>
-              </Space>
-            </Button>
-          </Space>
-        </FormItem>
-      </Form>
-    </Card>
+      <div class="flex justify-between items-center">
+        <Form layout="inline">
+          <FormItem label="画册">
+            <div class="w-50">
+              <Select v-model:value="search.versionId" placeholder="请选择画册" :field-names="fieldNames"
+                      :options="getVersionList"></Select>
+            </div>
+          </FormItem>
+          <FormItem label="图片名称">
+            <Input v-model:value="search.imageName" :allow-clear="true"/>
+          </FormItem>
+          <FormItem>
+            <Space>
+              <Button type="primary" @click="onSearch">
+                <Space>
+                  <Icon class="flex text-base" type="search"></Icon>
+                  <span>搜索</span>
+                </Space>
+              </Button>
+              <Button @click="onReset">
+                <Space>
+                  <Icon class="flex text-base" type="redo"></Icon>
+                  <span>重置</span>
+                </Space>
+              </Button>
+            </Space>
+          </FormItem>
+        </Form>
 
-    <Card class="mt-5">
-      <Space size="large">
-        <Upload :multiple="true" @success="onSuccess" v-model:loading="isOnLoading">
-          <Button :loading="isOnLoading" :disabled="!search.versionId">
+        <Upload :multiple="true" :accept="onFileAccept" @success="onUploadSuccess" v-model:loading="isOnLoading"
+                :disabled="!project.projectNum">
+          <Button type="primary" :loading="isOnLoading" :disabled="!search.versionId">
             <Space>
               <Icon class="flex text-base" type="cloud-upload"></Icon>
               <span>图片上传</span>
             </Space>
           </Button>
         </Upload>
-      </Space>
+      </div>
     </Card>
 
     <Card class="mt-5">
