@@ -240,6 +240,7 @@ const onScanWord = function () {
       </template>
       <Textarea ref="translationRef"
                 :project-id="projectId"
+                :autofocus="true"
                 v-model:html="model.originalHtml"
                 v-model:text="model.originalText"
                 @translation="onChangeTranslationList"></Textarea>

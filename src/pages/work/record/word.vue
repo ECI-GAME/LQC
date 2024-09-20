@@ -30,10 +30,10 @@ defineProps({
     <DescriptionsItem label="译文">{{ data.translatedText }}</DescriptionsItem>
   </Descriptions>
   <template v-if="data.matchType">
-    <template v-if="data.matchType === DotMatchType.match || data.matchType === DotMatchType.noUpdate">
+    <template v-if="String(data.matchType) === DotMatchType.match || String(data.matchType) === DotMatchType.noUpdate">
       <Tips class="mt-5 deep-[.ant-descriptions-item-content]:text-[red]" :project-id="projectId" :data="data"></Tips>
     </template>
-    <template v-else-if="data.matchType === DotMatchType.update">
+    <template v-else-if="String(data.matchType) === DotMatchType.update">
       <Log class="mt-5 deep-[.ant-descriptions-item-content]:text-green-700" :data="data"></Log>
     </template>
   </template>

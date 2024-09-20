@@ -25,6 +25,10 @@ const props = defineProps({
   text: {
     type: String,
     default: () => "",
+  },
+  autofocus: {
+    type: Boolean,
+    required: false,
   }
 });
 
@@ -37,10 +41,10 @@ const editor = new Editor({
     TextAlign.configure({
       types: ['heading', 'paragraph'],
     }),
-  ]
+  ],
 });
 
-let __html: string;
+let __html: string = "";
 onMounted(function () {
   __html = props.html;
   watch(() => props.html, function (value) {
@@ -54,6 +58,9 @@ onMounted(function () {
 const onCheckText = async function () {
   const html = editor.getHTML();
   const text = editor.getText();
+  $emit("update:html", __html);
+  $emit("update:text", text);
+
   const str = String(text).trim();
   if (str && str.length > 0 && html !== __html) {
     const res = await checkWord(props.projectId, html);
@@ -67,10 +74,15 @@ const onCheckText = async function () {
       __html = html;
     }
   }
-  $emit("update:html", __html);
-  $emit("update:text", text);
+
 }
-editor.on("create", onCheckText);
+editor.on("create", async function () {
+  await onCheckText();
+  if (props.autofocus) {
+    editor.commands.setTextSelection(__html.length)
+    editor.commands.focus(); // 确保编辑器获得焦点
+  }
+});
 editor.on("blur", onCheckText);
 
 defineExpose({scan: onCheckText});

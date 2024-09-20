@@ -16,10 +16,10 @@ export enum DotDataType {
 }
 
 export enum DotMatchType {
-  not = "1",
-  match = "2",
-  update = "3",
-  noUpdate = "4",
+  not = "1",      // 未命中
+  match = "2",    // 命中
+  update = "3",   // 已修改
+  noUpdate = "4", // 命中未修改
 }
 
 export class DotData {
