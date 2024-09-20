@@ -21,7 +21,7 @@ function safeGet<T>(data: any, key: string): T | undefined {
 }
 
 const getResult = function <T, D>(response: D): T | undefined {
-  let result = safeGet<T>(response as object, "data");
+  let result = safeGet<T>(response as object, "data") ;
   if (response && result) {
     if (typeof result === "string") {
       try {
@@ -54,7 +54,7 @@ export const check = function <T, D>(API: APIConfig, response: D): T | boolean |
         break;
       }
     }
-    return tmp;
+    return tmp || data;
   }
 
   if (result && typeof result === "object") {
