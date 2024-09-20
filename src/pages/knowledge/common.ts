@@ -39,3 +39,15 @@ export const fileColumns = [
   {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
   {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
 ];
+
+export const textColumns = [
+  {title: "关联项目", dataIndex: 'projectName', key: 'projectName'},
+  {title: "关联版本", dataIndex: 'versionName', key: 'versionName'},
+  {title: "原文", dataIndex: 'originalText', key: 'originalText'},
+  {title: "建议译文", dataIndex: 'translationText', key: 'translationText'},
+  {title: " 类别", dataIndex: 'typeName', key: 'textName'},
+  {title: " 备注", dataIndex: 'remark', key: 'remark'},
+  {title: "创建人", dataIndex: 'createBy', key: 'createBy', align: "center"},
+  {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
+  {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
+];

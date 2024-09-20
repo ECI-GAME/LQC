@@ -7,60 +7,33 @@
 
 import api from "src/api";
 import {Icon} from "@ue/icon";
+import Search from "./search.vue";
 import * as model from "src/utils/model";
-import {computed, ref, reactive} from 'vue';
+import {useCommon, textColumns} from "./common";
+import {computed, ref, onMounted} from 'vue';
 import safeGet from "@fengqiaogang/safe-get";
 import {onCreate} from "src/utils/textResource";
-import Pagination from "src/components/page/index.vue";
+import Page from "src/components/page/index.vue";
 import {API_BASE, TOKEN_KEY, TOKEN_NAME} from "src/config";
 import Authorization from "src/libs/http/config/authorization";
-import {Table, Form, FormItem, InputSearch, Button, Upload, message} from "ant-design-vue";
+import {Table, Form, FormItem, InputSearch, Button, Upload, message, Space} from "ant-design-vue";
 
 
 import type {UploadChangeParam, UploadProps} from "ant-design-vue";
 
-const props = defineProps({
-  versionId: {
-    type: [String, Number],
-    required: false,
-  },
-  projectId: {
-    type: [String, Number],
-    required: true,
-  }
-});
 
-
-class FormState {
-  searchValue?: string;
-}
-
-const pageSize = ref<number>(10);
-const pageNumber = ref<number>(1);
-const formState = reactive<FormState>(new FormState());
 const textExportTemplate = ref<string>(`${API_BASE}project/text/export/textTmp`);
 const textUploadResource = ref<string>(`${API_BASE}eci-comic/project/text/upload/textResource`);
 
-
-const columns = [
-  {title: "关联项目", dataIndex: 'projectName', key: 'projectName'},
-  {title: "关联版本", dataIndex: 'versionName', key: 'versionName'},
-  {title: "原文", dataIndex: 'originalText', key: 'originalText'},
-  {title: "建议译文", dataIndex: 'translationText', key: 'translationText'},
-  {title: " 类别", dataIndex: 'typeName', key: 'textName'},
-  {title: " 备注", dataIndex: 'remark', key: 'remark'},
-  {title: "创建人", dataIndex: 'createBy', key: 'createBy', align: "center"},
-  {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
-  {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
-];
+const {versionId, projectId, isShowProject, pageSize, pageNumber, fromData} = useCommon();
 
 
 const {state, execute: onLoad, isLoading} = model.list<object>(function () {
-  if (props.projectId) {
-    return api.knowLedge.textList(pageNumber.value, props.projectId, props.versionId, formState.searchValue, pageSize.value);
+  if (projectId.value) {
+    return api.knowLedge.textList(pageNumber.value, projectId.value, versionId.value, fromData.value.searchValue, pageSize.value);
   }
   return new model.PageResult<object>([]);
-}, new model.PageResult<object>([]), true);
+});
 
 
 const onSearch = () => {
@@ -73,7 +46,7 @@ const changePage = () => onLoad(100);
 
 const fileList = ref([]);
 const uploadData = computed(function () {
-  return {'projectId': props.projectId};
+  return {'projectId': projectId.value};
 });
 
 
@@ -86,7 +59,7 @@ const headers = computed(function () {
 
 
 const nweTextRource = async function () {
-  const status = await onCreate(props.projectId as number);
+  const status = await onCreate(projectId.value!);
   if (status) {
     await onLoad(100);
   }
@@ -104,35 +77,46 @@ const handleChange = (info: UploadChangeParam) => {
 };
 
 const beforeUpload = (file: File) => {
-  const isJpgOrPng = file.name.indexOf('xlsx') > -1;
-  if (!isJpgOrPng) {
-    fileList.value = []
+  let status = false;
+  if (file.name) {
+    const reg = /\.xlsx$/i;
+    status = reg.test(file.name);
+  }
+  if (!status) {
     message.error('仅支持xlsx格式文件上传!');
     return false
   }
-  const isLt2M = file.size / 1024 / 1024 < 200;
-  if (!isLt2M) {
-    fileList.value = []
+  status = file.size / 1024 / 1024 < 200;
+  if (!status) {
     message.error('上传附件必须小于200MB!');
     return false
   }
-  return isJpgOrPng && isLt2M;
+  return true;
 };
 
+
+onMounted(onSearch);
 
 </script>
 <template>
   <div>
-    <Form layout="inline" :model="formState">
-      <slot name="search"></slot>
+    <Form layout="inline">
+      <Search v-model:project-id="projectId"
+              v-model:version-id="versionId"
+              :is-project="isShowProject"></Search>
       <FormItem>
-        <InputSearch v-model:value="formState.searchValue" :allow-clear="true" placeholder="请输入条件" enter-button
+        <InputSearch v-model:value="fromData.searchValue" :allow-clear="true" placeholder="请输入条件" enter-button
                      @search="onSearch"
                      class="w-100 float-left"/>
       </FormItem>
       <FormItem class="ml-3">
         <a class="inline-block" :href="textExportTemplate">
-          <Button type="primary" class="bg-neutral-600">导出</Button>
+          <Button>
+            <Space>
+              <Icon class="flex text-base" type="cloud-download"></Icon>
+              <span>模板下载</span>
+            </Space>
+          </Button>
         </a>
       </FormItem>
       <FormItem class="ml-3">
@@ -146,20 +130,29 @@ const beforeUpload = (file: File) => {
             :before-upload="beforeUpload"
             @success="handleChange"
         >
-          <Button type="primary" class="bg-violet-600">导入</Button>
+          <Button :disabled="!projectId">
+            <Space>
+              <Icon class="flex text-base" type="cloud-upload"></Icon>
+              <span>导入</span>
+            </Space>
+          </Button>
         </Upload>
       </FormItem>
       <FormItem class="ml-3">
-        <Button type="primary" class="bg-blue-600" @click="nweTextRource">新增</Button>
+        <Button @click="nweTextRource" :disabled="!projectId">
+          <Space>
+            <Icon class="flex text-base" type="plus"></Icon>
+            <span>新增</span>
+          </Space>
+        </Button>
       </FormItem>
-
     </Form>
 
     <Table class="mt-5"
            :loading="isLoading"
            :data-source="state.results"
            :pagination="false"
-           :columns="columns"
+           :columns="textColumns"
            :bordered="true">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.key === 'action'">
@@ -169,7 +162,7 @@ const beforeUpload = (file: File) => {
         </template>
       </template>
     </Table>
-    <Pagination v-model:page="pageNumber" v-model:size="pageSize" :total="state.total" @click="changePage"></Pagination>
+    <Page v-model:page="pageNumber" v-model:size="pageSize" :total="state.total" @click="changePage"></Page>
   </div>
 
 </template>
