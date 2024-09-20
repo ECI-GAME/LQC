@@ -1,3 +1,4 @@
+import * as _ from "lodash-es";
 import cache from "src/utils/cache";
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
@@ -28,8 +29,24 @@ export default class extends GraphQL {
     };
     const apiName = "getProjectTasksList";
     const keys = ["code", "rows", "total", "msg"];
-    const res = await this.graphQL<{ rows: T[] }>(apiName, [{input}], keys);
-    return new PageResult<T>(res);
+    const value = await this.graphQL<{ rows: T[] }>(apiName, [{input}], keys);
+
+    const res = new PageResult<T>(value);
+
+    const progress = _.map(res.results, (item: object) => {
+      const id = safeGet<string | number>(item, "id");
+      return this.getTaskProgress(id!);
+    });
+
+    const list = await Promise.all(progress);
+    const array = _.map(res.results, function(item: object, index: number) {
+      const totalCnt = safeGet<number>(list[index], "totalCnt") || 0;  // 总量
+      const doneCnt = safeGet<number>(list[index], "doneCnt") || 0;    // 已处理
+      const StartCnt= safeGet<number>(list[index], "StartCnt") || 0;   // 未处理
+      return { ...item, totalCnt, doneCnt, StartCnt };
+    })
+
+    return new PageResult<T>(array, res.total);
   }
 
 
@@ -58,10 +75,10 @@ export default class extends GraphQL {
   }
 
   //根据ID查询画册信息
-  @tryError(new PageResult<object>())
+  @tryError({})
   @Get("/project/tasks/taskProgress/:id")
   @validate
-  getTaskProgress(@required taskId: number | string): Promise<PageResult<object>> {
+  getTaskProgress<T = object>(@required taskId: number | string): Promise<T> {
     const params = {id: taskId};
     // @ts-ignore
     return {params};
