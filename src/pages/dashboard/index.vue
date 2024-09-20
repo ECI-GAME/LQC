@@ -60,21 +60,7 @@ const onDemo = async function () {
 </script>
 <template>
   <div>
-    <div>{{ languages }}</div>
-    <div class="mt-5">
-      <LanguagePair class="w-100" v-model:value="languages"></LanguagePair>
-    </div>
-    <div class="mt-5">
-      <Button @click="onCreate">新建</Button>
-    </div>
-    <div>项目进度总览</div>
-    <div>任务中心</div>
-    <hr/>
-    <Button @click="onDemo">文件上传测试</Button>
-    <hr/>
-    <Upload :multiple="true" @success="onSuccess">
-      <Button>AAA</Button>
-    </Upload>
+    
   </div>
 </template>
 

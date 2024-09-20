@@ -59,6 +59,16 @@ export default class extends GraphQL {
 
   //根据ID查询画册信息
   @tryError(new PageResult<object>())
+  @Get("/project/tasks/taskProgress/:id")
+  @validate
+  getTaskProgress(@required taskId: number | string): Promise<PageResult<object>> {
+    const params = {id: taskId};
+    // @ts-ignore
+    return {params};
+  }
+
+  //根据ID查询画册信息
+  @tryError(new PageResult<object>())
   @Get("/project/task/relations/tasks/:id")
   @validate
   getTaskInfoDetailById(@required taskId: number | string): Promise<PageResult<object>> {
