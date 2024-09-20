@@ -80,6 +80,9 @@ const onUpload = async function (value: File[]) {
   }
   setTimeout(function () {
     $emit("update:loading", false);
+    if (fileRef.value) {
+      fileRef.value.reset();
+    }
   }, 300);
 }
 

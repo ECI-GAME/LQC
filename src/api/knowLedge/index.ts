@@ -1,31 +1,28 @@
 //知识库
+import * as _ from "lodash-es";
+import Graphql from "../graphql";
 import {Gql, tryError} from "@js-lion/api";
-
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 
-export default class {
+export default class extends Graphql {
   /**
    * 知识库-文件资源
    */
   @tryError(new PageResult())
-  @Gql("/graphql")
   async list<T = object>(pageNum: number, projectId: number | string, versionId: number | string = 0, searchValue: string = "", resourceType: string, pageSize: number = 20): Promise<PageResult<T>> {
-    // 查询用户信息
-    const data: string = `{
-      knowledgeList (input: { pageNum: ${pageNum},projectId: ${projectId},versionId:${versionId || 0},searchValue:"${searchValue}",resourceType:"${resourceType}", pageSize: ${pageSize} }) {
-        code
-        rows
-        msg
-        total
-      }
-    }`;
-    const callback = function (res: object) {
-      const value = safeGet<object>(res, "knowledgeList");
-      return new PageResult<T>(value);
+    const name = "knowledgeList";
+    const input = {
+      pageNum,
+      pageSize,
+      projectId,
+      searchValue: _.trim(searchValue),
+      versionId: Number(versionId || 0),
+      resourceType: String(resourceType),
     }
-    // @ts-ignore
-    return {data, callback};
+    const keys = ["code", "rows", "total", "msg"];
+    const res = await this.graphQL<object>(name, [{input}], keys);
+    return new PageResult<T>(res);
   }
 
   /**

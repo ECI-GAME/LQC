@@ -286,12 +286,13 @@ export default class extends Graphql {
   //提交项目关联方法
   @tryError(false)
   @$error()
-  @$success("操作成功")
-  @post("/project/knowledge")
+  @$success("上传成功")
+  @post("/project/knowledge/upload")
   @validate
-  addKnowLedgeInfo(data: object) {
+  addKnowLedgeInfo(data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
 

@@ -2,8 +2,7 @@
 /**
  * @file 知识库
  */
-import {ref, computed} from "vue";
-import Search from "./comp/search.vue";
+import {ref} from "vue";
 import * as alias from "src/router/alias";
 import lazyload from "src/utils/lazyload";
 import {Tabs, TabPane} from "ant-design-vue";
@@ -17,8 +16,7 @@ const list = [
   {key: "3", value: "图片资源"},
 ];
 
-const versionId = ref<number | undefined>(route.query.versionId ? Number(route.query.versionId) : void 0);
-const projectId = ref<number | undefined>(route.params.projectId ? Number(route.params.projectId) : void 0);
+
 const activeKey = ref<string>(String(route.query.type || list[0].key));
 
 const isComp = function (type: string) {
@@ -45,13 +43,12 @@ const getRouteValue = function (type: string) {
         </template>
       </TabPane>
     </Tabs>
-    <component :key="activeKey" :is="isComp(activeKey)"
-               :project-id="projectId"
-               :version-id="route.query.versionId">
-      <template #search>
-        <Search v-model:project-id="projectId" v-model:version-id="versionId"
-                :is-project="!!route.params.projectId"></Search>
-      </template>
+    <component :key="activeKey" :is="isComp(activeKey)">
+<!--      <template #search>-->
+<!--        <Search v-model:project-id="projectId"-->
+<!--                v-model:version-id="versionId"-->
+<!--                :is-project="!!route.params.projectId"></Search>-->
+<!--      </template>-->
     </component>
   </div>
 </template>

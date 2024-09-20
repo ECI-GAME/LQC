@@ -6,7 +6,7 @@ import {FormItem, Select, SelectOption} from "ant-design-vue";
 
 import type {VersionData} from "src/types";
 
-const $emit = defineEmits(["update:projectId", "update:versionId"]);
+const $emit = defineEmits(["update:projectId", "update:versionId", "change"]);
 const props = defineProps({
   projectId: {
     type: [String, Number],
@@ -47,6 +47,8 @@ const project = computed<string | number | undefined>({
   },
   set: (value?: string | number) => {
     $emit("update:projectId", value);
+    $emit("update:versionId", void 0);
+    $emit("change");
   }
 });
 
@@ -56,6 +58,7 @@ const version = computed<string | number | undefined>({
   },
   set: (value?: string | number) => {
     $emit("update:versionId", value);
+    $emit("change");
   }
 });
 
@@ -64,7 +67,7 @@ const version = computed<string | number | undefined>({
 <template>
   <div class="flex">
     <FormItem v-show="!isProject">
-      <Select class="w-50" v-model:value="project" placeholder="请选择项目" clearable @change="onChangeVersion">
+      <Select class="w-50" v-model:value="project" placeholder="请选择项目" :allow-clear="true" @change="onChangeVersion">
         <SelectOption
             v-for="item in projectState.results"
             :key="item.id"
@@ -73,7 +76,7 @@ const version = computed<string | number | undefined>({
       </Select>
     </FormItem>
     <FormItem>
-      <Select class="w-50" v-model:value="version" placeholder="请选择画册" clearable>
+      <Select class="w-50" v-model:value="version" placeholder="请选择画册" :allow-clear="true">
         <SelectOption
             v-for="item in versionState.results"
             :key="item.versionId"

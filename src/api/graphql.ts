@@ -15,8 +15,8 @@ export default class {
         if (_.isNil(value)) {
           continue;
         }
-        if (_.isNumber(value) || /^\d+$/.test(value)) {
-          list.push(value);
+        if (_.isNumber(value)) {
+          list.push(String(value));
         } else if (_.isArray(value) || _.isObject(value)) {
           list.push(this.graphQLQuery(value));
         } else {
@@ -32,7 +32,7 @@ export default class {
         if (_.isNil(value)) {
           continue;
         }
-        if (_.isNumber(value) || /^\d+$/.test(value)) {
+        if (_.isNumber(value)) {
           list.push(`${name}: ${value}`);
         } else if (_.isArray(value) || _.isObject(value)) {
           const item = this.graphQLQuery(value);
@@ -61,7 +61,7 @@ export default class {
           params.push(`${key}: ${this.graphQLQuery(value)}`);
         } else if (_.isNumber(value)) {
           params.push(`${key}: ${value}`);
-        } else if (_.isString(value) && /^\d+$/.test(value)) {
+        } else if (_.isString(value)) {
           params.push(`${key}: ${value}`);
         } else if (_.isString(value)) {
           params.push(`${key}: ${value}`);

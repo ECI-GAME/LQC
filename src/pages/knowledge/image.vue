@@ -2,50 +2,33 @@
 /**
  * @file 知识库
  */
-import {ref} from 'vue';
 import api from "src/api";
+import {Icon} from "@ue/icon";
+import {onMounted} from 'vue';
+import Search from "./search.vue";
+import {useCommon} from "./common";
 import * as model from "src/utils/model";
 import {ElImage as Image} from "element-plus";
 import {FileData} from "src/utils/upload/common";
 import Upload from "src/components/upload/index.vue";
 import Pagination from "src/components/page/index.vue";
-import {Form, FormItem, InputSearch, Button, message, Card, Empty} from "ant-design-vue";
+import {Form, FormItem, InputSearch, Button, Space, Card, Empty} from "ant-design-vue";
 
 import type {ProjectImage} from "src/types";
 
-const props = defineProps({
-  versionId: {
-    type: [String, Number],
-    required: false,
-  },
-  projectId: {
-    type: [String, Number],
-    required: true,
-  }
-});
-
-
-class FormState {
-  searchValue?: string;
-}
-
-
-let fileInfo: any[] = [];
-const isOnloading = ref<boolean>(false);
-const fromData = ref<FormState>(new FormState());
-const pageSize = ref<number>(10);
-const pageNumber = ref<number>(1);
+const resourceType = "2";
+const {versionId, projectId, isShowProject, pageSize, pageNumber, isUploading, fromData} = useCommon();
 
 const {state, execute: onLoad} = model.list<ProjectImage>(function () {
-  if (props.projectId) {
-    return api.knowLedge.list<ProjectImage>(pageNumber.value, props.projectId, props.versionId, fromData.value.searchValue, "2", pageSize.value);
+  if (projectId.value) {
+    return api.knowLedge.list<ProjectImage>(pageNumber.value, projectId.value, versionId.value, fromData.value.searchValue, resourceType, pageSize.value);
   }
   return new model.PageResult<ProjectImage>([]);
-}, new model.PageResult<ProjectImage>([]), true);
+});
 
 const onSearch = () => {
   pageNumber.value = 1;
-  onLoad(100);
+  onLoad(300);
 }
 
 const changePage = () => onLoad(100);
@@ -56,35 +39,48 @@ const getPreviewList = function (list: ProjectImage[]): string[] {
 
 //文件上传
 const onSuccess = async function (files: FileData[]) {
-  files.forEach(s => {
-    fileInfo.push({
-      'fileName': s.fileName,
-      'fileSize': s.size,
-      'filePath': s.src,
-      'fileType': s.type,
-      'projectId': props.projectId,
-      'versionId': props.versionId || 0,
-      "resourceType": '2'
-    })
-  })
-  message.success("上传成功")
-  api.project.addKnowLedgeInfo(fileInfo);
-  fileInfo = []
-  onSearch();
+  const fileInfo = files.map(function (item: FileData) {
+    return {
+      resourceType,
+      filePath: item.src,
+      fileSize: item.size,
+      fileType: item.type,
+      fileName: item.fileName,
+      projectId: projectId.value,
+      versionId: versionId.value || 0,
+    };
+  });
+  const status = await api.project.addKnowLedgeInfo(fileInfo);
+  if (status) {
+    onSearch();
+  }
 }
+
+onMounted(onSearch);
 
 </script>
 <template>
   <div>
-    <Form layout="inline" :model="fromData">
-      <slot name="search"></slot>
+    <Form layout="inline">
+      <Search v-model:project-id="projectId"
+              v-model:version-id="versionId"
+              :is-project="isShowProject"></Search>
       <FormItem>
-        <InputSearch v-model:value="fromData.searchValue" placeholder="请输入条件" enter-button allow-clear
-                     @search="onSearch" class="w-100 float-left"/>
+        <InputSearch v-model:value="fromData.searchValue"
+                     placeholder="请输入名称"
+                     :enter-button="true"
+                     :allow-clear="true"
+                     @search="onSearch"
+                     class="w-100 deep-[.anticon-search]:flex"/>
       </FormItem>
       <FormItem>
-        <Upload :multiple="true" @success="onSuccess" class="ml-3" v-model:loading="isOnloading">
-          <Button :loading="isOnloading">图片上传</Button>
+        <Upload :multiple="true" @success="onSuccess" class="ml-3" v-model:loading="isUploading">
+          <Button :loading="isUploading">
+            <Space>
+              <Icon class="flex text-base" type="cloud-upload"></Icon>
+              <span>图片上传</span>
+            </Space>
+          </Button>
         </Upload>
       </FormItem>
     </Form>
@@ -104,7 +100,6 @@ const onSuccess = async function (files: FileData[]) {
           <div class="text-center pt-1">{{ item.fileName }}</div>
         </div>
       </div>
-
       <Pagination v-model:page="pageNumber" v-model:size="pageSize" :total="state.total"
                   @click="changePage"></Pagination>
     </template>
