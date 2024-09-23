@@ -4,11 +4,12 @@
  * @author svon.me@gmail.com
  */
 
-import {ref,computed} from "vue";
+import {ref} from "vue";
 import api from "src/api";
 import Switch from "./switch.vue";
 import BigNumber from "bignumber.js";
 import {TaskStatus} from "src/types";
+import * as message from "@ue/message";
 import Record from "./record/index.vue";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
@@ -181,34 +182,27 @@ const onSubmit = async function () {
   }
 }
 
-const headers = computed(function () {
-  const header = Authorization(TOKEN_KEY, TOKEN_NAME);
-  return {
-    [TOKEN_NAME]: safeGet<string>(header, "Authorization")
-  };
-});
 
-const downTxt = function(){
-  console.log(headers.value);
-  const header = Authorization(TOKEN_KEY, TOKEN_NAME);
-  fetch(`${API_BASE}/project/image/translations/export?taskId=`+route.params.taskId, {
-        method: 'POST',
-        headers: {"Authorization":safeGet<string>(header, "Authorization")}
-    }) .then(response => {
-        if (response.ok) {
-            return response.blob(); // 获取文件数据
-        }
-        throw new Error('导出失败');
-    })
-    .then(blob => {
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'data.xlsx';  // 指定下载文件名
-        link.click();
-    })
-    .catch(error => {
-        console.error('导出时出错:', error);
-    });
+const downTxt = function () {
+  const auth = Authorization(TOKEN_KEY, TOKEN_NAME);
+  const headers = new Headers();
+  headers.set(TOKEN_NAME, safeGet<string>(auth, TOKEN_NAME)!);
+  const url = `${API_BASE}/project/image/translations/export?taskId=` + route.params.taskId;
+  fetch(url, {method: 'POST', headers}).then(response => {
+    if (response.ok) {
+      return response.blob(); // 获取文件数据
+    }
+    return Promise.reject(new Error());
+  }).then(blob => {
+    if (blob) {
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'data.xlsx';  // 指定下载文件名
+      link.click();
+    }
+  }).catch(error => {
+    message.error("导出时出错");
+  });
 }
 
 
