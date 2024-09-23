@@ -13,6 +13,17 @@ const onSubmit = function (data: object, nodeId: number | string) {
 export const openNewUser = function (nodeId: number | string) {
   return modal.form([
     {
+      key: "roleId",
+      label: "角色",
+      component: Select,
+      rules: rules.text('请选择角色！'),
+      props: {
+        placeholder: "请选择角色！",
+        fieldNames:{label: "name", value: "id"},
+        options: () => api.system.getRoleList()
+      }
+    },
+    {
       key: "userName",
       label: "用户名",
       component: Input,
