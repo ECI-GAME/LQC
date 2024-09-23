@@ -9,8 +9,13 @@ const onSubmit = function (data: object, nodeId: number | string) {
   return api.project.addProjectUserInfoBy(value);
 };
 
+const onInvite = function (data: object, projectNum: number | string, nodeId: number | string) {
+  const value = {...data, jobMethodsId: nodeId, projectNum};
+  return api.project.invitePerson(value);
+}
 
-export const openNewUser = function (nodeId: number | string) {
+// 人员邀请
+export const inviteUser = function (projectNum: number | string, nodeId: number | string) {
   return modal.form([
     {
       key: "roleId",
@@ -19,18 +24,18 @@ export const openNewUser = function (nodeId: number | string) {
       rules: rules.text('请选择角色！'),
       props: {
         placeholder: "请选择角色！",
-        fieldNames:{label: "name", value: "id"},
+        fieldNames: {label: "name", value: "id"},
         options: () => api.system.getRoleList()
       }
     },
     {
-      key: "userName",
+      key: "empName",
       label: "用户名",
       component: Input,
       rules: rules.text('请输入用户名！'),
     },
     {
-      key: "handlerId",
+      key: "empMailAccount",
       label: "邮箱",
       component: Input,
       rules: rules.email('请输入正确的邮箱地址！'),
@@ -40,7 +45,7 @@ export const openNewUser = function (nodeId: number | string) {
     width: 300,
     buttonClassName: ["pb-5", "px-5"],
     okText: "邀请",
-    onOk: (value: object) => onSubmit(value, nodeId),
+    onOk: (value: object) => onInvite(value, projectNum, nodeId),
   });
 }
 
@@ -48,7 +53,7 @@ export const openNewUser = function (nodeId: number | string) {
  * @file 项目创建
  * @author svon.me@gmail.com
  */
-export const onCreatePerson = async function (nodeId?: number | string) {
+export const onCreatePerson = async function (projectNum: number | string, nodeId?: number | string) {
   if (!nodeId) {
     return false;
   }
@@ -69,6 +74,6 @@ export const onCreatePerson = async function (nodeId?: number | string) {
     buttonClassName: ["pb-5", "px-5"],
     onOk: (value: object) => onSubmit(value, nodeId),
     otherText: "邀请",
-    otherOk: () => openNewUser(nodeId),
+    otherOk: () => inviteUser(projectNum, nodeId),
   });
 }

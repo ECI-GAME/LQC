@@ -14,12 +14,18 @@ import {onCreatePerson} from "src/utils/person";
 import {VueDraggableNext} from 'vue-draggable-next';
 import {Button, Row, Col, Popconfirm, Empty} from "ant-design-vue";
 
+import type {Project} from "src/types";
 
 const route = useRoute();
 const projectId = computed<string>(() => String(route.params.projectId));
 
 const active = ref<string | number>();
 const state = ref<object[]>([]);
+
+// 项目详情
+const {state: project} = model.result<Project>(function () {
+  return api.project.getProjectInfoById(projectId.value);
+}, {} as Project, true);
 
 const {state: personList, execute: onLoadPersons} = model.list(function () {
   if (active.value) {
@@ -44,7 +50,7 @@ const onLoadList = async function () {
 onMounted(onLoadList);
 
 const changePerson = function (element: object) {
-  const value = safeGet<string | number>(element, ".id");
+  const value = safeGet<string | number>(element, "id");
   if (value) {
     console.log(value);
     active.value = value;
@@ -78,7 +84,7 @@ const onCreateWorkFlow = async function () {
 
 // 添加人员
 const onCreatePeople = async function () {
-  const status = await onCreatePerson(active.value);
+  const status = await onCreatePerson(project.value.projectNum, active.value);
   if (status) {
     await onLoadPersons(500);
   }

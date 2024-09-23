@@ -86,14 +86,14 @@ export const result = function <T>(api: (...args: any[]) => T | Promise<T>, init
  * @param execute       是否默认加载, 默认不加载
  * @returns
  */
-export const list = function <T = object>(api: (...args: any[]) => PageResult<T> | Promise<PageResult<T>>, initialState?: PageResult<T>, execute?: boolean) {
+export const list = function <T = object>(api: (...args: any[]) => T[] | Promise<T[]> | PageResult<T> | Promise<PageResult<T>>, initialState?: PageResult<T>, execute?: boolean) {
   const callback = function (value: any) {
     if (_.isNil(value) || value === false || !value) {
       return new PageResult<T>();
     }
     return new PageResult<T>(value);
   }
-  return result<PageResult<T>>(api, initialState || new PageResult<T>(), execute, callback);
+  return result<PageResult<T>>(api as any, initialState || new PageResult<T>(), execute, callback);
 }
 
 // 用于接口, 以装饰器方式使用

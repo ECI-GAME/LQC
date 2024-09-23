@@ -313,14 +313,10 @@ export default class extends Graphql {
   //模板导入
   @Get("project/text/upload/textResource")
   @validate
-  importTextResource(data: number) {
-    const params = {projectId: data};
+  importTextResource(@required projectId: number) {
+    const params = {projectId};
     // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
-    // @ts-ignore
-    return {data, params};
+    return {params};
   }
 
   //提交语言内容
@@ -329,9 +325,10 @@ export default class extends Graphql {
   @$success("操作成功")
   @post("/project/text")
   @validate
-  addTextReource(data: object) {
+  addTextReource(@required data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
   //提交语言内容
@@ -340,9 +337,10 @@ export default class extends Graphql {
   @$success("操作成功")
   @post("/system/emp/add/project/participants")
   @validate
-  invitePerson(data: object) {
+  invitePerson(@required data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
 
