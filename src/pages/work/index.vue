@@ -4,7 +4,7 @@
  * @author svon.me@gmail.com
  */
 
-import {ref} from "vue";
+import {ref,computed} from "vue";
 import api from "src/api";
 import Switch from "./switch.vue";
 import BigNumber from "bignumber.js";
@@ -25,7 +25,12 @@ import {filterSuccess, pickImage, RecordTabType} from "./config";
 import {DotDataType, DotData} from "src/components/preview/config";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
 
+
 import type {ImageData, TaskData, Project} from "src/types";
+import Authorization from "src/libs/http/config/authorization";
+import safeGet from "@fengqiaogang/safe-get";
+import {API_BASE, TOKEN_KEY, TOKEN_NAME} from "src/config";
+
 
 const previewRef = ref();
 const route = useRoute();
@@ -176,6 +181,37 @@ const onSubmit = async function () {
   }
 }
 
+const headers = computed(function () {
+  const header = Authorization(TOKEN_KEY, TOKEN_NAME);
+  return {
+    [TOKEN_NAME]: safeGet<string>(header, "Authorization")
+  };
+});
+
+const downTxt = function(){
+  console.log(headers.value);
+  const header = Authorization(TOKEN_KEY, TOKEN_NAME);
+  fetch(`${API_BASE}/project/image/translations/export?taskId=`+route.params.taskId, {
+        method: 'POST',
+        headers: {"Authorization":safeGet<string>(header, "Authorization")}
+    }) .then(response => {
+        if (response.ok) {
+            return response.blob(); // 获取文件数据
+        }
+        throw new Error('导出失败');
+    })
+    .then(blob => {
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'data.xlsx';  // 指定下载文件名
+        link.click();
+    })
+    .catch(error => {
+        console.error('导出时出错:', error);
+    });
+}
+
+
 const onClickImage = function (e: Event, data: { x: number, y: number, width: number, height: number }) {
   dotAddTempValue.value = new DotData(
     data.x,
@@ -213,7 +249,7 @@ const calcDotValue = function (data: DotData): DotData {
         <!-- 右侧操作按钮 -->
         <template #operate="{ task }">
           <Space>
-            <Button>文本导出</Button>
+            <Button @click="downTxt">文本导出</Button>
             <TaskLog :task-id="taskInfo.id"></TaskLog>
             <a :href="getKnowledgeUrl()" target="_blank">
               <Button>知识库</Button>

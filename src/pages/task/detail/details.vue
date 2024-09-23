@@ -93,7 +93,7 @@ const headers = computed(function () {
 const downTxt = function(){
   console.log(headers.value);
   const header = Authorization(TOKEN_KEY, TOKEN_NAME);
-  fetch(`${API_BASE}project/image/translations/export?taskId=`+route.params.taskId, {
+  fetch(`${API_BASE}/project/image/translations/export?taskId=`+route.params.taskId, {
         method: 'POST',
         headers: {"Authorization":safeGet<string>(header, "Authorization")}
     }) .then(response => {

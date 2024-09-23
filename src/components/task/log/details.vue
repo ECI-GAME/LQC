@@ -17,6 +17,7 @@ defineProps({
     <span class="ml-1 first:ml-0 text-lg">{{ data.handlerName }}</span>
     <span class="ml-1 first:ml-0 text-primary">[{{ data.nodeName }}]</span>
     <span class="ml-1 first:ml-0">[{{ data.taskName }}]</span>
-    <span class="ml-auto text-black text-opacity-50">{{ moment(data.startTime).format("YYYY-MM-DD hh:mm:ss") }}</span>
+    <span class="ml-1 first:ml-0">[{{ data.remarks }}]</span>
+    <span class="ml-auto text-black text-opacity-40">{{ moment(data.startTime).format("YYYY-MM-DD hh:mm:ss") }}</span>
   </div>
 </template>

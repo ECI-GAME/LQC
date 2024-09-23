@@ -20,7 +20,7 @@ export default class extends GraphQL {
 
   //任务列表查询
   @tryError(new PageResult())
-  async list<T = object>(pageNum: number = 1, versionId: number | string = 0, pageSize: number = 20, query: object = {}): Promise<PageResult<T>> {
+  async list<T = object>(pageNum: number = 1, versionId: number | string = 0, pageSize: number = 10, query: object = {}): Promise<PageResult<T>> {
     const input = {
       ...query,
       pageNum: Number(pageNum),

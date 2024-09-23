@@ -24,7 +24,7 @@ import type {TaskData} from "src/types";
 
 const route = useRoute();
 const pageNumber = ref<number>(1);
-const pageSize = ref<number>(20);
+const pageSize = ref<number>(10);
 const search = ref<Search>(new Search());
 const TaskStatus = "comic_task_status";
 
@@ -62,6 +62,21 @@ const editFrom = async function (value: TaskData) {
   if (status) {
     await onLoad(100);
   }
+}
+
+const changeHandlerName = function(param1:String,param2:String){
+  if (param1 && param2) {
+      let param2Array = param2.split(',').map(item => item.trim());
+
+      let combinedArray = [param1, ...param2Array];
+
+      let uniqueArray = [...new Set(combinedArray)];
+
+      
+      return uniqueArray.join(';');
+    }
+
+    return param1 || param2 || '';
 }
 
 onMounted(function () {
@@ -142,7 +157,11 @@ onMounted(function () {
           </template>
           <Dict v-else-if="column.key === 'taskStatus'" :type="TaskStatus" :value="text"></Dict>
           <Time v-else-if="column.key === 'time'" :value="text"></Time>
-          <Tags v-else-if="column.key === 'tags'" :value="text"></Tags>
+          
+          <template v-else-if="column.key === 'tags'">
+            
+            <Tags :value="changeHandlerName(record.handlerName,record.imgHandlerName)"> </Tags>
+          </template>
           <Progress v-else-if="column.key === 'progress'" :total="record.totalCnt" :value="record.doneCnt"/>
           <template v-else-if="column.key === 'action'">
             <Space class="text-xl text-primary">
