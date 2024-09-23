@@ -47,26 +47,28 @@ export default class {
 
   @Gql("/graphql")
   @validate
-  protected graphQL<T>(@required name: string, @required query: Query[], @required keys: string[]): Promise<T> {
+  protected graphQL<T>(@required name: string, @required query: Query | Query[], @required keys: string[]): Promise<T> {
     let data: string;
-    if (query.length > 0) {
+    const search = _.concat<Query>([], query);
+    if (search.length > 0) {
       const params: string[] = [];
-      for (const item of query) {
-        const [key] = Object.keys(item);
-        const value = item[key];
-        if (_.isNil(value)) {
-          continue;
-        }
-        if (_.isArray(value) || _.isObject(value)) {
-          params.push(`${key}: ${this.graphQLQuery(value)}`);
-        } else if (_.isNumber(value)) {
-          params.push(`${key}: ${value}`);
-        } else if (_.isString(value)) {
-          params.push(`${key}: ${value}`);
-        } else if (_.isString(value)) {
-          params.push(`${key}: ${value}`);
-        } else {
-          params.push(`${key}: ${JSON.stringify(value)}`);
+      for (const item of search) {
+        for (const key of Object.keys(item)) {
+          const value = item[key];
+          if (_.isNil(value)) {
+            continue;
+          }
+          if (_.isArray(value) || _.isObject(value)) {
+            params.push(`${key}: ${this.graphQLQuery(value)}`);
+          } else if (_.isNumber(value)) {
+            params.push(`${key}: ${value}`);
+          } else if (_.isString(value)) {
+            params.push(`${key}: ${value}`);
+          } else if (_.isString(value)) {
+            params.push(`${key}: ${value}`);
+          } else {
+            params.push(`${key}: ${JSON.stringify(value)}`);
+          }
         }
       }
       data = `{ ${name} (${params.join(", ")}) { ${keys.join("\n")} } }`;

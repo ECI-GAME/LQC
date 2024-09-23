@@ -143,26 +143,21 @@ export default class extends Graphql {
   }
 
 
-  // //根据ID查询画册图片详细信息-分页
-  // @post("project/images/list")
-  // @validate
-  // geVersionImageDetailPage(data: object) {
-  //   const callback = function (res: object) {
-  //     console.log('res');
-  //     console.log(res);
-  //     return safeGet<object>(res, "rows");
-  //   }
-
-  //   return { data,callback};
-  // }
-
+  // 根据ID查询画册图片详细信息-分页
   @tryError([])
   async geVersionImageDetailPage(versionId: number | string = 0, projectId: number | string, pageNum: number, pageSize: number = 10, imageName?: string): Promise<PageResult<object>> {
+    // 方法名称
     const name = "getProjectVersionImagesList";
+    // 所需字段
     const keys = ["code", "rows", "total", "msg"];
+    // 查询条件
     const input = {
-      pageNum, pageSize, versionId, projectId, imageName
+      pageNum: Number(pageNum),
+      pageSize: Number(pageSize),
+      versionId: Number(versionId),
+      projectId: Number(projectId),
+      imageName: String(imageName || "").trim(),
     };
-    return this.graphQL(name, [{input}], keys);
+    return this.graphQL(name, {input}, keys);
   }
 }
