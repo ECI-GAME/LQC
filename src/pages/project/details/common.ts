@@ -74,11 +74,12 @@ export const useImageAlbum = function (projectId: number | string) {
 
   // 编辑
   const edit = async function (value: ImageAlbum): Promise<boolean> {
+    const languagePair = state.value.sourceLanguage + '->' + state.value.targetLanguage;
     const res = await api.version.geVersionInfoById<ImageAlbum>(value.id);
     if (res) {
       res.startDate = res.startDate ? moment(res.startDate).format(dateFormat) : "";
       res.endDate = res.endDate ? moment(res.endDate).format(dateFormat) : "";
-      return onEditImage({...res});
+      return onEditImage({...res, languagePair});
     } else {
       const dateList = String(value.dateInterval || "").split("-");
       const [startDate, endDate] = _.map(dateList, function (value: string) {
@@ -87,7 +88,7 @@ export const useImageAlbum = function (projectId: number | string) {
         }
         return "";
       });
-      return onEditImage({...value, startDate, endDate});
+      return onEditImage({...value, startDate, endDate, languagePair});
     }
   }
   return {state, isReady, create, edit};
