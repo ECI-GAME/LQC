@@ -25,6 +25,7 @@ export const inviteUser = function (projectNum: number | string, nodeId: number 
       component: Select,
       rules: rules.text('请选择角色！'),
       props: {
+        showSearch: true,
         placeholder: "请选择角色！",
         fieldNames: {label: "name", value: "id"},
         options: () => api.system.getRoleList()
@@ -67,6 +68,7 @@ export const onCreatePerson = async function (projectNum: number | string, nodeI
       component: Select,
       rules: rules.text('请选择流程节点！'),
       props: {
+        showSearch: true,
         placeholder: "请选择人员",
         readonly: _.compact(readonly),
         options: () => api.project.getProjectUserInfoBy()

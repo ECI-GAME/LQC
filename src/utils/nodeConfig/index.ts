@@ -45,6 +45,7 @@ export const onCreate = async function (methodList: Array<any>, projectId: strin
       component: Select,
       rules: rules.text('请选择流程节点！'),
       props: {
+        showSearch: true,
         type: DictNodeType,
         placeholder: "请选择流程节点",
         readonly: _.compact(selected),
