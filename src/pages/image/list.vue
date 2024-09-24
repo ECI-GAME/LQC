@@ -9,7 +9,7 @@ import api from "src/api";
 import {Icon} from "@ue/icon";
 import {columns} from "./config";
 import Preview from "./preview.vue";
-import Tags from "../task/comp/tag.vue";
+import Tags from "src/components/ue/tag.vue/tag.vue";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
 import safeGet from "@fengqiaogang/safe-get";

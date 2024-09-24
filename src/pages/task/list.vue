@@ -6,10 +6,10 @@
 
 import api from "src/api";
 import {Icon} from "@ue/icon";
-import Tags from "./comp/tag.vue";
+import Tags from "src/components/ue/tag.vue";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
-import Progress from "./comp/progress.vue";
+import Progress from "src/components/ue/progress.vue";
 import {ref, onMounted, computed} from 'vue';
 import {RouterLink, useRoute} from "vue-router";
 import Time from "src/components/time/index.vue";
