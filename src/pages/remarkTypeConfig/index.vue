@@ -5,10 +5,10 @@
 import api from "src/api";
 import {ref, reactive} from 'vue';
 import {useRoute} from "vue-router";
+import onSure from "src/utils/tips/sure";
 import {Card, Tag, Input, message} from "ant-design-vue";
 
 const route = useRoute();
-console.log('Project ID = "%s"', route.params.projectId);
 
 const state = ref<object[]>([]);
 const fetchErrorInfo = async () => {
@@ -32,12 +32,13 @@ const data = reactive({
 });
 
 const handleClose = async function (removedTag: object) {
-
-
-  await api.project.delProjectPSErrorData(removedTag.id)
-  message.success('操作成功')
-  fetchErrorInfo()
-
+  let status = await onSure("是否确认删除？");
+  if (status) {
+    status = await api.project.delProjectPSErrorData(removedTag.id)
+  }
+  if (status) {
+    fetchErrorInfo()
+  }
 };
 
 const showInput = (item: object) => {

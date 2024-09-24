@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import {ref} from 'vue';
 import api from "src/api";
 import * as _ from "lodash-es";
-import {ref, watch} from 'vue';
 import * as model from "src/utils/model";
-import {Image, Space, Checkbox, CheckboxGroup, Divider, Button, message} from "ant-design-vue";
 import Upload from "src/components/upload/index.vue";
+import {Image, Space, Checkbox, CheckboxGroup, Divider, Button, message} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import type {FileData} from "src/utils/upload/common";
@@ -161,7 +161,7 @@ defineExpose({onSubmit: onSave, getList: () => list.value.results});
     <Divider class="my-3"/>
     <CheckboxGroup class="block clearfix cursor-default" v-model:value="imageIds" @change="onChangeValue">
       <div class="float-left ml-3 mb-3 w-25 truncate" v-for="item in list.results" :key="item.id">
-        <div class="h-40 rounded-md overflow-hidden">
+        <div class="h-40 rounded-md overflow-hidden text-center" :title="item.imageName">
           <Image class="object-cover" :src="item.originalImagePath" height="100%"/>
         </div>
         <template v-if="item.taskId">

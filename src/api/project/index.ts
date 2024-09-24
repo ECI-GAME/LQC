@@ -246,14 +246,11 @@ export default class extends Graphql {
   @$success("操作成功")
   @Delete("project/error/type/:ids")
   @validate
-  delProjectPSErrorData(data: number) {
+  delProjectPSErrorData(data: number): Promise<boolean> {
     const params = {ids: data};
+    const callback = () => true;
     // @ts-ignore
-    const callback = function (res: object) {
-      return safeGet<object>(res, "data");
-    }
-    // @ts-ignore
-    return {data, params};
+    return {params, callback};
   }
 
 

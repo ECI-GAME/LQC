@@ -87,7 +87,7 @@ const onSubmit = async function () {
               </Select>
             </div>
             <div class="flex-1 max-w-50 ml-5">
-              <InputNumber v-model:value="item.fontSize" :min="1" :step="1" :precision="0" size="small"
+              <InputNumber v-model:value="item.fontSize" :min="1" :max="1296" :step="1" :precision="0" size="small"
                            addon-after="PT"/>
             </div>
           </div>
@@ -95,7 +95,7 @@ const onSubmit = async function () {
 
         <FormItem label="行距">
           <div class="w-full max-w-50">
-            <InputNumber v-model:value="item.lineSpacing" :min="1" :step="1" :precision="0" size="small"
+            <InputNumber v-model:value="item.lineSpacing" :min="1" :max="5000" :step="1" :precision="0" size="small"
                          addon-after="%"/>
           </div>
         </FormItem>

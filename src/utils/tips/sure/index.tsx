@@ -8,5 +8,5 @@ export default function (message: string) {
     <div className="text-2xl text-[#faad14]">{value}</div>
     <div className="ml-3 flex-1 w-20 truncate">{message}</div>
   </div>);
-  return modal.sure(html, {title: "提示"});
+  return modal.sure(html, {title: "提示", okText: "确认" });
 }
