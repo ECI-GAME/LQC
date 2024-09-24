@@ -125,8 +125,8 @@ const saveNodeInfo = function () {
                 <span class="mx-auto" :class="{ 'text-white': element.id == active }">{{ element.methodName }}</span>
                 <Popconfirm
                     title="确认删除该节点信息吗?"
-                    ok-text="Yes"
-                    cancel-text="No"
+                    ok-text="确认"
+                    cancel-text="取消"
                     @confirm="deleteNode(element.id)"
                 >
                   <Icon
@@ -152,8 +152,8 @@ const saveNodeInfo = function () {
               <span>{{ person.handlerName }}</span>
               <Popconfirm
                   title="确认删除该人员信息吗?"
-                  ok-text="Yes"
-                  cancel-text="No"
+                  ok-text="确认"
+                  cancel-text="取消"
                   @confirm="deletePerson(person.id)"
               >
                 <Icon class="text-xl text-primary cursor-pointer float-right" type="delete"></Icon>
