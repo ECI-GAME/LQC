@@ -1,5 +1,6 @@
 import Word from "./word";
 import GraphQL from "../graphql";
+import loading from "src/utils/loading";
 import * as message from "@ue/message";
 import {PageResult} from "src/utils/model";
 import {validate, required, Put, Post, tryError} from "@js-lion/api";
@@ -58,6 +59,7 @@ export default class extends GraphQL {
   @tryError(false)
   @message.$error()
   @message.$success("已提交")
+  @loading()
   @Post("/project/tasks/submit")
   @validate
   onSubmit(@required data: object): Promise<boolean> {

@@ -66,7 +66,7 @@ export const onCreatePerson = async function (projectNum: number | string, nodeI
       key: "handlerId",
       label: "用户名",
       component: Select,
-      rules: rules.text('请选择流程节点！'),
+      rules: rules.text('请选择人员！'),
       props: {
         showSearch: true,
         placeholder: "请选择人员",
