@@ -5,13 +5,13 @@
 
 import Graphql from "../graphql";
 import cache from "src/utils/cache";
-import {Delete, Get, Gql, post, tryError, validate, required} from "@js-lion/api";
-import {$error, $success} from "@ue/message"
+import {$error, $success} from "@ue/message";
+import {API, Delete, Get, Gql, post, tryError, validate, required} from "@js-lion/api";
 
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 
-import type {Project, PsConfig, VersionData} from "src/types";
+import type {Project, PsConfig, VersionData, Remark} from "src/types";
 
 export default class extends Graphql {
   /**
@@ -193,15 +193,12 @@ export default class extends Graphql {
    * @returns UserIfno
    */
   @tryError([])
-  @cache()
   @validate
-  async projectErrorType(@required projectId: string | number): Promise<PageResult<object>> {
-    const name: string = "getProjectErrorTypeList";
-    const query = {
-      "input": `{ projectId: ${projectId} }`
-    };
-    const res = await this.graphQL<{ data: object[] }>(name, [query], ["data"]);
-    return new PageResult<object>(res.data);
+  async projectErrorType(@required projectId: string | number): Promise<PageResult<Remark>> {
+    const name = "getProjectErrorTypeList";
+    const input = {projectId: Number(projectId)};
+    const res = await this.graphQL<{ data: Remark[] }>(name, {input}, ["data"]);
+    return new PageResult<Remark>(safeGet<Remark[]>(res, "data"));
   }
 
 
@@ -232,11 +229,15 @@ export default class extends Graphql {
   @tryError(false)
   @$error()
   @$success("操作成功")
-  @post("/project/error/type")
   @validate
-  addProjectPSErrorData(data: object) {
-    // @ts-ignore
-    return {data};
+  async addProjectPSErrorData(data: object): Promise<boolean> {
+    const api = new API();
+    try {
+      await api.post("/project/error/type", data);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
 

@@ -97,7 +97,7 @@ export const PsTypeConfig: RouteRecordBase = {
 }
 
 export const RemarkTypeConfig: RouteRecordBase = {
-  name: "Image reamrk",
+  name: "Image remark",
   path: "/remarkTypeConfig/:projectId",
   meta: {
     breadcrumb: "project/config.vue"

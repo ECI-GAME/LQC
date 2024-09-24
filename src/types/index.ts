@@ -5,3 +5,4 @@ export * from "./language";
 export * from "./project";
 export * from "./word";
 export * from "./psconfig";
+export * from "./remark";
