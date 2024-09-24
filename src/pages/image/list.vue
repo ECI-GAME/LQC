@@ -202,7 +202,9 @@ const getVersionList = async function () {
                 cancel-text="No"
                 @confirm="confirmDelete(record)"
             >
-              <Icon class="text-xl text-primary cursor-pointer" type="delete"></Icon>
+              <Button class="p-0" type="link" title="删除画册" :danger="true">
+                <Icon class="text-xl" type="delete"></Icon>
+              </Button>
             </Popconfirm>
             
           </span>

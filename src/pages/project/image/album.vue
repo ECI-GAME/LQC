@@ -80,8 +80,8 @@ const onSubmit = async function (e: Event) {
       </FormItem>
       <FormItem class="col-span-2">
         <Upload v-model:loading="uploadStatus" v-model:value="files">
-          <template #preview>
-            <UploadPreview></UploadPreview>
+          <template #preview="{files, update}">
+            <UploadPreview :list="files" @change="update"></UploadPreview>
           </template>
         </Upload>
       </FormItem>

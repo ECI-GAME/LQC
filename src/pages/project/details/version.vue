@@ -67,7 +67,6 @@ const onRemoveVersion = async function (data: ImageAlbum) {
 <template>
   <div>
     <Table :data-source="state.results" :pagination="false" :columns="albumColumns" :bordered="true">
-
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'versionName'">
           <RouterLink :to="{ name: alias.TaskList.name, params: { projectId:projectId,versionId: record.id } }">
@@ -87,12 +86,13 @@ const onRemoveVersion = async function (data: ImageAlbum) {
               <Icon class="text-xl" type="edit-square"></Icon>
             </Button>
             <Button class="p-0" type="link" title="删除画册" :danger="true" @click="onRemoveVersion(record)">
-              <Icon class="text-xl" type="delete-fill"></Icon>
+              <Icon class="text-xl" type="delete"></Icon>
             </Button>
           </Space>
         </template>
       </template>
     </Table>
+
     <Page v-model:page="pageNumber" :size="3" :total="state.total" @click="onChangePage"></Page>
   </div>
 </template>
