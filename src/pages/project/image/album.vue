@@ -61,7 +61,7 @@ const onSubmit = async function (e: Event) {
   <div class="p-5">
     <Form class="grid grid-cols-2 gap-x-5" layout="vertical" ref="formRef" :model="data">
       <FormItem label="画册名称" name="versionName" :rules="rules.text('请输入画册名称!')">
-        <Input v-model:value="data.versionName" placeholder="请输入画册名称"/>
+        <Input v-model:value="data.versionName" placeholder="请输入画册名称" :maxlength="50"/>
       </FormItem>
       <FormItem label="语言对">
         <LanguagePair :input="true" :value="data.languagePair"/>
@@ -75,7 +75,7 @@ const onSubmit = async function (e: Event) {
                     :value-format="dateFormat"/>
       </FormItem>
       <FormItem class="col-span-2 mb-0" label="备注" name="remark">
-        <Textarea class="w-full resize-none" v-model:value="data.remark" :rows="4" :maxlength="500" :show-count="true"
+        <Textarea class="w-full deep-[textarea]:resize-none" v-model:value="data.remark" :rows="4" :maxlength="500" :show-count="true"
                   placeholder="请输入备注"/>
       </FormItem>
       <FormItem class="col-span-2">

@@ -39,11 +39,11 @@ export default class extends GraphQL {
     });
 
     const list = await Promise.all(progress);
-    const array = _.map(res.results, function(item: object, index: number) {
+    const array = _.map(res.results, function (item: object, index: number) {
       const totalCnt = safeGet<number>(list[index], "totalCnt") || 0;  // 总量
       const doneCnt = safeGet<number>(list[index], "doneCnt") || 0;    // 已处理
-      const StartCnt= safeGet<number>(list[index], "StartCnt") || 0;   // 未处理
-      return { ...item, totalCnt, doneCnt, StartCnt };
+      const StartCnt = safeGet<number>(list[index], "StartCnt") || 0;   // 未处理
+      return {...item, totalCnt, doneCnt, StartCnt};
     })
 
     return new PageResult<T>(array, res.total);
@@ -199,7 +199,7 @@ export default class extends GraphQL {
   @$error()
   @cache(1000 * 5)
   @Get("/project/image/relation/file/getComparePicture")
-  getImageValue(@required imageId: string | number, @required imageType: string): Promise<string | undefined> {
+  getImageValue(@required imageId: string | number, @required imageType: string | number): Promise<string | undefined> {
     const params = {id: imageId, type: imageType};
     const callback = (value: object) => {
       const src = safeGet<string>(value, "path");

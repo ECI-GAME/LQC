@@ -3,7 +3,7 @@
  * @author svon.me@gmail.com
  */
 
-
+import * as _ from "lodash-es";
 import Graphql from "../graphql";
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
@@ -137,7 +137,11 @@ export default class extends Graphql {
   private imageNameCheck(@required versionId: number | string, @required fileName: string): Promise<boolean> {
     const data = {versionId: versionId, imageName: fileName};
     const callback = (value: number) => {
-      return !(value || value > 0);
+      const status = _.isObject(value) ? safeGet<number>(value, "data") : value;
+      if (_.isNumber(status) && status === 0) {
+        return true;
+      }
+      return true;
     }
     // @ts-ignore
     return {data, callback};

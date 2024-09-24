@@ -11,7 +11,6 @@ const props = defineProps({
     required: true,
   },
   value: {
-    type: String,
     required: false,
   },
   type: {
@@ -21,9 +20,12 @@ const props = defineProps({
 });
 
 const onOpenImage = async function () {
-  const type: string = safeGet<string>(ImageNodeType, props.type)!;
-  const value = await api.task.getImageValue(props.id, type);
-  const src = preview(value);
+  let src: string | undefined;
+  const type = safeGet<string>(ImageNodeType, props.type) || props.type;
+  if (type) {
+    const value = await api.task.getImageValue(props.id, type);
+    src = preview(value);
+  }
   if (src) {
     window.open(src);
   }
@@ -33,7 +35,11 @@ const onOpenImage = async function () {
 
 <template>
   <div>
-    <Button v-if="value && safeGet(ImageNodeType, props.type)" type="link" @click="onOpenImage">预览</Button>
-    <span v-else>待生成</span>
+    <Button v-if="value && props.type" type="link" @click="onOpenImage">
+      <slot>预览</slot>
+    </Button>
+    <Button v-else type="link" :disabled="true">
+      <slot>待生成</slot>
+    </Button>
   </div>
 </template>
