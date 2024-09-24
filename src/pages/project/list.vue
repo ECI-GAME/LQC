@@ -67,7 +67,7 @@ const editFrom = async function (data: Project) {
           placeholder="请输入条件"
           enter-button
           @search="onSearch"
-          class="w-100"
+          class="w-100 deep-[.anticon-search]:flex"
       />
       <Button type="primary"  @click="onCreateProject">
         <template #icon>
@@ -99,15 +99,3 @@ const editFrom = async function (data: Project) {
     <Page v-model:page="pageNumber" :total="state.total" @click="onSearch"></Page>
   </div>
 </template>
-
-
-
-<style scoped lang="scss">
-
-  :deep(.ant-input-search-button) {
-    background-color: #1E90FF !important; /* 背景颜色 */
-    color: white !important; /* 文字颜色 */
-  }
-  
-
-</style>

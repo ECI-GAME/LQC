@@ -128,7 +128,7 @@ const onDragLeave = function () {
       <FileBox ref="fileRef" :disabled="disabled" :accept="accept" :multiple="multiple"
                @change="onUpload"></FileBox>
     </label>
-    <div @click.stop.prevent="onClick">
+    <div class="inline-block" @click.stop.prevent="onClick">
       <slot :dragenter="drag ? dragenter : false" :disabled="disabled">
         <Button :disabled="disabled">
           <Space>

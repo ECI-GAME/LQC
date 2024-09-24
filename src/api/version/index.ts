@@ -18,7 +18,7 @@ export default class extends Graphql {
    */
   @tryError([])
   @Gql("/graphql")
-  async list(pageNum: number, projectId: number | string, pageSize: number = 3): Promise<PageResult<object>> {
+  async list<T = object>(pageNum: number, projectId: number | string, pageSize: number = 3): Promise<PageResult<T>> {
     // 查询用户信息
     const data: string = `{
       getProjectVersionPageList (input: { pageNum: ${pageNum},projectId: ${projectId}, pageSize: ${pageSize} }) {
@@ -29,7 +29,7 @@ export default class extends Graphql {
       }
     }`;
     const callback = function (res: object) {
-      return safeGet<object>(res, "getProjectVersionPageList");
+      return safeGet<T>(res, "getProjectVersionPageList");
     }
     // @ts-ignore
     return {data, callback};
@@ -42,9 +42,10 @@ export default class extends Graphql {
   @$success("操作成功")
   @post("/project/version")
   @validate
-  addVersion(data: object) {
+  addVersion(data: object): Promise<boolean> {
+    const callback = () => true;
     // @ts-ignore
-    return {data};
+    return {data, callback};
   }
 
   //修改画册
@@ -72,6 +73,7 @@ export default class extends Graphql {
 
 
   //根据ID查询画册信息
+  @tryError(void 0)
   @Get("project/version/:id")
   @validate
   geVersionInfoById<T = object>(id: number | string): Promise<T> {

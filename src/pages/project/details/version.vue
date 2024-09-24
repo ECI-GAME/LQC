@@ -9,7 +9,9 @@ import LanguagePair from "src/components/language/pair.vue";
 
 import api from "src/api";
 import {Progress, Pagination} from "ant-design-vue";
-import {onCreate} from "src/utils/version";
+import {useImageAlbum} from "./common";
+
+import type {ImageAlbum} from "src/types";
 
 
 const props = defineProps({
@@ -29,14 +31,16 @@ const columns = [
   {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
 ];
 
+const {edit: onEdit} = useImageAlbum(props.projectId);
+
 // 构造当前列表数据对象
-const {state, execute: onLoad} = model.list<object>(
+const {state, execute: onLoad} = model.list<ImageAlbum>(
   // 执行逻辑
   function () {
-    return api.version.list(pageNumber.value, props.projectId);
+    return api.version.list<ImageAlbum>(pageNumber.value, props.projectId);
   },
   // 默认值，为空时自动创建
-  new model.PageResult<object>([]),
+  new model.PageResult<ImageAlbum>([]),
   // 是否默认执行，默认为 false
   true
 );
@@ -47,17 +51,13 @@ const changeProcess = function (doneCount: number, allCount: number) {
 }
 
 const changePage = function (page: Object) {
-  
   pageNumber.value = page.pageNum
   onLoad()
 }
-const onUpdateVersion = async function (versionId:number) {
-  console.log(state)
-  // 创建项目
-  const status = await onCreate(props.projectId as string,1,versionId);
-  // 状态判断
+const onUpdateVersion = async function (data: ImageAlbum) {
+  const status = await onEdit(data);
   if (status) {
-    window.location.reload();
+    await onLoad(300);
   }
 }
 </script>
@@ -65,7 +65,7 @@ const onUpdateVersion = async function (versionId:number) {
 <template>
   <div>
     <Table :data-source="state.results" :pagination="false" :columns="columns" :bordered="true">
-    
+
       <template #bodyCell="{ column, text, record  }">
         <template v-if="column.key === 'versionName'">
           <RouterLink :to="{ name: alias.TaskList.name, params: { projectId:projectId,versionId: record.id } }">
@@ -81,7 +81,8 @@ const onUpdateVersion = async function (versionId:number) {
         </template>
         <template v-else-if="column.key === 'action'">
           <span class="inline-block">
-            <Icon class="text-xl text-primary cursor-pointer" @click="onUpdateVersion(record.id)" type="edit-square"></Icon>
+            <Icon class="text-xl text-primary cursor-pointer" @click="onUpdateVersion(record)"
+                  type="edit-square"></Icon>
           </span>
         </template>
       </template>

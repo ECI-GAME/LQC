@@ -11,6 +11,10 @@ defineProps({
   value: {
     type: String,
     required: true,
+  },
+  input: {
+    type: Boolean,
+    required: false,
   }
 });
 
@@ -27,5 +31,5 @@ const convert = function (text?: string) {
 </script>
 
 <template>
-  <Detail :value="convert(value)"></Detail>
+  <Detail :class="{ 'deep-[span]:hidden': !value }" :input="input" :value="convert(value)"></Detail>
 </template>

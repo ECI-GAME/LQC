@@ -1,4 +1,3 @@
-
 export interface ImageData {
   id: number;
   taskId: number;
@@ -14,4 +13,19 @@ export interface ImageData {
   updateBy: string | null;
   updateTime: string | null;
   imagePath: string;
+}
+
+// 画册 / 版本
+export interface ImageAlbum {
+  dateInterval: string;
+  doneCnt: number;
+  id: number;
+  languagePair: string;
+  projectNum: string | number;
+  totalCnt: number;
+  versionName: number;
+  versionStatus: number | string;
+  remark: string;
+  startDate: string | number;
+  endDate: string | number;
 }

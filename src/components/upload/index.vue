@@ -15,9 +15,17 @@ import {Bucket, format} from "src/utils/upload/common";
 import type {Result} from "@js-lion/upload";
 import type {FileData} from "src/utils/upload/common";
 
-const $emit = defineEmits(["success", "update:loading", "progress", "abnormal", "update:value", "change"]);
+const $emit = defineEmits([
+  "success",
+  "update:loading",
+  "progress",
+  "abnormal",
+  "update:value",
+  "change"
+]);
 
 const props = defineProps({
+  // 记录所有的上传数据
   value: {
     type: [Array, String],
     required: false
@@ -111,7 +119,7 @@ const onAbnormal = function (...args: any[]) {
       <slot>
         <span class="flex items-center cursor-pointer">
           <Icon class="flex text-xl" type="cloud-upload"></Icon>
-          <span>图片上传</span>
+          <span class="ml-2">图片上传</span>
         </span>
       </slot>
     </Upload>

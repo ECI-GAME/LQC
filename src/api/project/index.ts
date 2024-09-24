@@ -92,6 +92,8 @@ export default class extends Graphql {
   }
 
   //根据ID查询项目信息
+  @tryError({})
+  @cache(1000 * 5)
   @Get("project/:id")
   @validate
   getProjectInfoById(@required projectId: number | string): Promise<Project> {

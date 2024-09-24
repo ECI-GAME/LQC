@@ -23,6 +23,10 @@ const props = defineProps({
     required: false,
     default: () => "targetLanguage"
   },
+  input: {
+    type: Boolean,
+    required: false,
+  }
 });
 
 const DictTypeValue = "comic_language_type";
@@ -31,10 +35,16 @@ const pickLanguageValue = function (key: string, data?: object,) {
   return data ? safeGet<string>(data, key) : key;
 }
 
+const inputStyle = function (status: boolean) {
+  if (status) {
+    return "block min-h-8 leading-8 border border-solid border-[#d9d9d9] rounded-md px-1 text-sm";
+  }
+}
+
 </script>
 
 <template>
-  <span>
+  <span :class="inputStyle(input)">
     <Dict :type="DictTypeValue" name="code" :value="pickLanguageValue(source, value)"></Dict>
     <span>-></span>
     <Dict :type="DictTypeValue" name="code" :value="pickLanguageValue(target, value)"></Dict>
