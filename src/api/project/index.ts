@@ -143,7 +143,6 @@ export default class extends Graphql {
   //删除节点信息
   @tryError(false)
   @$error()
-  @$success("操作成功")
   @Delete("project/methods/:ids")
   @validate
   deleteNode(ids: number): Promise<boolean> {

@@ -1,18 +1,21 @@
 <!--节点配置页面 -->
 <script setup lang="ts">
 /**
- * @file 错误类型配置
+ * @file 节点配置页面
+ * @author svon.me@gmail.com
  */
+
 import api from "src/api";
 import {Icon} from "@ue/icon";
+import * as _ from "lodash-es";
 import {useRoute} from "vue-router";
 import * as model from "src/utils/model";
-import {onMounted, ref, computed} from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import safeGet from "@fengqiaogang/safe-get";
 import {onCreate} from "src/utils/nodeConfig";
 import {onCreatePerson} from "src/utils/person";
 import {VueDraggableNext} from 'vue-draggable-next';
-import {Button, Row, Col, Popconfirm, Empty} from "ant-design-vue";
+import {Button, Col, Empty, Popconfirm, Row} from "ant-design-vue";
 
 import type {Project} from "src/types";
 
@@ -52,7 +55,6 @@ onMounted(onLoadList);
 const changePerson = function (element: object) {
   const value = safeGet<string | number>(element, "id");
   if (value) {
-    console.log(value);
     active.value = value;
     onLoadPersons(500)
   }
@@ -70,7 +72,13 @@ const deletePerson = async function (id: number | string) {
 const deleteNode = async function (id: number) {
   const status = await api.project.deleteNode(id);
   if (status) {
-    await onLoadPersons(500);
+    // 重新加载数据
+    await onLoadList();
+    // 重新排序
+    state.value = _.map(state.value, function (value: object, index: number) {
+      return {...value, orderBy: index + 1};
+    });
+    await saveNodeInfo();
   }
 }
 
@@ -84,7 +92,7 @@ const onCreateWorkFlow = async function () {
 
 // 添加人员
 const onCreatePeople = async function () {
-  const status = await onCreatePerson(project.value.projectNum, active.value);
+  const status = await onCreatePerson(project.value.projectNum, active.value, personList.value.results);
   if (status) {
     await onLoadPersons(500);
   }
@@ -92,7 +100,7 @@ const onCreatePeople = async function () {
 
 // 保存排序
 const saveNodeInfo = function () {
-  api.project.updateProMethSort(state.value);
+  return api.project.updateProMethSort(state.value);
 }
 
 </script>
@@ -110,28 +118,21 @@ const saveNodeInfo = function () {
 
           <VueDraggableNext class="dragArea list-group w-full cursor-pointer" :list="state">
             <div v-for="element in state" :key="element.methCode">
-              <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" v-if="element.id == active"
-                   @click="changePerson(element)" style="background-color: blue;color: white;">
-                {{ element.methodName }}
+              <div
+                  class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center flex items-center justify-between"
+                  :class="{ 'bg-[blue]': element.id == active }"
+                  @click="changePerson(element)">
+                <span class="mx-auto" :class="{ 'text-white': element.id == active }">{{ element.methodName }}</span>
                 <Popconfirm
                     title="确认删除该节点信息吗?"
                     ok-text="Yes"
                     cancel-text="No"
                     @confirm="deleteNode(element.id)"
                 >
-                  <Icon class="text-xl text-primary cursor-pointer float-right text-white" type="delete"></Icon>
-                </Popconfirm>
-              </div>
-              <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" @click="changePerson(element)"
-                   v-else>
-                {{ element.methodName }}
-                <Popconfirm
-                    title="确认删除该节点信息吗?"
-                    ok-text="Yes"
-                    cancel-text="No"
-                    @confirm="deleteNode(element.id)"
-                >
-                  <Icon class="text-xl text-primary cursor-pointer float-right" type="delete"></Icon>
+                  <Icon
+                      class="text-xl cursor-pointer text-primary"
+                      :class="{ 'text-white': element.id == active }"
+                      type="delete"></Icon>
                 </Popconfirm>
               </div>
             </div>
@@ -148,7 +149,7 @@ const saveNodeInfo = function () {
           <template v-if="personList.total > 0">
             <div class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center" v-for="person in personList.results"
                  :key="person.handlerId">
-              {{ person.handlerName }}
+              <span>{{ person.handlerName }}</span>
               <Popconfirm
                   title="确认删除该人员信息吗?"
                   ok-text="Yes"
