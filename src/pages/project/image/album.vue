@@ -34,6 +34,7 @@ const dateFormat: string = "YYYY-MM-DD";
 const {formRef, validate} = useValidate();
 const data = ref<ImageAlbum>({...props.value});
 
+console.log(data);
 
 const onCancel = function (e: Event) {
   $emit("cancel", e);
@@ -78,7 +79,7 @@ const onSubmit = async function (e: Event) {
         <Textarea class="w-full deep-[textarea]:resize-none" v-model:value="data.remark" :rows="4" :maxlength="500" :show-count="true"
                   placeholder="请输入备注"/>
       </FormItem>
-      <FormItem class="col-span-2">
+      <FormItem class="col-span-2" v-if="!data.id">
         <Upload v-model:loading="uploadStatus" v-model:value="files">
           <template #preview="{files, update}">
             <UploadPreview :list="files" @change="update"></UploadPreview>
