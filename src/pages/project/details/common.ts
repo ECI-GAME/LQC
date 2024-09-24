@@ -15,6 +15,15 @@ import type {Project, ImageAlbum} from "src/types";
 
 const dateFormat: string = "YYYY-MM-DD";
 
+export const albumColumns = [
+  {title: "画册名称", dataIndex: 'versionName', key: 'versionName'},
+  {title: "语言对", dataIndex: 'languagePair', key: 'languagePair', align: "center"},
+  {title: "状态", dataIndex: 'status', key: 'status', align: "center"},
+  {title: "时间区域", dataIndex: 'dateInterval', key: 'dateInterval', align: "center"},
+  {title: "画册进度", dataIndex: 'doneCnt', key: 'doneCnt', align: "center"},
+  {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
+];
+
 /**
  * @file 画册创建
  * @author svon.me@gmail.com

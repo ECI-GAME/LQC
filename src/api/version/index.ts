@@ -35,6 +35,18 @@ export default class extends Graphql {
     return {data, callback};
   }
 
+  //删除画册
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
+  @Delete("/project/version/:id")
+  @validate
+  removeVersion(@required id: string | number): Promise<boolean> {
+    const params = {id};
+    const callback = () => true;
+    // @ts-ignore
+    return {params, callback};
+  }
 
   //提交画册
   @tryError(false)
