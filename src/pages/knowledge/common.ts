@@ -1,6 +1,9 @@
 import {ref} from "vue";
+import api from "src/api";
 import {useRoute} from "vue-router";
 import * as message from "@ue/message";
+import onSure from "src/utils/tips/sure";
+import safeGet from "@fengqiaogang/safe-get";
 
 class FormState {
   searchValue?: string;
@@ -41,6 +44,17 @@ export const onFileAccept = (file: File) => {
   return false
 };
 
+// 资源文件删除
+export const onRemove = async function (data: object) {
+  let status = await onSure("是否确认删除？");
+  if (status) {
+    const fileId = safeGet<string>(data, "fileId");
+    if (fileId) {
+      status = await api.knowLedge.removeItem(fileId);
+    }
+  }
+  return !!status;
+}
 
 export const fileColumns = [
   {title: "关联项目", dataIndex: 'projectName', key: 'projectName'},

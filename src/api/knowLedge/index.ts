@@ -5,8 +5,9 @@
 
 import * as _ from "lodash-es";
 import Graphql from "../graphql";
-import {tryError} from "@js-lion/api";
 import {PageResult} from "src/utils/model";
+import {$error, $success} from "@ue/message";
+import {tryError, Delete, validate, required} from "@js-lion/api";
 
 import type {TextResource} from "src/types";
 
@@ -28,6 +29,18 @@ export default class extends Graphql {
     const keys = ["code", "rows", "total", "msg"];
     const res = await this.graphQL<object>(name, [{input}], keys);
     return new PageResult<T>(res);
+  }
+
+  @tryError(false)
+  @$error()
+  @$success("已删除")
+  @Delete("/project/knowledge/remove/:id")
+  @validate
+  removeItem(@required id: string | number): Promise<boolean> {
+    const params = {id};
+    const callback = () => true;
+    // @ts-ignore
+    return {params, callback};
   }
 
   /**

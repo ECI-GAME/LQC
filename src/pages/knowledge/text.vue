@@ -15,7 +15,6 @@ import onSure from "src/utils/tips/sure";
 import Page from "src/components/page/index.vue";
 import {onCreate, onEdit} from "./resource/text";
 import Upload from "src/components/upload/index.vue";
-import {downloadFile} from "src/utils/brower/download";
 import {useCommon, textColumns, onFileAccept} from "./common";
 import {Table, Form, FormItem, InputSearch, Button, Space} from "ant-design-vue";
 

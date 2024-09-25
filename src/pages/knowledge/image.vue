@@ -6,8 +6,8 @@ import api from "src/api";
 import {Icon} from "@ue/icon";
 import {onMounted} from 'vue';
 import Search from "./search.vue";
-import {useCommon} from "./common";
 import * as model from "src/utils/model";
+import {useCommon, onRemove} from "./common";
 import {ElImage as Image} from "element-plus";
 import {FileData} from "src/utils/upload/common";
 import Upload from "src/components/upload/index.vue";
@@ -56,6 +56,13 @@ const onSuccess = async function (files: FileData[]) {
   }
 }
 
+const onRemoveFile = async function (data: object) {
+  let status = await onRemove(data);
+  if (status) {
+    await onLoad(100);
+  }
+}
+
 onMounted(onSearch);
 
 </script>
@@ -87,8 +94,8 @@ onMounted(onSearch);
 
     <template v-if="state.total > 0">
       <div class="clearfix">
-        <div class="mt-5 float-left w-60" v-for="(item, index) in state.results" :key="item.fileId">
-          <div class="h-70 mr-5 rounded-md overflow-hidden">
+        <div class="mt-5 float-left w-60 mr-5" v-for="(item, index) in state.results" :key="item.fileId">
+          <div class="h-70 rounded-md overflow-hidden" :title="item.fileName">
             <Image class="w-full h-full"
                    :src="item.filePath"
                    fit="cover"
@@ -97,7 +104,14 @@ onMounted(onSearch);
                    :preview-teleported="true"
                    :preview-src-list="getPreviewList(state.results)"/>
           </div>
-          <div class="text-center pt-1">{{ item.fileName }}</div>
+          <div class="pt-1 flex items-center max-w-full">
+            <div class="flex-1 w-1 truncate">{{ item.fileName }}</div>
+            <div class="pl-3">
+              <Button class="p-0" type="link" title="删除" :danger="true" @click="onRemoveFile(item)">
+                <Icon class="text-xl" type="delete"></Icon>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
       <Pagination v-model:page="pageNumber" v-model:size="pageSize" :total="state.total"

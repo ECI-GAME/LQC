@@ -8,12 +8,12 @@ import {Icon} from "@ue/icon";
 import {onMounted} from 'vue';
 import Search from "./search.vue";
 import * as model from "src/utils/model";
-import {useCommon, fileColumns} from "./common";
+import safeGet from "@fengqiaogang/safe-get";
 import {FileData} from "src/utils/upload/common";
 import Upload from "src/components/upload/index.vue";
-
 import Pagination from "src/components/page/index.vue";
 import {downloadFile} from "src/utils/brower/download";
+import {useCommon, fileColumns, onRemove} from "./common";
 import {Table, Form, FormItem, InputSearch, Button, Space} from "ant-design-vue";
 
 const resourceType = "1";
@@ -48,6 +48,13 @@ const onSuccess = async function (files: FileData[]) {
     };
   });
   const status = await api.project.addKnowLedgeInfo(fileInfo);
+  if (status) {
+    await onLoad(100);
+  }
+}
+
+const onRemoveFile = async function (data: object) {
+  let status = await onRemove(data);
   if (status) {
     await onLoad(100);
   }
@@ -93,9 +100,14 @@ onMounted(onSearch);
            :pagination="false">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.key === 'action'">
-          <span class="inline-block" @click="downloadFile(record.filePath)">
+          <Space>
+            <Button class="p-0" type="link" title="编辑" @click="downloadFile(record.filePath)">
               <Icon class="text-xl text-primary cursor-pointer" type="download"></Icon>
-          </span>
+            </Button>
+            <Button class="p-0" type="link" title="删除" :danger="true" @click="onRemoveFile(record)">
+              <Icon class="text-xl" type="delete"></Icon>
+            </Button>
+          </Space>
         </template>
       </template>
     </Table>
