@@ -39,7 +39,9 @@ const onSearch = () => {
 const onChangePage = function () {
   onLoad(100);
 };
-
+const downloadTxtFile = function(){
+  window.open(textExportTemplate.value)
+}
 // 新增文本
 const onCreateResource = async function () {
   const status = await onCreate(projectId.value!, versionId.value);
@@ -95,7 +97,7 @@ onMounted(onSearch);
                      class="w-100 deep-[.anticon-search]:flex"/>
       </FormItem>
       <FormItem class="ml-3">
-        <Button @click="downloadFile(textExportTemplate)">
+        <Button @click="downloadTxtFile()">
           <Space>
             <Icon class="flex text-base" type="cloud-download"></Icon>
             <span>模板下载</span>
