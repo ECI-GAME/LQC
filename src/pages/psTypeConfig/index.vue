@@ -1,17 +1,20 @@
 <script setup lang="ts">
 /**
  * @file PSD 参数配置页面
+ * @author svon.me@gmail.com
  */
+
 import api from "src/api";
 import {ref, onMounted} from "vue";
-import {useRoute} from "vue-router";
 import * as model from "src/utils/model";
+import {useRoute, useRouter} from "vue-router";
 import Loading from "src/components/loading/index.vue";
 import {Card, Button, Form, FormItem, Select, InputNumber} from "ant-design-vue";
 
 import type {PsConfig} from "src/types";
 
 const route = useRoute();
+const router = useRouter();
 const isLoading = ref<boolean>(true);
 const labelCol = {style: {width: '5rem'}};
 const fieldNames = {label: 'dictLabel', value: 'dictValue'};
@@ -52,7 +55,7 @@ const findTitle = function (dictValue: string | number): string | undefined {
 const onSubmit = async function () {
   const status = await api.project.updateProjectPSErrorData(psConfigList.value);
   if (status) {
-    await getConfigList();
+    router.back();
   }
 }
 </script>

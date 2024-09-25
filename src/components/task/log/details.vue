@@ -10,6 +10,10 @@ defineProps({
     required: true,
   }
 });
+
+const format1 = "YYYY-MM-DDTHH:mm:ss.SSSZ";
+const format2 = "YYYY-MM-DD hh:mm:ss";
+
 </script>
 
 <template>
@@ -18,6 +22,6 @@ defineProps({
     <span class="ml-1 first:ml-0 text-primary">[{{ data.nodeName }}]</span>
     <span class="ml-1 first:ml-0">[{{ data.taskName }}]</span>
     <span class="ml-1 first:ml-0">[{{ data.remarks }}]</span>
-    <span class="ml-auto text-black text-opacity-40">{{ moment(data.startTime).format("YYYY-MM-DD hh:mm:ss") }}</span>
+    <span class="ml-auto text-black text-opacity-40">{{ moment(data.startTime, format1).format(format2) }}</span>
   </div>
 </template>

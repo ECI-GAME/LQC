@@ -25,7 +25,9 @@ export default class extends GraphQL {
       ...query,
       pageNum: Number(pageNum),
       pageSize: Number(pageSize),
-      versionId: Number(versionId)
+      versionId: Number(versionId),
+      // orderByColumn: "t.create_time",
+      // isAsc: "desc",
     };
     const apiName = "getProjectTasksList";
     const keys = ["code", "rows", "total", "msg"];

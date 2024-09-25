@@ -187,7 +187,7 @@ const downTxt = function () {
   const auth = Authorization(TOKEN_KEY, TOKEN_NAME);
   const headers = new Headers();
   headers.set(TOKEN_NAME, safeGet<string>(auth, TOKEN_NAME)!);
-  const url = `${API_BASE}/project/image/translations/export?taskId=` + route.params.taskId;
+  const url = `${API_BASE}project/image/translations/export?taskId=` + route.params.taskId;
   fetch(url, {method: 'POST', headers}).then(response => {
     if (response.ok) {
       return response.blob(); // 获取文件数据
@@ -244,6 +244,7 @@ const calcDotValue = function (data: DotData): DotData {
         <template #operate="{ task }">
           <Space>
             <Button @click="downTxt">文本导出</Button>
+            <!--操作记录-->
             <TaskLog :task-id="taskInfo.id"></TaskLog>
             <a :href="getKnowledgeUrl()" target="_blank">
               <Button>知识库</Button>
