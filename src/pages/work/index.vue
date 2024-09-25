@@ -311,6 +311,7 @@ const calcDotValue = function (data: DotData): DotData {
                   <RegisterWord v-else-if="currentFile"
                                 :data="calcDotValue(dotAddTempValue)"
                                 :file="currentFile"
+                                :language = "taskInfo.sourceLanguage"
                                 :projectId="taskInfo.projectId"
                                 :read-order="projectInfo.readOrder"
                                 @save="onUpDataDots"
