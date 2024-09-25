@@ -120,7 +120,7 @@ const saveNodeInfo = function () {
             <div v-for="element in state" :key="element.methCode">
               <div
                   class="list-group-item bg-gray-300 m-1 p-3 rounded-md text-center flex items-center justify-between"
-                  :class="{ 'bg-[blue]': element.id == active }"
+                  :class="{ '!bg-[blue]': element.id == active }"
                   @click="changePerson(element)">
                 <span class="mx-auto" :class="{ 'text-white': element.id == active }">{{ element.methodName }}</span>
                 <Popconfirm

@@ -44,7 +44,7 @@ export const onFileAccept = (file: File) => {
 
 export const fileColumns = [
   {title: "关联项目", dataIndex: 'projectName', key: 'projectName'},
-  {title: "关联版本", dataIndex: 'versionName', key: 'versionName'},
+  // {title: "关联版本", dataIndex: 'versionName', key: 'versionName'},
   {title: "文件名称", dataIndex: 'fileName', key: 'fileName'},
   {title: "文件大小", dataIndex: 'fileSize', key: 'fileSize'},
   {title: "文件类型", dataIndex: 'fileType', key: 'fileType', align: "center"},
@@ -55,7 +55,7 @@ export const fileColumns = [
 
 export const textColumns = [
   {title: "关联项目", dataIndex: 'projectName', key: 'projectName'},
-  {title: "关联版本", dataIndex: 'versionName', key: 'versionName'},
+  // {title: "关联版本", dataIndex: 'versionName', key: 'versionName'},
   {title: "原文", dataIndex: 'originalText', key: 'originalText'},
   {title: "建议译文", dataIndex: 'translationText', key: 'translationText'},
   {title: " 类别", dataIndex: 'typeName', key: 'textName'},

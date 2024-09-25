@@ -36,12 +36,22 @@ export const inviteUser = function (projectNum: number | string, nodeId: number 
       label: "用户名",
       component: Input,
       rules: rules.text('请输入用户名！'),
+      props: {
+        placeholder: "请输入用户名",
+        maxlength: 20,
+        showCount: true,
+      },
     },
     {
       key: "empMailAccount",
       label: "邮箱",
       component: Input,
       rules: rules.email('请输入正确的邮箱地址！'),
+      props: {
+        placeholder: "请输入用户名",
+        maxlength: 50,
+        showCount: true,
+      },
     },
   ], {
     title: "邀请人员",

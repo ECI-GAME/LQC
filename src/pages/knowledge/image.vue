@@ -74,7 +74,7 @@ onMounted(onSearch);
                      class="w-100 deep-[.anticon-search]:flex"/>
       </FormItem>
       <FormItem>
-        <Upload :multiple="true" @success="onSuccess" class="ml-3" v-model:loading="isUploading">
+        <Upload :multiple="true" @success="onSuccess" accept="image/*" v-model:loading="isUploading">
           <Button :loading="isUploading">
             <Space>
               <Icon class="flex text-base" type="cloud-upload"></Icon>

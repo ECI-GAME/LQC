@@ -62,7 +62,12 @@ const onCreate = async function (
         value: data.projectName,
         label: "项目名称",
         component: Input,
-        rules: rules.text("请填写项目名称")
+        rules: rules.text("请填写项目名称！"),
+        props: {
+          maxlength: 50,
+          showCount: true,
+          placeholder: "请填写项目名称",
+        }
       }
     ],
     {
@@ -78,6 +83,11 @@ const onCreate = async function (
         value: data.comicPublisher,
         label: "发行商",
         component: Input,
+        props: {
+          maxlength: 50,
+          showCount: true,
+          placeholder: "请输入发行商名称",
+        }
       },
       // {
       //   key: "imageType",
@@ -129,6 +139,11 @@ const onCreate = async function (
       value: data.remarks,
       label: "备注",
       component: Input.TextArea,
+      props: {
+        maxlength: 500,
+        showCount: true,
+        placeholder: "请输入备注",
+      }
     },
   ], {
     title: (data.id ? "修改项目" : "新建项目"),
