@@ -1,99 +1,81 @@
 <!--文本-->
 <script setup lang="ts">
 /**
- * @file 知识库
+ * @file 知识库 - 文本
+ * @author svon.me@gmial.com
  */
-
 
 import api from "src/api";
 import {Icon} from "@ue/icon";
 import Search from "./search.vue";
+import {ref, onMounted} from 'vue';
+import {API_BASE} from "src/config";
 import * as model from "src/utils/model";
-import {useCommon, textColumns} from "./common";
-import {computed, ref, onMounted} from 'vue';
-import safeGet from "@fengqiaogang/safe-get";
-import {onCreate} from "src/utils/textResource";
+import onSure from "src/utils/tips/sure";
 import Page from "src/components/page/index.vue";
-import {API_BASE, TOKEN_KEY, TOKEN_NAME} from "src/config";
-import Authorization from "src/libs/http/config/authorization";
-import {Table, Form, FormItem, InputSearch, Button, Upload, message, Space} from "ant-design-vue";
+import {onCreate, onEdit} from "./resource/text";
+import Upload from "src/components/upload/index.vue";
+import {downloadFile} from "src/utils/brower/download";
+import {useCommon, textColumns, onFileAccept} from "./common";
+import {Table, Form, FormItem, InputSearch, Button, Space} from "ant-design-vue";
 
+import type {TextResource} from "src/types";
 
-import type {UploadChangeParam, UploadProps} from "ant-design-vue";
-
-
+// 模板导出地址
 const textExportTemplate = ref<string>(`${API_BASE}project/text/export/textTmp`);
-const textUploadResource = ref<string>(`${API_BASE}eci-comic/project/text/upload/textResource`);
-
+// 构造公共数据
 const {versionId, projectId, isShowProject, pageSize, pageNumber, fromData} = useCommon();
-
-
-const {state, execute: onLoad, isLoading} = model.list<object>(function () {
+// 文本列表
+const {state, execute: onLoad, isLoading} = model.list<TextResource>(function () {
   if (projectId.value) {
     return api.knowLedge.textList(pageNumber.value, projectId.value, versionId.value, fromData.value.searchValue, pageSize.value);
   }
-  return new model.PageResult<object>([]);
+  return new model.PageResult<TextResource>([]);
 });
-
-
 const onSearch = () => {
   pageNumber.value = 1;
   onLoad(100);
 }
+const onChangePage = function () {
+  onLoad(100);
+};
 
-const changePage = () => onLoad(100);
-
-
-const fileList = ref([]);
-const uploadData = computed(function () {
-  return {'projectId': projectId.value};
-});
-
-
-const headers = computed(function () {
-  const header = Authorization(TOKEN_KEY, TOKEN_NAME);
-  return {
-    [TOKEN_NAME]: safeGet<string>(header, "Authorization")
-  };
-});
-
-
-const nweTextRource = async function () {
-  const status = await onCreate(projectId.value!);
+// 新增文本
+const onCreateResource = async function () {
+  const status = await onCreate(projectId.value!, versionId.value);
   if (status) {
     await onLoad(100);
   }
 }
 
-const handleChange = (info: UploadChangeParam) => {
-  if (info.code != 200) {
-    message.error(info.msg);
-  } else {
-    message.success(info.msg);
-    onLoad(100);
+const onEditResource = async function (value: TextResource) {
+  const status = await onEdit(value);
+  if (status) {
+    await onLoad(100);
   }
-  fileList.value = []
-  return
-};
+}
 
-const beforeUpload = (file: File) => {
-  let status = false;
-  if (file.name) {
-    const reg = /\.xlsx$/i;
-    status = reg.test(file.name);
+const onRemoveResource = async function (value: TextResource) {
+  let status = await onSure("是否确认删除?");
+  if (status) {
+    status = await api.project.removeTextReource(value.id);
   }
-  if (!status) {
-    message.error('仅支持xlsx格式文件上传!');
-    return false
+  if (status) {
+    await onLoad(100);
   }
-  status = file.size / 1024 / 1024 < 200;
-  if (!status) {
-    message.error('上传附件必须小于200MB!');
-    return false
-  }
-  return true;
-};
+}
 
+// 文件上传
+const onUploadFile = async function (value: File[]) {
+  const file = value[0];
+  const data = new FormData();
+  data.append("file", file);
+  data.append("projectId", String(projectId.value));
+  const status = await api.project.importTextResource(data);
+  if (status) {
+    onSearch();
+  }
+}
 
 onMounted(onSearch);
 
@@ -105,31 +87,23 @@ onMounted(onSearch);
               v-model:version-id="versionId"
               :is-project="isShowProject"></Search>
       <FormItem>
-        <InputSearch v-model:value="fromData.searchValue" :allow-clear="true" placeholder="请输入条件" enter-button
+        <InputSearch v-model:value="fromData.searchValue"
+                     :allow-clear="true"
+                     placeholder="请输入条件"
+                     :enter-button="true"
                      @search="onSearch"
-                     class="w-100 float-left"/>
+                     class="w-100 deep-[.anticon-search]:flex"/>
       </FormItem>
       <FormItem class="ml-3">
-        <a class="inline-block" :href="textExportTemplate">
-          <Button>
-            <Space>
-              <Icon class="flex text-base" type="cloud-download"></Icon>
-              <span>模板下载</span>
-            </Space>
-          </Button>
-        </a>
+        <Button @click="downloadFile(textExportTemplate)">
+          <Space>
+            <Icon class="flex text-base" type="cloud-download"></Icon>
+            <span>模板下载</span>
+          </Space>
+        </Button>
       </FormItem>
       <FormItem class="ml-3">
-        <Upload
-            v-model:file-list="fileList"
-            name="file"
-            :action="textUploadResource"
-            :headers="headers"
-            :data="uploadData"
-            :show-upload-list="false"
-            :before-upload="beforeUpload"
-            @success="handleChange"
-        >
+        <Upload :disabled="!projectId" :action="onUploadFile" :accept="onFileAccept" :max-size="200">
           <Button :disabled="!projectId">
             <Space>
               <Icon class="flex text-base" type="cloud-upload"></Icon>
@@ -139,7 +113,7 @@ onMounted(onSearch);
         </Upload>
       </FormItem>
       <FormItem class="ml-3">
-        <Button @click="nweTextRource" :disabled="!projectId">
+        <Button @click="onCreateResource" :disabled="!projectId">
           <Space>
             <Icon class="flex text-base" type="plus"></Icon>
             <span>新增</span>
@@ -156,13 +130,18 @@ onMounted(onSearch);
            :bordered="true">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.key === 'action'">
-          <span class="inline-block">
-            <Icon class="text-xl text-primary cursor-pointer" type="edit-square"></Icon>
-          </span>
+          <Space>
+            <Button class="p-0" type="link" title="编辑" @click="onEditResource(record)">
+              <Icon class="text-xl" type="edit-square"></Icon>
+            </Button>
+            <Button class="p-0" type="link" title="删除" :danger="true" @click="onRemoveResource(record)">
+              <Icon class="text-xl" type="delete"></Icon>
+            </Button>
+          </Space>
         </template>
       </template>
     </Table>
-    <Page v-model:page="pageNumber" v-model:size="pageSize" :total="state.total" @click="changePage"></Page>
+    <Page v-model:page="pageNumber" v-model:size="pageSize" :total="state.total" @click="onChangePage"></Page>
   </div>
 
 </template>

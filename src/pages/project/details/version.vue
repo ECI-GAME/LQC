@@ -82,10 +82,10 @@ const onRemoveVersion = async function (data: ImageAlbum) {
         <UeProgress v-else-if="column.key === 'doneCnt'" :value="text" :total="record.totalCnt"></UeProgress>
         <template v-else-if="column.key === 'action'">
           <Space>
-            <Button class="p-0" type="link" title="编辑画册" @click="onUpdateVersion(record)">
+            <Button class="p-0" type="link" title="编辑" @click="onUpdateVersion(record)">
               <Icon class="text-xl" type="edit-square"></Icon>
             </Button>
-            <Button class="p-0" type="link" title="删除画册" :danger="true" @click="onRemoveVersion(record)">
+            <Button class="p-0" type="link" title="删除" :danger="true" @click="onRemoveVersion(record)">
               <Icon class="text-xl" type="delete"></Icon>
             </Button>
           </Space>

@@ -30,7 +30,7 @@ export interface VersionData {
   versionStatus: number;
 }
 
-export interface ProjectImage extends VersionData{
+export interface ProjectImage extends VersionData {
   fileId: number;
   filePath: string;
   fileName: string;
@@ -41,4 +41,18 @@ export interface ProjectImage extends VersionData{
   originalImagePath: string;
 
   [key: string]: string | number;
+}
+
+
+export interface TextResource {
+  id: number;
+  typeName: string;
+  typeCode: string | number;
+  originalText: string;
+  translationText: string;
+  remark: string;
+  versionId?: string | number;
+  versionName?: string;
+  projectId: number | string;
+  projectName: string;
 }

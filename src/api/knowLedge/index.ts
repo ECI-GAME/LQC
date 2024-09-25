@@ -1,9 +1,14 @@
-//知识库
+/**
+ * @file 知识库
+ * @author svon.me@gmail.com
+ **/
+
 import * as _ from "lodash-es";
 import Graphql from "../graphql";
-import {Gql, tryError} from "@js-lion/api";
+import {tryError} from "@js-lion/api";
 import {PageResult} from "src/utils/model";
-import safeGet from "@fengqiaogang/safe-get";
+
+import type {TextResource} from "src/types";
 
 export default class extends Graphql {
   /**
@@ -30,22 +35,17 @@ export default class extends Graphql {
    * @returns UserInfo
    */
   @tryError(new PageResult())
-  @Gql("/graphql")
-  async textList(pageNum: number, projectId: number | string, versionId: number | string = 0, searchValue: string = "", pageSize: number = 10): Promise<PageResult<object>> {
-    // 查询用户信息
-    const data: string = `{
-      getProjectTextResourcePage (input: { pageNum: ${pageNum},projectId: ${projectId},versionId:${versionId || 0},searchValue:"${searchValue}", pageSize: ${pageSize} }) {
-        code
-        rows
-        msg
-        total
-      }
-    }`;
-    const callback = function (res: object) {
-      return safeGet<object>(res, "getProjectTextResourcePage");
+  async textList(pageNum: number, projectId: number | string, versionId: number | string = 0, searchValue: string = "", pageSize: number = 10): Promise<PageResult<TextResource>> {
+    const input = {
+      pageNum: Number(pageNum),
+      pageSize: Number(pageSize),
+      projectId: Number(projectId),
+      versionId: versionId || 0,
+      searchValue: String(searchValue || "").trim(),
     }
-    // @ts-ignore
-    return {data, callback};
+    const keys = ["code", "rows", "msg", "total"];
+    const res = await this.graphQL<object>("getProjectTextResourcePage", [{input}], keys);
+    return new PageResult<TextResource>(res);
   }
 
 

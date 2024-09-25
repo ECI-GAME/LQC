@@ -6,7 +6,7 @@
 
 import {ref} from "vue"
 import FileBox from "./file.vue";
-import {onUploadFile} from "./config";
+import {onBeforeUploadFile, onUploadFile} from "./config";
 import {Space, Button} from "ant-design-vue";
 import {Icon} from "@ue/icon";
 
@@ -59,7 +59,11 @@ const props = defineProps({
   bucket: {
     type: String,
     required: true,
-  }
+  },
+  action: {
+    required: false,
+    type: Function
+  },
 })
 
 const fileRef = ref();
@@ -72,18 +76,26 @@ const onChange = function (file: File, progress: number, data?: Result) {
 const onUpload = async function (value: File[]) {
   $emit("update:loading", true);
   try {
-    const res: Result[] = await onUploadFile(props, value, onChange);
-    $emit("success", res);
+    // 校验文件大小与格式
+    await onBeforeUploadFile(props, value);
+    // 开始上传
+    if (props.action && typeof props.action === "function") {
+      await Promise.resolve(props.action(value));
+    } else {
+      const res: Result[] = await onUploadFile(props, value, onChange);
+      $emit("success", res);
+    }
   } catch (e) {
     // 异常
     $emit("abnormal", e);
+  } finally {
+    setTimeout(function () {
+      $emit("update:loading", false);
+      if (fileRef.value) {
+        fileRef.value.reset();
+      }
+    }, 300);
   }
-  setTimeout(function () {
-    $emit("update:loading", false);
-    if (fileRef.value) {
-      fileRef.value.reset();
-    }
-  }, 300);
 }
 
 const onClick = function () {

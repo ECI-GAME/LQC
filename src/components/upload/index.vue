@@ -70,7 +70,11 @@ const props = defineProps({
     type: Number,
     required: false,
     default: () => 0, // 0 表示无限制
-  }
+  },
+  action: {
+    required: false,
+    type: Function
+  },
 });
 
 const fileList = ref<FileData[]>([])
@@ -107,15 +111,18 @@ const onAbnormal = function (...args: any[]) {
 
 <template>
   <div>
-    <Upload
+    <Upload v-model:loading="status"
         :multiple="multiple"
         :accept="accept"
-        v-model:loading="status"
         :disabled="disabled"
         :drag="drag"
         :max-size="maxSize"
         :limit="limit"
-        :bucket="Bucket" @change="onProgress" @success="onSuccess" @abnormal="onAbnormal">
+        :action="action"
+        :bucket="Bucket"
+        @change="onProgress"
+        @success="onSuccess"
+        @abnormal="onAbnormal">
       <slot>
         <span class="flex items-center cursor-pointer">
           <Icon class="flex text-xl" type="cloud-upload"></Icon>

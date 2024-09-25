@@ -6,7 +6,7 @@
 import Graphql from "../graphql";
 import cache from "src/utils/cache";
 import {$error, $success} from "@ue/message";
-import {API, Delete, Get, Gql, post, tryError, validate, required} from "@js-lion/api";
+import {API, Delete, Get, Post, Put, Gql, tryError, validate, required} from "@js-lion/api";
 
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
@@ -60,7 +60,7 @@ export default class extends Graphql {
   @tryError(false)
   @$error()
   @$success("操作成功")
-  @post("/project")
+  @Post("/project")
   @validate
   addProject(data: object): Promise<boolean> {
     const callback = () => true;
@@ -72,7 +72,7 @@ export default class extends Graphql {
   @tryError(false)
   @$error()
   @$success("操作成功")
-  @post("/project/update")
+  @Post("/project/update")
   @validate
   updateProject(data: object): Promise<boolean> {
     const callback = () => true;
@@ -84,7 +84,7 @@ export default class extends Graphql {
   @tryError(false)
   @$error()
   @$success("操作成功")
-  @post("/project/methods/upSort")
+  @Post("/project/methods/upSort")
   @validate
   updateProMethSort(data: Array<Object>): Promise<boolean> {
     // @ts-ignore
@@ -118,7 +118,7 @@ export default class extends Graphql {
   @tryError(false)
   @$error()
   @$success("操作成功")
-  @post("/project/task/person")
+  @Post("/project/task/person")
   @validate
   addProjectUserInfoBy(data: object): Promise<boolean> {
     const callback = () => true;
@@ -131,7 +131,7 @@ export default class extends Graphql {
   @tryError(false)
   @$error()
   @$success("操作成功")
-  @post("/project/methods")
+  @Post("/project/methods")
   @validate
   addProjecMethodInfoBy(data: object): Promise<boolean> {
     const callback = () => true;
@@ -259,7 +259,7 @@ export default class extends Graphql {
   @tryError(false)
   @$error()
   @$success("操作成功")
-  @post("system/psconfig/update")
+  @Post("system/psconfig/update")
   @validate
   updateProjectPSErrorData(data: PsConfig[]): Promise<boolean> {
     // @ts-ignore
@@ -286,7 +286,7 @@ export default class extends Graphql {
   @tryError(false)
   @$error()
   @$success("上传成功")
-  @post("/project/knowledge/upload")
+  @Post("/project/knowledge/upload")
   @validate
   addKnowLedgeInfo(data: object): Promise<boolean> {
     const callback = () => true;
@@ -296,7 +296,7 @@ export default class extends Graphql {
 
 
   //模板导出
-  @Get("project/text/export/textTmp")
+  @Get("/project/text/export/textTmp")
   @validate
   exportTextResource() {
 
@@ -310,19 +310,21 @@ export default class extends Graphql {
 
 
   //模板导入
-  @Get("project/text/upload/textResource")
+  @tryError()
+  @$error()
+  @$success("操作成功")
+  @Post("/project/text/upload/textResource")
   @validate
-  importTextResource(@required projectId: number) {
-    const params = {projectId};
+  importTextResource(@required data: object): Promise<boolean> {
     // @ts-ignore
-    return {params};
+    return {data};
   }
 
   //提交语言内容
   @tryError(false)
   @$error()
   @$success("操作成功")
-  @post("/project/text")
+  @Post("/project/text")
   @validate
   addTextReource(@required data: object): Promise<boolean> {
     const callback = () => true;
@@ -330,17 +332,40 @@ export default class extends Graphql {
     return {data, callback};
   }
 
+  //编辑语言内容
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
+  @Put("/project/text")
+  @validate
+  updateTextReource(@required data: object): Promise<boolean> {
+    const callback = () => true;
+    // @ts-ignore
+    return {data, callback};
+  }
+
+  //删除语言内容
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
+  @Delete("/project/text/:id")
+  @validate
+  removeTextReource(@required id: string | number): Promise<boolean> {
+    const params = {id};
+    const callback = () => true;
+    // @ts-ignore
+    return {params, callback};
+  }
+
   //提交语言内容
   @tryError(false)
   @$error()
   @$success("操作成功")
-  @post("/system/emp/add/project/participants")
+  @Post("/system/emp/add/project/participants")
   @validate
   invitePerson(@required data: object): Promise<boolean> {
     const callback = () => true;
     // @ts-ignore
     return {data, callback};
   }
-
-
 }

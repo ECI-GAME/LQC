@@ -1,5 +1,6 @@
 import {ref} from "vue";
 import {useRoute} from "vue-router";
+import * as message from "@ue/message";
 
 class FormState {
   searchValue?: string;
@@ -27,6 +28,18 @@ export const useCommon = function () {
     fromData
   };
 }
+
+// 文件格式校验
+export const onFileAccept = (file: File) => {
+  if (file.name) {
+    const reg = /\.xlsx$/i;
+    if (reg.test(file.name)) {
+      return true;
+    }
+  }
+  message.error('仅支持xlsx格式文件上传!');
+  return false
+};
 
 
 export const fileColumns = [

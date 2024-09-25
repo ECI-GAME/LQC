@@ -57,7 +57,7 @@ const onCreateVersion = async function () {
             <Button type="primary">
               <Space>
                 <Icon class="flex text-base" type="mr"/>
-                <span>错误类型配置</span>
+                <span>节点配置页面</span>
               </Space>
             </Button>
           </RouterLink>

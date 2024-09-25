@@ -27,7 +27,7 @@ export const getAcceptValue = function (value: string | AcceptFun) {
 }
 
 // 上传文件
-export const onUploadFile = async function (config: Config, files: File[], onChange: ChangeCallback) {
+export const onBeforeUploadFile = async function (config: Config, files: File[]) {
   if (!config.bucket) {
     return Promise.reject({type: "bucket"});
   }
@@ -64,9 +64,11 @@ export const onUploadFile = async function (config: Config, files: File[], onCha
       }
     }
   }
+}
 
-  // 文件开始上传
+export const onUploadFile = function (config: Config, files: File[], onChange: ChangeCallback) {
+// 文件开始上传
   const client = new S3Client(config.bucket, files);
   client.on(onChange);
-  return await client.start();
+  return client.start();
 }
