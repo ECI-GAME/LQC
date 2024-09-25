@@ -49,7 +49,7 @@ const columns = [
   {title: "处理人", dataIndex: 'handlerName', key: 'handlerName', align: "center"},
   {title: "是否已完成", dataIndex: 'isFinish', key: 'isFinish', align: "center"},
   {title: "最近处理时间", dataIndex: 'dealTime', key: 'dealTime', align: "center"},
-  {title: "操作", dataIndex: 'id', key: 'action', align: "center", width: 180},
+  {title: "操作", dataIndex: 'imageId', key: 'action', align: "center", width: 180},
 ];
 
 const getKnowledgeUrl = function () {
@@ -108,7 +108,11 @@ const onSave = function (data: object) {
           <template v-else-if="column.key === 'action'">
             <Space>
               <!--图片预览下载-->
-              <ImagePreview class="flex" :value="text" :id="text" :type="record.imageStatus">
+              <ImagePreview class="flex"
+                            :value="text"
+                            :id="text"
+                            :type="record.imageStatus"
+                            :query="{ download: true }">
                 <template #default="data">
                   <Button type="primary" size="small" :disabled="data.disabled" @click="data.click">
                     <Space :size="4">

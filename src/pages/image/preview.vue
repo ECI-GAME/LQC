@@ -17,13 +17,17 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  query: {
+    type: Object,
+    required: false,
+  },
 });
 
 const onOpenImage = async function () {
   let src: string | undefined;
   const type = safeGet<string>(ImageNodeType, props.type) || props.type;
   if (type) {
-    const value = await api.task.getImageValue(props.id, type);
+    const value = await api.task.getImageValue(props.id, type, props.query || {});
     src = preview(value);
   }
   if (src) {

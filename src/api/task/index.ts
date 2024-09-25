@@ -201,8 +201,8 @@ export default class extends GraphQL {
   @$error()
   @cache(1000 * 5)
   @Get("/project/image/relation/file/getComparePicture")
-  getImageValue(@required imageId: string | number, @required imageType: string | number): Promise<string | undefined> {
-    const params = {id: imageId, type: imageType};
+  getImageValue(@required imageId: string | number, @required imageType: string | number, query: object = {}): Promise<string | undefined> {
+    const params = {id: imageId, type: imageType, ...query};
     const callback = (value: object) => {
       const src = safeGet<string>(value, "path");
       if (src) {
