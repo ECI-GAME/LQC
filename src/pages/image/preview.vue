@@ -35,11 +35,15 @@ const onOpenImage = async function () {
 
 <template>
   <div>
-    <Button v-if="value && props.type" type="link" @click="onOpenImage">
-      <slot>预览</slot>
-    </Button>
-    <Button v-else type="link" :disabled="true">
-      <slot>待生成</slot>
-    </Button>
+    <template v-if="value && props.type">
+      <slot :click="onOpenImage" text="预览" :disabled="false">
+        <Button type="link" @click="onOpenImage">预览</Button>
+      </slot>
+    </template>
+    <template v-else>
+      <slot :click="onOpenImage" text="待生成" :disabled="true">
+        <Button type="link" @click="onOpenImage" :disabled="true">待生成</Button>
+      </slot>
+    </template>
   </div>
 </template>

@@ -5,6 +5,7 @@
  */
 
 import api from "src/api";
+import * as _ from "lodash-es";
 import * as model from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 
@@ -13,7 +14,7 @@ import type {DictItem} from "src/types";
 const props = defineProps({
   type: {
     type: String,
-    required: true,
+    required: false,
   },
   value: {
     type: [String, Number],
@@ -26,10 +27,25 @@ const props = defineProps({
   name: {
     type: String,
     required: false,
-  }
+  },
+  // 数据列表
+  options: {
+    type: Array,
+    required: false,
+  },
+  fieldNames: {
+    type: Object,
+    required: false,
+    default() {
+      return {label: "dictLabel", value: "dictValue"};
+    }
+  },
 });
 
 const {state} = model.list<DictItem>(function () {
+  if (props.options && _.size(props.options) > 0) {
+    return new model.PageResult<DictItem>(props.options);
+  }
   if (props.type) {
     return api.system.getDictData<DictItem>(props.type);
   }
@@ -40,12 +56,13 @@ const {state} = model.list<DictItem>(function () {
 //数据匹配
 const pickValue = function (value?: string | number) {
   let res: string | number | undefined;
-  const name = props.name || "dictValue";
+  const name = props.name || safeGet<string>(props.fieldNames, "value", "dictValue");
   if (name && value) {
     for (const item of state.value.results) {
       const text = safeGet<string | number>(item, name);
       if (String(text) === String(value)) {
-        res = item.dictLabel;
+        const key = safeGet<string>(props.fieldNames, "label") || "dictLabel";
+        res = safeGet<string>(item, key);
         break;
       }
     }

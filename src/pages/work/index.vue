@@ -9,13 +9,13 @@ import api from "src/api";
 import Switch from "./switch.vue";
 import BigNumber from "bignumber.js";
 import {TaskStatus} from "src/types";
-import * as message from "@ue/message";
 import Record from "./record/index.vue";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
 import {useRoute, useRouter} from "vue-router";
 import RegisterWord from "./register/word.vue";
 import Tab from "src/components/tab/index.vue";
+import * as work from "src/utils/work/common";
 import RegisterComment from "./register/comment.vue";
 import Screen from "src/components/screen/index.vue";
 import Preview from "src/components/preview/index.vue";
@@ -26,11 +26,7 @@ import {filterSuccess, pickImage, RecordTabType} from "./config";
 import {DotDataType, DotData} from "src/components/preview/config";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
 
-
 import type {ImageData, TaskData, Project} from "src/types";
-import Authorization from "src/libs/http/config/authorization";
-import safeGet from "@fengqiaogang/safe-get";
-import {API_BASE, TOKEN_KEY, TOKEN_NAME} from "src/config";
 
 
 const previewRef = ref();
@@ -182,29 +178,10 @@ const onSubmit = async function () {
   }
 }
 
-
-const downTxt = function () {
-  const auth = Authorization(TOKEN_KEY, TOKEN_NAME);
-  const headers = new Headers();
-  headers.set(TOKEN_NAME, safeGet<string>(auth, TOKEN_NAME)!);
-  const url = `${API_BASE}project/image/translations/export?taskId=` + route.params.taskId;
-  fetch(url, {method: 'POST', headers}).then(response => {
-    if (response.ok) {
-      return response.blob(); // 获取文件数据
-    }
-    return Promise.reject(new Error());
-  }).then(blob => {
-    if (blob) {
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = 'data.xlsx';  // 指定下载文件名
-      link.click();
-    }
-  }).catch(error => {
-    message.error("导出时出错");
-  });
+// 文本导出
+const onDownloadText = function () {
+  work.onSave(route.params.taskId as string);
 }
-
 
 const onClickImage = function (e: Event, data: { x: number, y: number, width: number, height: number }) {
   dotAddTempValue.value = new DotData(
@@ -243,7 +220,7 @@ const calcDotValue = function (data: DotData): DotData {
         <!-- 右侧操作按钮 -->
         <template #operate="{ task }">
           <Space>
-            <Button @click="downTxt">文本导出</Button>
+            <Button @click="onDownloadText">文本导出</Button>
             <!--操作记录-->
             <TaskLog :task-id="taskInfo.id"></TaskLog>
             <a :href="getKnowledgeUrl()" target="_blank">

@@ -40,7 +40,7 @@ export default class extends GraphQL {
    **/
   @tryError(false)
   @message.$error()
-  @message.$success("已保存")
+  @message.$success("操作成功")
   @Put("/project/task/relations")
   @validate
   onSave(@required workId: string | number): Promise<boolean> {

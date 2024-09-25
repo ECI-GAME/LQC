@@ -12,6 +12,7 @@ import {Icon} from "@ue/icon";
 import Comment from "./comment.vue";
 import sure from "src/utils/tips/sure";
 import safeGet from "@fengqiaogang/safe-get";
+import * as work from "src/utils/work/common";
 import {ElButton as Button} from "element-plus";
 import {RecordTabType, useCreateBy} from "../config";
 import {Space, Collapse, CollapsePanel} from "ant-design-vue";
@@ -67,11 +68,8 @@ const onRemoveDetail = async function (data: DotData) {
   }
 }
 
-const onSave = async function () {
-  const status = await api.work.onSave(props.workId);
-  if (status) {
-    onUpdate();
-  }
+const onSave = function () {
+  work.onSave(props.workId, onUpdate);
 }
 
 const onSort = async function (data: DotData, index: number) {
