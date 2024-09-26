@@ -3,9 +3,10 @@
  * @author svon.me@gmail.com
  */
 
+import * as _ from "lodash-es";
 import {defineStore} from "pinia";
-import {Result} from "src/libs/upload/util/upload/res";
 import {filePath} from "src/libs/upload/util/upload/config";
+import {Result, Status} from "src/libs/upload/util/upload/res";
 
 interface UploadData extends Result {
   progress: number;
@@ -68,6 +69,20 @@ export const uploadStore = defineStore("upload", {
       const map: Log = {...this.map, [key]: data};
       const status = this.status === 0 ? 2 : this.status;
       this.$patch({status, map});
+    },
+    clear() {
+      let size = 0;
+      const map: Log = {};
+      _.each(this.map, function (item: UploadData, key: string) {
+        if (item.status !== Status.complete) {
+          map[key] = item;
+          size += 1;
+        }
+      });
+      this.map = {...map};
+      if (size < 1) {
+        this.status = 0;
+      }
     },
     hidden() {
       if (this.status !== 0) {

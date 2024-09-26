@@ -5,10 +5,10 @@
  */
 
 import {ref} from "vue"
-import FileBox from "./file.vue";
-import {onBeforeUploadFile, onUploadFile} from "./config";
-import {Space, Button} from "ant-design-vue";
 import {Icon} from "@ue/icon";
+import FileBox from "./file.vue";
+import {Space, Button} from "ant-design-vue";
+import {onBeforeUploadFile, onUploadFile} from "./config";
 
 import type {PropType} from "vue";
 import type {AcceptFun} from "./accept";
