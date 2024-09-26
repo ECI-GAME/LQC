@@ -58,23 +58,23 @@ export const onRemove = async function (data: object) {
 
 export const fileColumns = [
   {title: "关联项目", dataIndex: 'projectName', key: 'projectName'},
-  // {title: "关联版本", dataIndex: 'versionName', key: 'versionName'},
+  {title: "关联画册", dataIndex: 'versionName', key: 'versionName', align: "center"},
   {title: "文件名称", dataIndex: 'fileName', key: 'fileName'},
-  {title: "文件大小", dataIndex: 'fileSize', key: 'fileSize'},
-  {title: "文件类型", dataIndex: 'fileType', key: 'fileType', align: "center"},
-  {title: "创建人", dataIndex: 'createByName', key: 'createByName', align: "center"},
+  {title: "文件大小", dataIndex: 'fileSize', key: 'fileSize', width: 100},
+  {title: "文件类型", dataIndex: 'fileType', key: 'fileType', align: "center", width: 100},
+  {title: "创建人", dataIndex: 'createByName', key: 'createByName', align: "center", width: 100},
   {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
   {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
 ];
 
 export const textColumns = [
   {title: "关联项目", dataIndex: 'projectName', key: 'projectName'},
-  // {title: "关联版本", dataIndex: 'versionName', key: 'versionName'},
+  {title: "关联画册", dataIndex: 'versionName', key: 'versionName', align: "center"},
   {title: "原文", dataIndex: 'originalText', key: 'originalText'},
   {title: "建议译文", dataIndex: 'translationText', key: 'translationText'},
-  {title: " 类别", dataIndex: 'typeName', key: 'textName'},
-  {title: " 备注", dataIndex: 'remark', key: 'remark'},
-  {title: "创建人", dataIndex: 'createBy', key: 'createBy', align: "center"},
+  {title: " 备注", dataIndex: 'remark', key: 'remark', align: "left"},
+  {title: " 类别", dataIndex: 'typeName', key: 'textName', align: "center", width: 100},
+  {title: "创建人", dataIndex: 'createBy', key: 'createBy', align: "center", width: 100},
   {title: "创建时间", dataIndex: 'createTime', key: 'createTime', align: "center"},
   {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
 ];

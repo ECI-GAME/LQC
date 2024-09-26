@@ -109,6 +109,7 @@ onMounted(onSearch);
             </Button>
           </Space>
         </template>
+        <template v-else>{{ text || "--" }}</template>
       </template>
     </Table>
     <Pagination v-model:page="pageNumber" v-model:size="pageSize" :total="state.total" @click="changePage"></Pagination>
