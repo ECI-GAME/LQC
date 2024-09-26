@@ -3,8 +3,9 @@ import {ref} from 'vue';
 import api from "src/api";
 import * as _ from "lodash-es";
 import * as model from "src/utils/model";
-import Upload from "src/components/upload/index.vue";
 import {checkFileImage} from "src/utils/accpet";
+import Upload from "src/components/upload/index.vue";
+import {initSelectedList, autoSelectedList, getAllSelectList} from "./common";
 import {Image, Space, Checkbox, CheckboxGroup, Divider, Button, message} from "ant-design-vue";
 
 import type {PropType} from "vue";
@@ -35,11 +36,8 @@ const props = defineProps({
 
 const checkAll = ref<boolean>(false);
 const indeterminate = ref<boolean>(false);
-const imageIds = ref<Array<string | number>>(props.value || []);
-
-const isCheckedImage = function (taskId: string | number) {
-  return !!(taskId && props.taskId && String(taskId) === String(props.taskId));
-}
+const imageIds = ref<Array<string | number>>([]);
+const imageAllList = ref<Array<string | number>>([]);
 
 const {state: info} = model.result<VersionInfo>(function () {
   if (props.projectNum) {
@@ -51,52 +49,40 @@ const {state: info} = model.result<VersionInfo>(function () {
 
 const {state: list, execute: reLoad} = model.list<ProjectImage>(async function () {
   const res = await api.version.geVersionImageById<ProjectImage>(props.versionId);
-  const value = _.map(res.results, function (item: ProjectImage) {
-    if (isCheckedImage(item.taskId)) {
-      return item.id;
-    }
-  });
-  const tmp = _.compact(value)
-  imageIds.value = tmp;
-  indeterminate.value = tmp.length > 0;
+  // 根据 taskID 和 默认的 props.value 筛选需要默认选中的数据
+  const all = getAllSelectList(res.results, props.taskId);
+  const value = initSelectedList(res.results, props.value, props.taskId);
+  imageIds.value = value;
+  imageAllList.value = all;
+  if (all.length === value.length) {
+    checkAll.value = true;
+    indeterminate.value = false;
+  } else if (all.length > 0) {
+    checkAll.value = false;
+    indeterminate.value = true;
+  } else {
+    checkAll.value = false;
+    indeterminate.value = false;
+  }
   return res;
 }, void 0, true);
-
-const getAllImage = function () {
-  const array: Array<string | number> = [];
-  for (const item of list.value.results) {
-    if (item.taskId) {
-      if (isCheckedImage(item.taskId)) {
-        array.push(item.id);
-      }
-    } else {
-      array.push(item.id);
-    }
-  }
-  return array;
-}
 
 
 const onCheckAllChange = () => {
   let value: Array<string | number | undefined> = [];
   if (checkAll.value) {
-    value = getAllImage();
+    value = imageAllList.value;
     indeterminate.value = false;
   } else {
-    for (const item of list.value.results) {
-      if (item.taskId && isCheckedImage(item.taskId)) {
-        value.push(item.id);
-      }
-    }
     indeterminate.value = value.length > 0;
+    value = autoSelectedList(list.value.results, props.taskId);
   }
   imageIds.value = _.compact(value);
   $emit("update:value", value);
 };
 
 const onChangeValue = function (value: Array<string | number>) {
-  const images = getAllImage();
-  if (value.length > 0 && value.length === images.length) {
+  if (value.length > 0 && value.length === imageAllList.value.length) {
     checkAll.value = true;
     indeterminate.value = false;
   } else if (value.length > 0) {
@@ -160,19 +146,21 @@ defineExpose({onSubmit: onSave, getList: () => list.value.results});
       </Upload>
     </div>
     <Divider class="my-3"/>
-    <CheckboxGroup class="block clearfix cursor-default" v-model:value="imageIds" @change="onChangeValue">
-      <div class="float-left ml-3 mb-3 w-25 truncate" v-for="item in list.results" :key="item.id">
-        <div class="h-40 rounded-md overflow-hidden text-center" :title="item.imageName">
-          <Image class="object-cover" :src="item.originalImagePath" height="100%"/>
+    <div class="max-h-100 overflow-auto mb-3">
+      <CheckboxGroup class="block clearfix cursor-default" v-model:value="imageIds" @change="onChangeValue">
+        <div class="float-left ml-3 mb-3 w-25 truncate" v-for="item in list.results" :key="item.id">
+          <div class="h-40 rounded-md overflow-hidden text-center" :title="item.imageName">
+            <Image class="object-cover" :src="item.originalImagePath" height="100%"/>
+          </div>
+          <template v-if="item.taskId">
+            <Checkbox class="mt-2 select-none" :value="item.id" :disabled="true">{{ item.imageName }}</Checkbox>
+          </template>
+          <template v-else>
+            <Checkbox class="mt-2 select-none" :value="item.id">{{ item.imageName }}</Checkbox>
+          </template>
         </div>
-        <template v-if="item.taskId">
-          <Checkbox class="mt-2 select-none" :value="item.id" :disabled="true">{{ item.imageName }}</Checkbox>
-        </template>
-        <template v-else>
-          <Checkbox class="mt-2 select-none" :value="item.id">{{ item.imageName }}</Checkbox>
-        </template>
-      </div>
-    </CheckboxGroup>
+      </CheckboxGroup>
+    </div>
     <div class="px-3">
       <slot name="buttons">
         <div class="text-right">
