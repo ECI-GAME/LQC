@@ -5,17 +5,17 @@ import Tips from "./tips.vue";
 import * as _ from "lodash-es";
 import type {PropType} from "vue";
 import {ref, toRaw} from "vue";
-import {useValidate} from "@ue/form";
 import Textarea from "./textarea.vue";
-import {ElImage as Image, ElLoading} from 'element-plus';
 import Cropper from "src/utils/cropper";
-import * as ImageUtil from "src/utils/image";
 import {basename} from "src/utils/image";
+import {useValidate, rules} from "@ue/form";
+import * as ImageUtil from "src/utils/image";
 import Upload from "src/utils/upload/file";
 import safeGet from "@fengqiaogang/safe-get";
 import {preview} from "src/utils/brower/image";
 import {format} from "src/utils/upload/common";
 import {changeTranslationList} from "../config";
+import {ElImage as Image, ElLoading} from 'element-plus';
 import {DotData, DotDataType, DotMatchType} from "src/components/preview/config";
 import {Button, Card, Form, FormItem, Select, SelectOption, Space, Spin} from "ant-design-vue";
 import type {ImageData} from "src/types";
@@ -161,7 +161,7 @@ const onOCR = async function (dot: DotData) {
       const upload = new Upload([img]);
       const [data, text] = await Promise.all([
         upload.start(),
-        api.system.ocr(img, props.readOrder,props.language)
+        api.system.ocr(img, props.readOrder, props.language)
       ]);
       if (data && data[0]) {
         const image = format(data[0]);
@@ -196,8 +196,8 @@ const onScanWord = function () {
 
 <template>
   <Form layout="vertical" ref="formRef" :model="model">
-    <FormItem label="类别">
-      <Select v-model:value="model.imageFlag">
+    <FormItem label="类别" name="imageFlag" :rules="rules.text('请选择类别！')">
+      <Select v-model:value="model.imageFlag" placeholder="请选择类别">
         <SelectOption value="1">框内</SelectOption>
         <SelectOption value="2">框外</SelectOption>
       </Select>
@@ -224,7 +224,7 @@ const onScanWord = function () {
       </div>
     </FormItem>
 
-    <FormItem class="deep-[label]:w-full">
+    <FormItem class="deep-[label]:w-full" name="originalText" :rules="rules.text('请填写原文！')">
       <template #label>
         <div class="w-full flex items-center justify-between">
           <div>
@@ -245,7 +245,7 @@ const onScanWord = function () {
                 v-model:text="model.originalText"
                 @translation="onChangeTranslationList"></Textarea>
     </FormItem>
-    <FormItem label="译文">
+    <FormItem label="译文" name="translatedText" :rules="rules.text('请填写译文！')">
         <Textarea :key="translateUuid"
                   :project-id="projectId"
                   v-model:html="model.translatedHtml"

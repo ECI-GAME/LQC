@@ -2,7 +2,7 @@
 import {Icon} from "@ue/icon";
 import {RouterLink} from "vue-router";
 import {Button, Space} from "ant-design-vue";
-import {getPrevRoute, getNextRoute} from "./config";
+import {getPrevRoute, getNextRoute, indexOfImage} from "./config";
 
 import type {PropType} from "vue";
 import type {ImageData} from "src/types/image";
@@ -47,5 +47,6 @@ defineProps({
         <Icon class="text-xl flex" type="caret-right"></Icon>
       </Button>
     </div>
+    <span class="text-base">{{ indexOfImage(list, current) + 1 }}/{{ list.length }}</span>
   </Space>
 </template>

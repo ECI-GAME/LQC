@@ -43,6 +43,11 @@ const props = defineProps({
   imageStatus: {
     type: [String, Number],
     required: false,
+  },
+  // 判断当前图片是否已保存
+  isFinish: {
+    type: [String, Number],
+    required: false,
   }
 });
 
@@ -167,7 +172,10 @@ const getTitleColor = function (data: DotData) {
     </Collapse>
     <slot>
       <div v-if="list.length > 0 && active === RecordTabType.Word" class="mt-2 first:mt-0 sticky bottom-0">
-        <Button class="w-full" type="primary" @click="onSave">保存</Button>
+        <Button class="w-full" type="primary" @click="onSave">
+          <template v-if="!isFinish || Number(isFinish) === 0">保存</template>
+          <template v-else>更新</template>
+        </Button>
       </div>
     </slot>
   </div>

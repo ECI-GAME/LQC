@@ -22,6 +22,7 @@ import Preview from "src/components/preview/index.vue";
 import TaskTitle from "src/components/task/title.vue";
 import Loading from "src/components/loading/index.vue";
 import TaskLog from "src/components/task/log/button.vue";
+import UeProgress from "src/components/ue/progress.vue";
 import {filterSuccess, pickImage, RecordTabType} from "./config";
 import {DotDataType, DotData} from "src/components/preview/config";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
@@ -33,8 +34,8 @@ const previewRef = ref();
 const route = useRoute();
 const router = useRouter();
 const recordActive = ref<string>();
-const recordTabs = ref<string[]>([RecordTabType.Word, RecordTabType.Comment]);
 const dotAddTempValue = ref<DotData>();
+const recordTabs = ref<string[]>([RecordTabType.Word, RecordTabType.Comment]);
 
 
 const currentFile = ref<ImageData>();
@@ -216,7 +217,9 @@ const calcDotValue = function (data: DotData): DotData {
   <Layout class="!p-0 h-screen">
     <LayoutHeader class="p-2 h-[initial] leading-[initial] bg-white min-h-12">
       <TaskTitle v-if="taskInfo && taskInfo.id" :task-id="taskInfo.id" :data="taskInfo">
-        <span>[{{ filterSuccess(state.results).length }} / {{ state.total }}]</span>
+        <div class="w-50">
+          <UeProgress :value="filterSuccess(state.results).length" :total="state.total"></UeProgress>
+        </div>
         <!-- 右侧操作按钮 -->
         <template #operate="{ task }">
           <Space>
@@ -277,7 +280,8 @@ const calcDotValue = function (data: DotData): DotData {
                       :projectId="taskInfo.projectId"
                       :key="recordActive"
                       :list="dots.results"
-                      :image-status="currentFile.imageStatus">
+                      :image-status="currentFile.imageStatus"
+                      :is-finish="currentFile.isFinish">
                 <Card v-if="dotAddTempValue" class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small">
                   <RegisterComment v-if="recordActive === RecordTabType.Comment"
                                    :data="dotAddTempValue"
@@ -288,7 +292,7 @@ const calcDotValue = function (data: DotData): DotData {
                   <RegisterWord v-else-if="currentFile"
                                 :data="calcDotValue(dotAddTempValue)"
                                 :file="currentFile"
-                                :language = "taskInfo.sourceLanguage"
+                                :language="taskInfo.sourceLanguage"
                                 :projectId="taskInfo.projectId"
                                 :read-order="projectInfo.readOrder"
                                 @save="onUpDataDots"
