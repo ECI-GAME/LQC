@@ -77,10 +77,18 @@ const onSort = async function (data: DotData, index: number) {
     return false;
   }
   const prev = props.list[index - 1];
-  const value = new Map<string | number, number>();
-  value.set(data.id, safeGet<number>(data, "orderCnt")! - 1);
-  value.set(prev.id, safeGet<number>(prev, "orderCnt")! + 1);
-  const status = await api.work.word.sort(Object.fromEntries(value));
+  const sort = new Map<string | number, number>();
+  for (let i = 0, size = props.list.length; i < size; i++) {
+    const item = props.list[i];
+    sort.set(item.id, i + 1);
+  }
+  if (sort.get(prev.id)) {
+    sort.set(prev.id, sort.get(prev.id)! + 1);
+  }
+  if (sort.get(data.id)) {
+    sort.set(data.id, sort.get(prev.id)! - 1);
+  }
+  const status = await api.work.word.sort(Object.fromEntries(sort));
   if (status) {
     onUpdate();
   }

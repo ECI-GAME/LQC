@@ -18,10 +18,14 @@ const format2 = "YYYY-MM-DD hh:mm:ss";
 
 <template>
   <div class="flex items-center w-full">
-    <span class="ml-1 first:ml-0 text-lg">{{ data.handlerName }}</span>
-    <span class="ml-1 first:ml-0 text-primary">[{{ data.nodeName }}]</span>
-    <span class="ml-1 first:ml-0">[{{ data.taskName }}]</span>
-    <span class="ml-1 first:ml-0">[{{ data.remarks }}]</span>
-    <span class="ml-auto text-black text-opacity-40">{{ moment(data.startTime, format1).format(format2) }}</span>
+    <div class="flex-1 whitespace-pre-wrap">
+      <span class="text-lg whitespace-normal mr-1">{{ data.handlerName }}</span>
+      <span class="text-primary whitespace-normal mr-1">[{{ data.nodeName }}]</span>
+      <span class="whitespace-normal mr-1">[{{ data.taskName }}]</span>
+      <span class="inline">[{{ data.remarks }}]</span>
+    </div>
+    <div class="ml-1 text-black text-opacity-40">
+      <span class="whitespace-normal">{{ moment(data.startTime, format1).format(format2) }}</span>
+    </div>
   </div>
 </template>

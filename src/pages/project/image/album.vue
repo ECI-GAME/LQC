@@ -8,9 +8,10 @@
 import * as _ from "lodash-es";
 import {ref, toRaw} from "vue";
 import {useValidate, rules} from "@ue/form";
+import {checkFileImage} from "src/utils/accpet";
 import Upload from "src/components/upload/index.vue";
-import UploadPreview from "src/components/upload/preview.vue";
 import LanguagePair from "src/components/language/pair.vue";
+import UploadPreview from "src/components/upload/preview.vue";
 import {Input, DatePicker, Form, FormItem, Textarea, Button, Space} from "ant-design-vue";
 
 import type {PropType} from "vue";
@@ -34,8 +35,6 @@ const dateFormat: string = "YYYY-MM-DD";
 const {formRef, validate} = useValidate();
 const data = ref<ImageAlbum>({...props.value});
 
-console.log(data);
-
 const onCancel = function (e: Event) {
   $emit("cancel", e);
 }
@@ -56,6 +55,7 @@ const onSubmit = async function (e: Event) {
     $emit("submit", e, res);
   }
 }
+
 </script>
 
 <template>
@@ -68,19 +68,30 @@ const onSubmit = async function (e: Event) {
         <LanguagePair :input="true" :value="data.languagePair"/>
       </FormItem>
       <FormItem label="计划开始时间" name="startDate" :rules="rules.text('请选择开始时间!')">
-        <DatePicker class="w-full" v-model:value="data.startDate" placeholder="开始时间" mode="date"
-                    :format="dateFormat" :value-format="dateFormat"/>
+        <DatePicker class="w-full"
+                    v-model:value="data.startDate"
+                    placeholder="开始时间" mode="date"
+                    :format="dateFormat"
+                    :value-format="dateFormat"/>
       </FormItem>
       <FormItem label="计划完成时间" name="endDate" :rules="rules.text('请选择结束时间!')">
-        <DatePicker class="w-full" v-model:value="data.endDate" placeholder="结束时间" mode="date" :format="dateFormat"
+        <DatePicker class="w-full"
+                    v-model:value="data.endDate"
+                    placeholder="结束时间"
+                    mode="date"
+                    :format="dateFormat"
                     :value-format="dateFormat"/>
       </FormItem>
       <FormItem class="col-span-2 mb-0" label="备注" name="remark">
-        <Textarea class="w-full deep-[textarea]:resize-none" v-model:value="data.remark" :rows="4" :maxlength="500" :show-count="true"
+        <Textarea class="w-full deep-[textarea]:resize-none"
+                  v-model:value="data.remark"
+                  :rows="4"
+                  :maxlength="500"
+                  :show-count="true"
                   placeholder="请输入备注"/>
       </FormItem>
       <FormItem class="col-span-2" v-if="!data.id">
-        <Upload v-model:loading="uploadStatus" v-model:value="files">
+        <Upload v-model:loading="uploadStatus" v-model:value="files" :multiple="true" :accept="checkFileImage">
           <template #preview="{files, update}">
             <UploadPreview :list="files" @change="update"></UploadPreview>
           </template>
@@ -89,7 +100,7 @@ const onSubmit = async function (e: Event) {
     </Form>
     <div class="text-right">
       <Space>
-        <Button @click.stop="onCancel">取消</Button>
+        <Button @click="onCancel">取消</Button>
         <Button type="primary" :disabled="uploadStatus" @click="onSubmit">确认</Button>
       </Space>
     </div>

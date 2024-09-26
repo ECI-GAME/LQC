@@ -148,6 +148,7 @@ export default class extends Graphql {
   }
 
   /** 图片名称重名检查 */
+  @tryError(false)
   @$error()
   @validate
   async checkImage(@required versionId: number | string, @required fileName: string): Promise<boolean> {

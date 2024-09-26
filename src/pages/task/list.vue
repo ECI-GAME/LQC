@@ -64,19 +64,19 @@ const editFrom = async function (value: TaskData) {
   }
 }
 
-const changeHandlerName = function(param1:String,param2:String){
+const changeHandlerName = function (param1: String, param2: String) {
   if (param1 && param2) {
-      let param2Array = param2.split(',').map(item => item.trim());
+    let param2Array = param2.split(',').map(item => item.trim());
 
-      let combinedArray = [param1, ...param2Array];
+    let combinedArray = [param1, ...param2Array];
 
-      let uniqueArray = [...new Set(combinedArray)];
+    let uniqueArray = [...new Set(combinedArray)];
 
-      
-      return uniqueArray.join(';');
-    }
 
-    return param1 || param2 || '';
+    return uniqueArray.join(';');
+  }
+
+  return param1 || param2 || '';
 }
 
 onMounted(function () {
@@ -157,15 +157,15 @@ onMounted(function () {
           </template>
           <Dict v-else-if="column.key === 'taskStatus'" :type="TaskStatus" :value="text"></Dict>
           <Time v-else-if="column.key === 'time'" :value="text"></Time>
-          
           <template v-else-if="column.key === 'tags'">
-            
-            <Tags :value="changeHandlerName(record.handlerName,record.imgHandlerName)"> </Tags>
+            <Tags :value="changeHandlerName(record.handlerName, record.imgHandlerName)"></Tags>
           </template>
           <Progress v-else-if="column.key === 'progress'" :total="record.totalCnt" :value="record.doneCnt"/>
           <template v-else-if="column.key === 'action'">
             <Space class="text-xl text-primary">
+              <!--编辑任务-->
               <Icon class="cursor-pointer" type="edit-square" @click="editFrom(record)"></Icon>
+              <!--任务明细-->
               <RouterLink
                   :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }">
                 <Icon type="table"></Icon>

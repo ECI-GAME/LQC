@@ -10,6 +10,7 @@ import * as model from "src/utils/model";
 import {useCommon, onRemove} from "./common";
 import {ElImage as Image} from "element-plus";
 import {FileData} from "src/utils/upload/common";
+import {checkFileImage} from "src/utils/accpet";
 import Upload from "src/components/upload/index.vue";
 import Pagination from "src/components/page/index.vue";
 import {Form, FormItem, InputSearch, Button, Space, Card, Empty} from "ant-design-vue";
@@ -81,7 +82,7 @@ onMounted(onSearch);
                      class="w-100 deep-[.anticon-search]:flex"/>
       </FormItem>
       <FormItem>
-        <Upload :multiple="true" @success="onSuccess" accept="image/*" v-model:loading="isUploading">
+        <Upload :multiple="true" @success="onSuccess" :accept="checkFileImage" v-model:loading="isUploading">
           <Button :loading="isUploading">
             <Space>
               <Icon class="flex text-base" type="cloud-upload"></Icon>

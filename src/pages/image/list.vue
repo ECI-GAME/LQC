@@ -9,9 +9,10 @@ import api from "src/api";
 import {Icon} from "@ue/icon";
 import {columns} from "./config";
 import Preview from "./preview.vue";
-import Tags from "src/components/ue/tag.vue";
+import * as message from "@ue/message";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
+import Tags from "src/components/ue/tag.vue";
 import safeGet from "@fengqiaogang/safe-get";
 import {RouterLink, useRoute} from "vue-router";
 import Page from "src/components/page/index.vue";
@@ -19,7 +20,8 @@ import {FileData} from "src/utils/upload/common";
 import Dict from "src/components/dict/index.vue";
 import Select from "src/components/dict/select.vue";
 import Upload from "src/components/upload/index.vue";
-import {Table, Button, Card, Form, FormItem, Input, Space, message, Popconfirm} from "ant-design-vue";
+import {checkFileImage} from "src/utils/accpet";
+import {Table, Button, Card, Form, FormItem, Input, Space, Popconfirm} from "ant-design-vue";
 
 import type {Project} from "src/types";
 
@@ -78,11 +80,14 @@ const onUploadSuccess = async function (files: FileData[]) {
   }
 }
 
-// 检测文件石佛上传过
-const onFileAccept = function (file: File): boolean | Promise<boolean> {
-  const versionId = search.value.versionId;
-  if (versionId) {
-    return api.version.checkImage(versionId, file.name);
+// 检测文件是否上传过
+const onFileAccept = async function (file: File): Promise<boolean> {
+  const status = await checkFileImage(file);
+  if (status) {
+    const versionId = search.value.versionId;
+    if (versionId) {
+      return api.version.checkImage(versionId, file.name);
+    }
   }
   return false;
 }
@@ -103,7 +108,7 @@ const onReset = function () {
 const confirmDelete = async function (data: object) {
   const taskName = safeGet<string>(data, "taskName");
   if (taskName) {
-    message.warning('当前图片还有任务关联，请先取消关联关系!');
+    message.error('当前图片还有任务关联，请先取消关联关系!');
     return;
   }
   let status: boolean = false;
@@ -143,7 +148,9 @@ const getVersionList = async function () {
         <Form layout="inline">
           <FormItem label="画册">
             <div class="w-50">
-              <Select v-model:value="search.versionId" placeholder="请选择画册" :field-names="fieldNames"
+              <Select v-model:value="search.versionId"
+                      placeholder="请选择画册"
+                      :field-names="fieldNames"
                       :options="getVersionList"></Select>
             </div>
           </FormItem>
@@ -168,7 +175,10 @@ const getVersionList = async function () {
           </FormItem>
         </Form>
 
-        <Upload :multiple="true" :accept="onFileAccept" @success="onUploadSuccess" v-model:loading="isOnLoading"
+        <Upload :multiple="true"
+                :accept="onFileAccept"
+                @success="onUploadSuccess"
+                v-model:loading="isOnLoading"
                 :disabled="!project.projectNum">
           <Button type="primary" :loading="isOnLoading" :disabled="!search.versionId">
             <Space>

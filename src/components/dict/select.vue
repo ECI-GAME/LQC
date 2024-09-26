@@ -71,6 +71,10 @@ const data = computed({
   }
 });
 
+const filterProp = computed<string | undefined>(() => {
+  return safeGet<string>(props.fieldNames, "label");
+});
+
 const toOptions = function (list: object[]): object[] {
   // 判断是否油只读数据需要设置
   if (props.readonly && props.readonly.length > 0) {
@@ -88,6 +92,10 @@ const toOptions = function (list: object[]): object[] {
 </script>
 
 <template>
-  <Select class="w-full" v-model:value="data" :fieldNames="fieldNames" :options="toOptions(state.results)"
-          :disabled="disabled"></Select>
+  <Select class="w-full"
+          v-model:value="data"
+          :fieldNames="fieldNames"
+          :options="toOptions(state.results)"
+          :disabled="disabled"
+          :option-filter-prop="filterProp"></Select>
 </template>

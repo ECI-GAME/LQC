@@ -5,7 +5,7 @@
 
 export {default as S3} from "./util/upload/s3";
 export {Result, Status} from "./util/upload/res";
-
+export {default as accept} from "./components/accept";
 export {default as Upload} from "./components/upload.vue";
 
 export type {ChangeCallback} from "./util/upload/s3";

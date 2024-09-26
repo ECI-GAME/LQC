@@ -35,7 +35,7 @@ export const useColumns = function (projectId?: string | number) {
     {title: "处理人", dataIndex: 'handlerName', key: 'tags', align: "center", width: 180, minWidth: 140, maxWidth: 300},
     {title: "图片总量", dataIndex: 'totalCnt', key: 'totalCnt', align: "center"},
     {title: "创建时间", dataIndex: 'createTime', key: 'time', align: "center"},
-    {title: "更新时间", dataIndex: 'lastDealTime', key: 'time', align: "center"},
+    {title: "更新时间", dataIndex: 'updateTime', key: 'time', align: "center"},
     {title: "进度", dataIndex: 'doneCnt', key: 'progress', align: "center"},
     {title: "操作", dataIndex: 'action', key: 'action', align: "center"},
   );

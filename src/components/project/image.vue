@@ -4,6 +4,7 @@ import api from "src/api";
 import * as _ from "lodash-es";
 import * as model from "src/utils/model";
 import Upload from "src/components/upload/index.vue";
+import {checkFileImage} from "src/utils/accpet";
 import {Image, Space, Checkbox, CheckboxGroup, Divider, Button, message} from "ant-design-vue";
 
 import type {PropType} from "vue";
@@ -154,7 +155,7 @@ defineExpose({onSubmit: onSave, getList: () => list.value.results});
   <div class="py-3">
     <div class="flex items-center justify-between px-3">
       <Checkbox v-model:checked="checkAll" :indeterminate="indeterminate" @change="onCheckAllChange">全选</Checkbox>
-      <Upload :multiple="true" @success="onSuccess" v-model:loading="isOnloading">
+      <Upload :multiple="true" :accept="checkFileImage" @success="onSuccess" v-model:loading="isOnloading">
         <Button :loading="isOnloading">图片上传</Button>
       </Upload>
     </div>
