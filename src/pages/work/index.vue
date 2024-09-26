@@ -180,7 +180,7 @@ const onSubmit = async function () {
 
 // 文本导出
 const onDownloadText = function () {
-  work.onSave(route.params.taskId as string);
+  work.onDownloadText(route.params.taskId as string);
 }
 
 const onClickImage = function (e: Event, data: { x: number, y: number, width: number, height: number }) {
