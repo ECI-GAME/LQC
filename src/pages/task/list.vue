@@ -164,9 +164,9 @@ onMounted(function () {
           <template v-else-if="column.key === 'action'">
             <Space class="text-xl text-primary">
               <!--编辑任务-->
-              <Button type="link" class="p-0 m-0" :disabled="isLoading">
+              <Button type="link" class="p-0 m-0" :disabled="isLoading" @click="editFrom(record)">
                 <Space :size="4">
-                  <Icon class="flex text-lg" type="edit-square" @click="editFrom(record)"></Icon>
+                  <Icon class="flex text-lg" type="edit-square" ></Icon>
                   <span>编辑</span>
                 </Space>
               </Button>
