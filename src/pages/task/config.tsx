@@ -1,7 +1,7 @@
-import {ref} from "vue";
 import api from "src/api";
 import * as _ from "lodash-es";
 import {rules} from "@ue/form";
+import {ref, computed} from "vue";
 import * as modal from "@ue/modal";
 import * as model from "src/utils/model";
 import ImageShow from "./comp/image.vue";
@@ -10,7 +10,6 @@ import Dict from "src/components/dict/index.vue";
 import LanguagePair from "src/components/language/pair.vue";
 import Select from "src/components/dict/select.vue";
 import {Input, InputNumber, RangePicker, message} from "ant-design-vue";
-
 
 
 import type {ModalProps} from "@ue/modal";
@@ -153,7 +152,7 @@ const onUpdate = async function (formData: TaskData) {
 
 export const useTask = function () {
   const versionId = ref<string | number>()
-  const {state: persons, execute: onReloadPersons} = model.list<object>(async function () {
+  const {state: persons, execute: onReloadPersons, isLoading: personLoading} = model.list<object>(async function () {
     if (versionId.value) {
       const res = await api.task.getTaskInfoPersonById(versionId.value);
       return new model.PageResult<object>(res);
@@ -161,12 +160,16 @@ export const useTask = function () {
     return new model.PageResult<object>();
   }, void 0, !!versionId);
 
-  const {state: info, execute: onReloadInfo} = model.result<VersionInfo>(function () {
+  const {state: info, execute: onReloadInfo, isLoading: infoLoading} = model.result<VersionInfo>(function () {
     if (versionId.value) {
       return api.version.geVersionInfoById<VersionInfo>(versionId.value);
     }
     return {} as VersionInfo;
   }, {} as VersionInfo, !!versionId);
+
+  const isLoading = computed<boolean>(function () {
+    return personLoading.value ? infoLoading.value : false;
+  });
 
   const reload = function (version?: string | number) {
     if (version) {
@@ -246,7 +249,7 @@ export const useTask = function () {
       },
     });
   }
-  return {versionId, reload, create, edit};
+  return {isLoading, versionId, reload, create, edit};
 }
 
 

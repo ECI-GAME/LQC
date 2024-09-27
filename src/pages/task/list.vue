@@ -30,11 +30,11 @@ const TaskStatus = "comic_task_status";
 
 const projectId = computed<string>(() => route.params.projectId as string);
 
-const {versionId, create: onCreate, edit: onEdit, reload: onReload} = useTask();
+const {versionId, create: onCreate, edit: onEdit, reload: onReload, isLoading} = useTask();
 
 const columns = useColumns(projectId.value);
 // 任务列表
-const {state, execute: onLoad, isLoading} = model.list<TaskData>(function () {
+const {state, execute: onLoad, isReady} = model.list<TaskData>(function () {
   return api.task.list<TaskData>(pageNumber.value, versionId.value, pageSize.value, search.value);
 });
 
@@ -125,7 +125,7 @@ onMounted(function () {
 
     <Card class="mt-5" v-if="projectId">
       <Space size="large">
-        <Button @click="onCreateTask" type="primary">
+        <Button @click="onCreateTask" type="primary" :disabled="isLoading">
           <Space>
             <Icon class="flex text-base" type="plus"></Icon>
             <span>新建任务</span>
@@ -147,7 +147,7 @@ onMounted(function () {
     </Card>
 
     <Card class="mt-5">
-      <Table :data-source="state.results" :columns="columns" :bordered="true" :loading="isLoading" :pagination="false"
+      <Table :data-source="state.results" :columns="columns" :bordered="true" :loading="!isReady" :pagination="false"
              table-layout="auto">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'taskName'">
@@ -164,11 +164,20 @@ onMounted(function () {
           <template v-else-if="column.key === 'action'">
             <Space class="text-xl text-primary">
               <!--编辑任务-->
-              <Icon class="cursor-pointer" type="edit-square" @click="editFrom(record)"></Icon>
+              <Button type="link" class="p-0 m-0" :disabled="isLoading">
+                <Space :size="4">
+                  <Icon class="flex text-lg" type="edit-square" @click="editFrom(record)"></Icon>
+                  <span>编辑</span>
+                </Space>
+              </Button>
               <!--任务明细-->
-              <RouterLink
-                  :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }">
-                <Icon type="table"></Icon>
+              <RouterLink :to="{ name: alias.TaskDetails.name, params:{ versionId: record.versionId, taskId: record.id } }">
+                <Button type="link" class="p-0 m-0">
+                  <Space :size="4">
+                    <Icon class="flex text-lg" type="table"></Icon>
+                    <span>明细</span>
+                  </Space>
+                </Button>
               </RouterLink>
             </Space>
           </template>

@@ -174,8 +174,12 @@ const onSubmit = async function () {
   };
   const status = await api.work.onSubmit(data);
   if (status) {
-    const value = backOption(taskInfo.value);
-    await router.replace(value);
+    await router.replace({
+      name: alias.TaskList.name,
+      params: {
+        versionId: taskInfo.value.versionId, projectId: taskInfo.value.projectId
+      }
+    });
   }
 }
 

@@ -89,7 +89,7 @@ const onSave = function (data: object) {
           <a v-if="isReady" :href="getKnowledgeUrl()" target="_blank">
             <Button>知识库</Button>
           </a>
-          <Button type="primary">提交</Button>
+<!--          <Button type="primary">提交</Button>-->
         </Space>
       </div>
     </Card>
