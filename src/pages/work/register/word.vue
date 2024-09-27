@@ -47,7 +47,8 @@ const props = defineProps({
 });
 
 const originImageRef = ref();
-const translationRef = ref();
+const translation1Ref = ref();
+const translation2Ref = ref();
 const translationWord = ref<object>();
 const {formRef, validate} = useValidate();
 
@@ -82,6 +83,18 @@ const getResult = function () {
   } else {
     // 普遍标记
     data.coordinateType = DotDataType.Word;
+  }
+
+  if (translation1Ref.value) {
+    const textarea = translation1Ref.value.getValue();
+    data.originalHtml = textarea.html;
+    data.originalText = textarea.text;
+  }
+
+  if (translation2Ref.value) {
+    const textarea = translation2Ref.value.getValue();
+    data.translatedHtml = textarea.html;
+    data.translatedText = textarea.text;
   }
   return data;
 };
@@ -186,7 +199,7 @@ const onOCR = async function (dot: DotData) {
 }
 
 const onScanWord = function () {
-  const comp = translationRef.value;
+  const comp = translation1Ref.value;
   if (comp && comp.scan) {
     comp.scan();
   }
@@ -238,7 +251,7 @@ const onScanWord = function () {
           </Space>
         </div>
       </template>
-      <Textarea ref="translationRef"
+      <Textarea ref="translation1Ref"
                 :project-id="projectId"
                 :autofocus="true"
                 v-model:html="model.originalHtml"
@@ -246,7 +259,7 @@ const onScanWord = function () {
                 @translation="onChangeTranslationList"></Textarea>
     </FormItem>
     <FormItem label="译文" name="translatedText" :rules="rules.text('请填写译文！')">
-        <Textarea :key="translateUuid"
+        <Textarea ref="translation2Ref" :key="translateUuid"
                   :project-id="projectId"
                   v-model:html="model.translatedHtml"
                   v-model:text="model.translatedText"></Textarea>

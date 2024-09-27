@@ -85,7 +85,13 @@ editor.on("create", async function () {
 });
 editor.on("blur", onCheckText);
 
-defineExpose({scan: onCheckText});
+const getValue = function () {
+  const html = editor.getHTML();
+  const text = editor.getText();
+  return {html, text};
+}
+
+defineExpose({scan: onCheckText, getValue});
 
 </script>
 
