@@ -15,9 +15,10 @@ import safeGet from "@fengqiaogang/safe-get";
 import {preview} from "src/utils/brower/image";
 import {format} from "src/utils/upload/common";
 import {changeTranslationList} from "../config";
+import Select from "src/components/dict/select.vue";
 import {ElImage as Image, ElLoading} from 'element-plus';
+import {Button, Card, Form, FormItem, Space, Spin} from "ant-design-vue";
 import {DotData, DotDataType, DotMatchType} from "src/components/preview/config";
-import {Button, Card, Form, FormItem, Select, SelectOption, Space, Spin} from "ant-design-vue";
 import type {ImageData} from "src/types";
 
 const $emit = defineEmits(["save", "cancel"]);
@@ -54,7 +55,7 @@ const {formRef, validate} = useValidate();
 
 const model = ref({
   imagePath: props.data.imagePath,
-  imageFlag: String(props.data.imageFlag || 1), // 类型
+  imageFlag: String(props.data.imageFlag || 6), // 类型
   translatedText: props.data.translatedText,          // 译文
   translatedHtml: props.data.translatedHtml,
   originalText: props.data.originalText,              // 原文
@@ -143,7 +144,7 @@ const translateMt = async function () {
 }
 
 const onChangeTranslationList = function (data: string[][]) {
-  translationWord.value = changeTranslationList(data, translationWord.value);
+  translationWord.value = changeTranslationList(data);
 }
 
 const getBgPosition = function (src: string, dot: DotData) {
@@ -210,10 +211,7 @@ const onScanWord = function () {
 <template>
   <Form layout="vertical" ref="formRef" :model="model">
     <FormItem label="类别" name="imageFlag" :rules="rules.text('请选择类别！')">
-      <Select v-model:value="model.imageFlag" placeholder="请选择类别">
-        <SelectOption value="1">框内</SelectOption>
-        <SelectOption value="2">框外</SelectOption>
-      </Select>
+      <Select v-model:value="model.imageFlag" placeholder="请选择类别" type="comic_ps_title_config"></Select>
     </FormItem>
     <template v-if="data.id">
       <FormItem v-if="data.imagePath">
@@ -244,7 +242,7 @@ const onScanWord = function () {
             <span>原文</span>
           </div>
           <Space class="text-primary cursor-default">
-            <Icon type="securityscan" class="text-xl cursor-pointer" @click="onScanWord"></Icon>
+            <Icon type="securityscan" class="text-xl cursor-pointer hidden" @click="onScanWord"></Icon>
             <Spin :spinning="spinning">
               <Icon class="cursor-pointer" :size="20" type="font-size" @Click="translateMt"></Icon>
             </Spin>

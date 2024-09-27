@@ -64,9 +64,7 @@ const onCheckText = async function () {
   const str = String(text).trim();
   if (str && str.length > 0 && html !== __html) {
     const res = await checkWord(props.projectId, html);
-    if (res.translation) {
-      $emit("translation", res.translation);
-    }
+    $emit("translation", res.translation);
     if (res.html) {
       __html = res.html;
       editor.commands.setContent(res.html);

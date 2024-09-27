@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import * as _ from "lodash-es";
 import {Descriptions, DescriptionsItem} from "ant-design-vue";
 
 defineProps({
@@ -10,6 +11,16 @@ defineProps({
   }
 })
 
+const isNull = function (value: any): boolean {
+  if (_.isNil(value) || _.isNull(value)) {
+    return true;
+  }
+  if (_.isString(value) && value === "null") {
+    return true;
+  }
+  return false;
+}
+
 </script>
 
 <template>
@@ -17,7 +28,7 @@ defineProps({
     <template v-for="(name, value) in word" :key="name">
       <DescriptionsItem>
         <span class="mr-3">{{ name }}:</span>
-        <span>{{ value }}</span>
+        <span>{{ isNull(value) ? "" : value }}</span>
       </DescriptionsItem>
     </template>
   </Descriptions>

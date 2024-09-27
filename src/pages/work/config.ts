@@ -65,10 +65,12 @@ export const checkWord = async function (project: string | number, keyword?: str
 }
 export const changeTranslationList = function (data: string[][], originValue?: object) {
   const map: Map<string, string> = new Map<string, string>(originValue ? Object.entries(originValue) : void 0);
-  for (const item of data) {
-    const [key, value] = item;
-    if (!map.has(key)) {
-      map.set(key, value);
+  if (data && data.length > 0) {
+    for (const item of data) {
+      const [key, value] = item;
+      if (!map.has(key)) {
+        map.set(key, value || "");
+      }
     }
   }
   if (map.size > 0) {
