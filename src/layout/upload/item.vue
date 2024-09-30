@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {Icon} from "@ue/icon";
 import {Progress, Button} from "ant-design-vue";
-
-import {Status} from "src/libs/upload/util/upload/res";
+import {Status} from "src/libs/upload/util/common/res";
 
 import type {PropType} from "vue";
 import type {UploadData} from "src/store/modules/upload";

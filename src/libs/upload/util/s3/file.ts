@@ -3,29 +3,35 @@
  * @author svon.me@gmail.com
  */
 
-
 import * as R2Config from "./r2";
-import {Result, Status} from "./res";
-import {uploadStore} from "src/store";
+import Basis from "../common/basis";
 import safeGet from "@fengqiaogang/safe-get";
-import {filePath, getFileMeta} from "./config";
+import {filePath, getFileMeta} from "../common/config";
+import {Result as CommonResult, Status} from "../common/res";
 import {
-  CompleteMultipartUploadCommand,
-  CreateMultipartUploadCommand,
-  HeadObjectCommand,
-  PutObjectCommand,
   S3Client,
-  UploadPartCommand
+  PutObjectCommand,
+  HeadObjectCommand,
+  UploadPartCommand,
+  CreateMultipartUploadCommand,
+  CompleteMultipartUploadCommand,
 } from "@aws-sdk/client-s3";
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
-
-export type ChangeCallback = (file: File, progress: number, res?: Result) => void;
 
 class FileChunk {
   constructor(public start: number, public end: number, public index: number) {
   }
 }
 
+class Result extends CommonResult {
+  constructor(file: File, path?: string, ETag?: string, status: Status = Status.complete) {
+    if (path) {
+      super(file, `https://assets.vuejs.com/${path}`, ETag, status);
+    } else {
+      super(file, void 0, ETag, status);
+    }
+  }
+}
 
 const getContentDisposition = function (file: File) {
   if (file && file.name) {
@@ -34,16 +40,12 @@ const getContentDisposition = function (file: File) {
   return "attachment";
 }
 
-let log: any;
-
-export default class Client extends S3Client {
-  private readonly files: File[] = [];        // 需要上传的文件列表
-  public chunkSize: number = 5 * 1024 * 1024; // 切片大小
-  public chunkCount: number = 4;
-
-  private event = new Set<ChangeCallback>();
+export default class Client extends Basis {
+  private readonly s3: S3Client;
 
   constructor(public Bucket: string, files: File[]) {
+    super(files);
+
     const config = {
       region: R2Config.region,
       endpoint: R2Config.host,
@@ -52,32 +54,24 @@ export default class Client extends S3Client {
         secretAccessKey: R2Config.secretKey,
       },
     };
-    super(config);
-    this.files = files;
+    this.s3 = new S3Client(config);
   }
 
-  // 绑定回调事件
-  on(callback: ChangeCallback) {
-    if (callback) {
-      this.event.add(callback);
-    }
+  init(): void | Promise<void> {
+    return void 0;
   }
 
-  private onChange(file: File, progress: number = 0, res?: Result) {
-    if (!log) {
-      log = uploadStore();
+  // 判断是否为小文件
+  isFileSimple(file: File): boolean {
+    const size = file.size;
+    return size <= this.chunkSize;
+  }
+
+  putObject(file: File): Promise<Result> {
+    if (this.isFileSimple(file)) {
+      return this.simpleUpload(file);
     }
-    if (log) {
-      const reload = () => {
-        if (res && res.status === Status.abnormal) {
-          return this.multipartUpload(file);
-        }
-      }
-      log.change(file, progress, res, reload);
-    }
-    for (const callback of this.event) {
-      callback(file, Math.min(progress, 100), res);
-    }
+    return this.multipartUpload(file);
   }
 
   async hasObject(file: File, path: string = filePath(file)): Promise<Result | undefined> {
@@ -86,7 +80,7 @@ export default class Client extends S3Client {
         Key: path,
         Bucket: this.Bucket,
       });
-      const res = await this.send(command);
+      const res = await this.s3.send(command);
       const ETag = safeGet<string>(res, "ETag");
       return new Result(file, path, ETag);
     } catch (error) {
@@ -95,7 +89,7 @@ export default class Client extends S3Client {
   }
 
   // 单文件直接上传
-  async simpleUpload(file: File): Promise<Result> {
+  private async simpleUpload(file: File): Promise<Result> {
     this.onChange(file, 0);
     const path: string = filePath(file);
     // 判断文件是否存在
@@ -114,7 +108,7 @@ export default class Client extends S3Client {
       ContentDisposition: getContentDisposition(file),
     });
     try {
-      const res = await this.send(command);
+      const res = await this.s3.send(command);
       const ETag = safeGet<string>(res, "ETag");
       const value = new Result(file, path, ETag);
       this.onChange(file, 100, value);
@@ -127,32 +121,6 @@ export default class Client extends S3Client {
       // todo
       return Promise.reject(e);
     }
-    // const http: Upload = new Upload({
-    //   client: this,
-    //   params: {
-    //     Key: path,
-    //     Body: file,
-    //     ContentType: file.type,
-    //     ContentLength: file.size,
-    //     ContentDisposition: getContentDisposition(file),
-    //     Bucket: this.Bucket,
-    //     Metadata: getFileMeta(file),
-    //   }
-    // });
-    // try {
-    //   const res = await http.done();
-    //   const ETag = safeGet<string>(res, "ETag");
-    //   const value = new Result(file, path, ETag);
-    //   this.onChange(file, 100, value);
-    //   return value;
-    // } catch (e) {
-    //   console.log("Simple Upload Error")
-    //   console.log(e);
-    //   const res = new Result(file, void 0, void 0, Status.abnormal);
-    //   this.onChange(file, 0, res);
-    //   // todo
-    //   return Promise.reject(e);
-    // }
   }
 
 
@@ -165,7 +133,7 @@ export default class Client extends S3Client {
       Metadata: getFileMeta(file),
     });
     // 创建临时的切片文件上传空间
-    const box = await this.send(command);
+    const box = await this.s3.send(command);
     return {
       chunks: () => {
         const size = file.size;
@@ -187,7 +155,7 @@ export default class Client extends S3Client {
           UploadId: box.UploadId,
           PartNumber: partNumber
         });
-        return getSignedUrl(this, part, {expiresIn: 60 * 5});
+        return getSignedUrl(this.s3, part, {expiresIn: 60 * 5});
       },
       merge: (parts: object[]) => {
         // 对切片列表进行排序
@@ -202,7 +170,7 @@ export default class Client extends S3Client {
           UploadId: box.UploadId,
           MultipartUpload: {Parts: list},
         });
-        return this.send(command);
+        return this.s3.send(command);
       },
       upload: async (item: FileChunk): Promise<object> => {
         const value = file.slice(item.start, item.end);
@@ -214,7 +182,7 @@ export default class Client extends S3Client {
           Bucket: this.Bucket
         });
         try {
-          const res = await this.send(commandChunk);
+          const res = await this.s3.send(commandChunk);
           const ETag = safeGet<string>(res, "ETag")!;
           return {ETag, PartNumber: String(item.index)};
         } catch (e) {
@@ -226,11 +194,7 @@ export default class Client extends S3Client {
   }
 
   // 大文件切分片上传
-  async multipartUpload(file: File) {
-    const size = file.size;
-    if (size <= this.chunkSize) {
-      return this.simpleUpload(file);
-    }
+  private async multipartUpload(file: File): Promise<Result> {
     const path: string = filePath(file);
     // 判断文件是否已上传
     const hasValue = await this.hasObject(file, path);
@@ -290,31 +254,5 @@ export default class Client extends S3Client {
       console.log(e);
       return Promise.reject(e);
     }
-  }
-
-  async start() {
-    const list: Result[] = [];
-    const abnormal: File[] = [];
-    let abnormalAgainCount: number = 3;
-    const count = this.files.length;
-    const upload = async (files: File[]) => {
-      for (let i = 0; i < count; i++) {
-        const file = files[i];
-        try {
-          const res = await this.multipartUpload(file);
-          list.push(res);
-        } catch (e) {
-          console.log(e)
-          abnormal.push(file)
-        }
-      }
-      if (abnormal.length > 0) {
-        abnormalAgainCount -= 1;
-      }
-    }
-    do {
-      await upload(this.files);
-    } while (abnormal.length > 0 && abnormalAgainCount > 0);
-    return list;
   }
 }

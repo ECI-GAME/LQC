@@ -5,8 +5,8 @@
 
 import * as _ from "lodash-es";
 import {defineStore} from "pinia";
-import {filePath} from "src/libs/upload/util/upload/config";
-import {Result, Status} from "src/libs/upload/util/upload/res";
+import {filePath} from "src/libs/upload/util/common/config";
+import {Result, Status} from "src/libs/upload/util/common/res";
 
 interface UploadData extends Result {
   progress: number;

@@ -1,4 +1,13 @@
 import * as _ from "../index";
+import {Result} from "./res";
+
+export type ChangeCallback = (file: File, progress: number, res?: Result) => void;
+
+
+export enum BucketType {
+  aliyun = "AliyunOSS",
+  cloudflare = "eci-assets"
+}
 
 export const getFileMeta = function (file: File) {
   const name: string = encodeURIComponent(file.name);
@@ -18,10 +27,16 @@ export const fileMd5 = function (file: File): string {
   return value ? value : _.UUID();
 }
 
-export const filePath = function (file: File): string {
-  const md5: string = fileMd5(file);
+/** 根据文件信息生成路径 */
+export const filePath = function (file: File, virtuallyPath?: string): string {
   const name: string = _.MD5(file.name);
   const index: number = file.name.lastIndexOf(".");
   const suffix: string = file.name.slice(index + 1);
-  return `${md5}/${name}.${suffix}`;
+  if (virtuallyPath) {
+    const list: string[] = [virtuallyPath, `${name}.${suffix}`];
+    return _.compact<string>(list).join("/");
+  } else {
+    const md5: string = fileMd5(file);
+    return `${md5}/${name}.${suffix}`;
+  }
 }

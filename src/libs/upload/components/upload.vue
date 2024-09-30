@@ -12,7 +12,7 @@ import {onBeforeUploadFile, onUploadFile} from "./config";
 
 import type {PropType} from "vue";
 import type {AcceptFun} from "./accept";
-import type {Result} from "../util/upload/res";
+import type {Result} from "../util/common/res";
 
 const $emit = defineEmits(["success", "update:loading", "change", "abnormal"]);
 const props = defineProps({

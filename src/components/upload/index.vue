@@ -9,9 +9,10 @@ import {ref} from "vue";
 import {computed} from "vue";
 import * as _ from "lodash-es";
 import {Icon} from "@ue/icon";
-import {Upload} from "@js-lion/upload";
-import {Bucket, format} from "src/utils/upload/common";
+import {format} from "src/utils/upload/common";
+import {Upload, BucketType} from "@js-lion/upload";
 
+import type {PropType} from "vue";
 import type {Result} from "@js-lion/upload";
 import type {FileData} from "src/utils/upload/common";
 
@@ -75,6 +76,10 @@ const props = defineProps({
     required: false,
     type: Function
   },
+  bucket: {
+    required: false,
+    type: String as PropType<BucketType>,
+  }
 });
 
 const fileList = ref<FileData[]>([])
@@ -112,17 +117,17 @@ const onAbnormal = function (...args: any[]) {
 <template>
   <div>
     <Upload v-model:loading="status"
-        :multiple="multiple"
-        :accept="accept"
-        :disabled="disabled"
-        :drag="drag"
-        :max-size="maxSize"
-        :limit="limit"
-        :action="action"
-        :bucket="Bucket"
-        @change="onProgress"
-        @success="onSuccess"
-        @abnormal="onAbnormal">
+            :multiple="multiple"
+            :accept="accept"
+            :disabled="disabled"
+            :drag="drag"
+            :max-size="maxSize"
+            :limit="limit"
+            :action="action"
+            :bucket="bucket || BucketType.aliyun"
+            @change="onProgress"
+            @success="onSuccess"
+            @abnormal="onAbnormal">
       <slot>
         <span class="flex items-center cursor-pointer">
           <Icon class="flex text-xl" type="cloud-upload"></Icon>

@@ -22,6 +22,10 @@ export class Result {
 
     if (path && /^\//.test(path)) {
       this.path = path;
+    } else if (path && /^https?:\/\//.test(path)) {
+      this.path = path;
+    } else if (path && /^\/\//.test(path)) {
+      this.path = path;
     } else if (path) {
       this.path = `/${path}`;
     }
