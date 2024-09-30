@@ -114,11 +114,8 @@ export default class Client extends Basis {
       this.onChange(file, 100, value);
       return value;
     } catch (e) {
-      console.log("Simple Upload Error")
-      console.log(e);
       const res = new Result(file, void 0, void 0, Status.abnormal);
       this.onChange(file, 0, res);
-      // todo
       return Promise.reject(e);
     }
   }
@@ -250,8 +247,6 @@ export default class Client extends Basis {
       this.onChange(file, 100, res);
       return res;
     } catch (e) {
-      console.log("Multipart Upload Error")
-      console.log(e);
       return Promise.reject(e);
     }
   }

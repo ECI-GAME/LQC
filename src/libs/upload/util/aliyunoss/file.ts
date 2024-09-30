@@ -78,7 +78,7 @@ export default class Upload extends Basis {
     } catch (error) {
       const res = new Result(file, signature.url, void 0, Status.abnormal);
       this.onChange(file, 0, res);
-      return res;
+      return Promise.reject(error);
     }
   }
 
@@ -112,7 +112,7 @@ export default class Upload extends Basis {
     } catch (e) {
       const res = new Result(file, signature.url, void 0, Status.abnormal);
       this.onChange(file, 0, res);
-      return res;
+      return Promise.reject(e);
     }
   }
 }
