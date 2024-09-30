@@ -151,7 +151,7 @@ onMounted(function () {
              table-layout="auto">
         <template #bodyCell="{ column, text, record  }">
           <template v-if="column.key === 'taskName'">
-            <RouterLink :to="{ name: alias.Work.name, params:{ taskId: record.id,workId:record.relationId } }">
+            <RouterLink :to="{ name: alias.Work.name, params:{ taskId: record.id,workId:record.relationId } }" target="_blank">
               <Button type="link" class="px-0">{{ text }}</Button>
             </RouterLink>
           </template>

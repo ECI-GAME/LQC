@@ -4,6 +4,7 @@ import {ImageNodeType} from "./config";
 import {Button} from "ant-design-vue";
 import safeGet from "@fengqiaogang/safe-get";
 import {preview} from "src/utils/brower/image";
+import {downloadFile} from "src/utils/brower/download";
 
 const props = defineProps({
   id: {
@@ -21,6 +22,10 @@ const props = defineProps({
     type: Object,
     required: false,
   },
+  download: {
+    type: Boolean,
+    required: false,
+  }
 });
 
 const onOpenImage = async function () {
@@ -28,7 +33,11 @@ const onOpenImage = async function () {
   const type = safeGet<string>(ImageNodeType, props.type) || props.type;
   if (type) {
     const value = await api.task.getImageValue(props.id, type, props.query || {});
-    src = preview(value);
+    if (props.download) {
+      downloadFile(value);
+    } else {
+      src = preview(value);
+    }
   }
   if (src) {
     window.open(src);
@@ -41,12 +50,12 @@ const onOpenImage = async function () {
   <div>
     <template v-if="value && props.type">
       <slot :click="onOpenImage" text="预览" :disabled="false">
-        <Button type="link" @click="onOpenImage">预览</Button>
+        <Button class="m-0 p-0" type="link" @click="onOpenImage">预览</Button>
       </slot>
     </template>
     <template v-else>
       <slot :click="onOpenImage" text="待生成" :disabled="true">
-        <Button type="link" @click="onOpenImage" :disabled="true">待生成</Button>
+        <Button class="m-0 p-0" type="link" @click="onOpenImage" :disabled="true">待生成</Button>
       </slot>
     </template>
   </div>

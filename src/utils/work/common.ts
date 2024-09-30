@@ -39,6 +39,7 @@ export const onDownloadText = function (taskId: string | number) {
       link.click();
     }
   }).catch(error => {
-    message.error("导出时出错");
+    const tips = safeGet<string>(error, "message") || "导出时出错，还有未翻译的文本信息需处理。"
+    message.error(tips);
   });
 }

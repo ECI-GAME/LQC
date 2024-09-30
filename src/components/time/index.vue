@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import moment from "moment";
+import * as date from "src/utils/date";
 
 defineProps({
   value: {
@@ -9,13 +9,13 @@ defineProps({
   format: {
     type: String,
     required: false,
-    default: () => "YYYY-MM-DD hh:mm:ss",
+    default: () => date.format,
   }
 });
 
 const time = function (value?: string | number, format?: string) {
   if (value) {
-    return moment(value).format(format);
+    return date.template(value, format);
   }
   return "--";
 }

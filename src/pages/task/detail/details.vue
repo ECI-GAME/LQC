@@ -12,7 +12,7 @@ import safeGet from "@fengqiaogang/safe-get";
 import * as work from "src/utils/work/common";
 import Dict from "src/components/dict/index.vue";
 import TaskTitle from "src/components/task/title.vue";
-import ImagePreview from "src/pages/image/preview.vue";
+import ImageDownload from "src/pages/image/download.vue";
 import TaskLog from "src/components/task/log/button.vue";
 import {Table, Button, Card, Space} from "ant-design-vue";
 import {RouterLink, useRoute, useRouter} from "vue-router";
@@ -89,7 +89,7 @@ const onSave = function (data: object) {
           <a v-if="isReady" :href="getKnowledgeUrl()" target="_blank">
             <Button>知识库</Button>
           </a>
-<!--          <Button type="primary">提交</Button>-->
+          <!--          <Button type="primary">提交</Button>-->
         </Space>
       </div>
     </Card>
@@ -108,20 +108,7 @@ const onSave = function (data: object) {
           <template v-else-if="column.key === 'action'">
             <Space>
               <!--图片预览下载-->
-              <ImagePreview class="flex"
-                            :value="text"
-                            :id="text"
-                            :type="record.imageStatus"
-                            :query="{ download: true }">
-                <template #default="data">
-                  <Button type="primary" size="small" :disabled="data.disabled" @click="data.click">
-                    <Space :size="4">
-                      <Icon class="text-xl flex" type="download"></Icon>
-                      <span>{{ data.disabled ? data.text : "下载" }}</span>
-                    </Space>
-                  </Button>
-                </template>
-              </ImagePreview>
+              <ImageDownload class="flex" :icon="true" :id="text" :value="text" :type="record.imageStatus"/>
               <!--设置完成状态-->
               <div class="flex">
                 <Button type="primary" size="small" @click="onSave(record)">

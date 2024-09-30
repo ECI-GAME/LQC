@@ -9,6 +9,7 @@ import api from "src/api";
 import {Icon} from "@ue/icon";
 import {columns} from "./config";
 import Preview from "./preview.vue";
+import Download from "./download.vue";
 import * as message from "@ue/message";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
@@ -200,8 +201,10 @@ const getVersionList = async function () {
               <Button type="link">{{ text }}</Button>
             </RouterLink>
           </template>
-          <Preview v-else-if="column.key === 'preview'" :value="text" :type="column.dataIndex"
-                   :id="record.id"></Preview>
+          <Space v-else-if="column.key === 'preview'">
+            <Preview :value="text" :type="column.dataIndex" :id="record.id"></Preview>
+            <Download :value="text" :type="column.dataIndex" :id="record.id"></Download>
+          </Space>
           <Dict v-else-if="column.key === 'imageStatus'" type="comic_task_status" :value="text" auto-value="--"></Dict>
           <Tags v-else-if="column.key === 'handlerName'" :value="text"></Tags>
           <template v-else-if="column.key === 'action'">
