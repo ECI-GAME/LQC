@@ -101,8 +101,7 @@ export default class Upload extends Basis {
       // 获取分片上传进度、断点和返回值。
       progress: (progress: number, checkpoint: Checkpoint) => {
         // console.log(progress, checkpoint);
-        const res = new Result(file, signature.url, void 0, Status.progress);
-        this.onChange(file, Number((progress * 100).toFixed(0)), res);
+        this.onChange(file, Number((progress * 100).toFixed(0)));
       },
     };
     try {
