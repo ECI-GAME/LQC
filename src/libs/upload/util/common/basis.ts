@@ -13,7 +13,7 @@ import type {ChangeCallback} from "./config";
 let log: any;
 export default abstract class {
   public files: File[] = [];                  // 需要上传的文件列表
-  public chunkSize: number = 5 * 1024 * 1024; // 切片大小
+  abstract chunkSize: number; // 切片大小
   public chunkCount: number = 4;              // 同时上传切片数量
 
   // 记录事件

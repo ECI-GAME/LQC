@@ -41,6 +41,7 @@ const getContentDisposition = function (file: File) {
 }
 
 export default class Client extends Basis {
+  public chunkSize: number = 5 * 1024 * 1024;
   private readonly s3: S3Client;
 
   constructor(public Bucket: string, files: File[]) {

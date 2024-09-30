@@ -18,6 +18,7 @@ import type {Signature} from "./sign";
 
 export default class Upload extends Basis {
   public chunkSize: number = 2 * 1024 * 1024;  // 大文件切片颗粒度大小, 默认 2M
+
   constructor(files: File[]) {
     super(files);
   }
