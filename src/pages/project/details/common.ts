@@ -4,16 +4,16 @@
  **/
 
 import api from "src/api";
-import moment from "moment";
 import * as _ from "lodash-es";
 import * as modal from "@ue/modal";
+import * as date from "src/utils/date";
 import * as model from "src/utils/model";
 import ImageAlbumView from "src/pages/project/image/album.vue";
 
 import type {Component} from "vue";
+import type {TimePlan} from "../image/config";
 import type {Project, ImageAlbum} from "src/types";
 
-const dateFormat: string = "YYYY-MM-DD";
 
 export const albumColumns = [
   {title: "画册名称", dataIndex: 'versionName', key: 'versionName'},
@@ -28,21 +28,22 @@ export const albumColumns = [
  * @file 画册创建
  * @author svon.me@gmail.com
  */
-const onCreateImage = function (value: ImageAlbum) {
+const onCreateImage = function (value: ImageAlbum, timePlan?: TimePlan) {
   const onOk = function (data: ImageAlbum) {
     if (data) {
       return api.version.addVersion(data);
     }
     return false;
   }
-  return modal.confirm<Component, boolean>(ImageAlbumView, {title: "新建画册", width: 480, onOk}, {value});
+  const config = {title: "新建画册", width: 480, onOk};
+  return modal.confirm<Component, boolean>(ImageAlbumView, config, {value, timePlan});
 }
 
 /**
  * @file 画册编辑
  * @author svon.me@gmail.com
  */
-const onEditImage = function (value: ImageAlbum) {
+const onEditImage = function (value: ImageAlbum, timePlan?: TimePlan) {
   const onOk = function (data: ImageAlbum) {
     if (data) {
       const res = {
@@ -56,7 +57,8 @@ const onEditImage = function (value: ImageAlbum) {
     }
     return false;
   }
-  return modal.confirm<Component, boolean>(ImageAlbumView, {title: "编辑画册", width: 480, onOk}, {value});
+  const config = {title: "编辑画册", width: 480, onOk};
+  return modal.confirm<Component, boolean>(ImageAlbumView, config, {value, timePlan});
 }
 
 // 相册管理
@@ -69,26 +71,38 @@ export const useImageAlbum = function (projectId: number | string) {
   // 创建
   const create = function (): Promise<boolean> {
     const languagePair = state.value.sourceLanguage + '->' + state.value.targetLanguage;
-    return onCreateImage({projectNum: state.value.projectNum, languagePair} as ImageAlbum);
+    return onCreateImage({
+        projectNum: state.value.projectNum,
+        languagePair
+      } as ImageAlbum,
+      {
+        min: state.value.planStartTime, // 最小时间
+        max: state.value.planEndTime,   // 最大时间
+      }
+    );
   };
 
   // 编辑
   const edit = async function (value: ImageAlbum): Promise<boolean> {
     const languagePair = state.value.sourceLanguage + '->' + state.value.targetLanguage;
     const res = await api.version.geVersionInfoById<ImageAlbum>(value.id);
+    const timePlan = {
+      min: state.value.planStartTime, // 最小时间
+      max: state.value.planEndTime,   // 最大时间
+    };
     if (res) {
-      res.startDate = res.startDate ? moment(res.startDate).format(dateFormat) : "";
-      res.endDate = res.endDate ? moment(res.endDate).format(dateFormat) : "";
-      return onEditImage({...res, languagePair});
+      res.startDate = res.startDate ? date.template(res.startDate, date.formatYYYYMMDD) : "";
+      res.endDate = res.endDate ? date.template(res.endDate, date.formatYYYYMMDD) : "";
+      return onEditImage({...res, languagePair}, timePlan);
     } else {
       const dateList = String(value.dateInterval || "").split("-");
       const [startDate, endDate] = _.map(dateList, function (value: string) {
         if (value) {
-          return moment(value, "YY/MM/DD").format(dateFormat);
+          return date.toDate(value, date.formatYYMMDD).format(date.formatYYYYMMDD);
         }
         return "";
       });
-      return onEditImage({...value, startDate, endDate, languagePair});
+      return onEditImage({...value, startDate, endDate, languagePair}, timePlan);
     }
   }
   return {state, isReady, create, edit};

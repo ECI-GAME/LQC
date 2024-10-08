@@ -7,7 +7,9 @@
 
 import * as _ from "lodash-es";
 import {ref, toRaw} from "vue";
+import * as date from "src/utils/date";
 import {useValidate, rules} from "@ue/form";
+import safeGet from "@fengqiaogang/safe-get";
 import {checkFileImage} from "src/utils/accpet";
 import Upload from "src/components/upload/index.vue";
 import LanguagePair from "src/components/language/pair.vue";
@@ -15,6 +17,7 @@ import UploadPreview from "src/components/upload/preview.vue";
 import {Input, DatePicker, Form, FormItem, Textarea, Button, Space} from "ant-design-vue";
 
 import type {PropType} from "vue";
+import type {TimePlan} from "./config";
 import type {ImageAlbum} from "src/types";
 import type {FileData} from "src/utils/upload/common";
 
@@ -26,6 +29,11 @@ const props = defineProps({
     default: function () {
       return {};
     }
+  },
+  // 时间范围限制
+  timePlan: {
+    required: false,
+    type: Object as PropType<TimePlan>,
   }
 });
 
@@ -56,6 +64,14 @@ const onSubmit = async function (e: Event) {
   }
 }
 
+const disabledDate = function (current: any): boolean {
+  const min = safeGet<any>(props.timePlan, "min");
+  const max = safeGet<any>(props.timePlan, "max");
+  const time = date.toDate(current).format(date.formatYYYYMMDD);
+  const status = date.allow(time, min, max);
+  return !status;
+}
+
 </script>
 
 <template>
@@ -72,7 +88,8 @@ const onSubmit = async function (e: Event) {
                     v-model:value="data.startDate"
                     placeholder="开始时间" mode="date"
                     :format="dateFormat"
-                    :value-format="dateFormat"/>
+                    :value-format="dateFormat"
+                    :disabled-date="disabledDate"/>
       </FormItem>
       <FormItem label="计划完成时间" name="endDate" :rules="rules.text('请选择结束时间!')">
         <DatePicker class="w-full"
@@ -80,7 +97,8 @@ const onSubmit = async function (e: Event) {
                     placeholder="结束时间"
                     mode="date"
                     :format="dateFormat"
-                    :value-format="dateFormat"/>
+                    :value-format="dateFormat"
+                    :disabled-date="disabledDate"/>
       </FormItem>
       <FormItem class="col-span-2 mb-0" label="备注" name="remark">
         <Textarea class="w-full deep-[textarea]:resize-none"
