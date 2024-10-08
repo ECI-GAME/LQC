@@ -3,13 +3,21 @@ import cache from "src/utils/cache";
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 import {$error, $success} from "@ue/message"
-import {Get, Gql, post, tryError, validate, required, Put} from "@js-lion/api";
+import {Get, Gql, post, tryError, validate, required, Put, Post} from "@js-lion/api";
 
 import GraphQL from "../graphql";
 
 import type {TaskData} from "src/types/task";
 
 export default class extends GraphQL {
+  @Post("/project/tasks/changeStatus")
+  track(@required taskId: number | string): Promise<void> {
+    const data = {id: taskId};
+    // @ts-ignore
+    return {data};
+  }
+
+
   @tryError(new PageResult())
   @cache(30 * 1000)
   @Get("/project/getMyProjectList")

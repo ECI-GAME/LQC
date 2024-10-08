@@ -93,7 +93,7 @@ onMounted(onSearch);
                      placeholder="请输入条件"
                      :enter-button="true"
                      @search="onSearch"
-                     class="w-100 deep-[.anticon-search]:flex"/>
+                     class="w-80 deep-[.anticon-search]:flex"/>
       </FormItem>
       <FormItem class="ml-3">
         <Button @click="downloadTxtFile()">

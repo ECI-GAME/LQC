@@ -41,6 +41,10 @@ const props = defineProps({
     type: Array,
     required: false,
     default: () => [],
+  },
+  placeholder: {
+    type: String,
+    required: false,
   }
 });
 
@@ -97,5 +101,8 @@ const toOptions = function (list: object[]): object[] {
           :fieldNames="fieldNames"
           :options="toOptions(state.results)"
           :disabled="disabled"
-          :option-filter-prop="filterProp"></Select>
+          :option-filter-prop="filterProp"
+          :placeholder="placeholder"
+          not-found-content="暂无数据">
+  </Select>
 </template>

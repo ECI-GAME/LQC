@@ -5,11 +5,11 @@
 
 import api from "src/api";
 import {Icon} from "@ue/icon";
-import {onMounted} from 'vue';
+import {onMounted, ref} from 'vue';
 import Search from "./search.vue";
 import * as model from "src/utils/model";
-import safeGet from "@fengqiaogang/safe-get";
 import {FileData} from "src/utils/upload/common";
+import Select from "src/components/dict/select.vue";
 import Upload from "src/components/upload/index.vue";
 import Pagination from "src/components/page/index.vue";
 import {downloadFile} from "src/utils/brower/download";
@@ -17,6 +17,7 @@ import {useCommon, fileColumns, onRemove} from "./common";
 import {Table, Form, FormItem, InputSearch, Button, Space} from "ant-design-vue";
 
 const resourceType = "1";
+const fileCategory = ref<string | number>();
 const {versionId, projectId, isShowProject, pageSize, pageNumber, isUploading, fromData} = useCommon();
 
 const {state, execute: onLoad, isLoading} = model.list<object>(function () {
@@ -70,12 +71,17 @@ onMounted(onSearch);
               v-model:version-id="versionId"
               :is-project="isShowProject"></Search>
       <FormItem>
+        <div class="w-40">
+          <Select v-model:value="fileCategory" placeholder="请选择文件类型" type="comic_file_category"/>
+        </div>
+      </FormItem>
+      <FormItem>
         <InputSearch v-model:value="fromData.searchValue"
                      placeholder="请输入名称"
                      :enter-button="true"
                      :allow-clear="true"
                      @search="onSearch"
-                     class="w-100 deep-[.anticon-search]:flex"/>
+                     class="w-80 deep-[.anticon-search]:flex"/>
       </FormItem>
       <FormItem>
         <Upload :multiple="true"

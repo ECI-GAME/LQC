@@ -67,7 +67,7 @@ const version = computed<string | number | undefined>({
 <template>
   <div class="flex">
     <FormItem v-show="!isProject">
-      <Select class="w-50" v-model:value="project" placeholder="请选择项目" :allow-clear="true" @change="onChangeVersion">
+      <Select class="w-40" v-model:value="project" placeholder="请选择项目" :allow-clear="true" @change="onChangeVersion">
         <SelectOption
             v-for="item in projectState.results"
             :key="item.id"
@@ -76,7 +76,7 @@ const version = computed<string | number | undefined>({
       </Select>
     </FormItem>
     <FormItem>
-      <Select class="w-50" v-model:value="version" placeholder="请选择画册" :allow-clear="true">
+      <Select class="w-40" v-model:value="version" placeholder="请选择画册" :allow-clear="true">
         <SelectOption
             v-for="item in versionState.results"
             :key="item.versionId"

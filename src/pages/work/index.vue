@@ -4,8 +4,8 @@
  * @author svon.me@gmail.com
  */
 
-import {ref} from "vue";
 import api from "src/api";
+import {ref, onMounted} from "vue";
 import Switch from "./switch.vue";
 import BigNumber from "bignumber.js";
 import {TaskStatus} from "src/types";
@@ -39,6 +39,11 @@ const recordTabs = ref<string[]>([RecordTabType.Word, RecordTabType.Comment]);
 
 
 const currentFile = ref<ImageData>();
+
+onMounted(function () {
+  api.task.track(route.params.taskId as string);
+})
+
 // 项目详情
 const {state: projectInfo} = model.result<Project>(() => {
   return api.project.getProjectInfoByTId(route.params.taskId as string);

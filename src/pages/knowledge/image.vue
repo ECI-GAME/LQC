@@ -79,7 +79,7 @@ onMounted(onSearch);
                      :enter-button="true"
                      :allow-clear="true"
                      @search="onSearch"
-                     class="w-100 deep-[.anticon-search]:flex"/>
+                     class="w-80 deep-[.anticon-search]:flex"/>
       </FormItem>
       <FormItem>
         <Upload :multiple="true" @success="onSuccess" :accept="checkFileImage" v-model:loading="isUploading">
