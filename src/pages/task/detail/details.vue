@@ -11,20 +11,27 @@ import * as alias from "src/router/alias";
 import safeGet from "@fengqiaogang/safe-get";
 import * as work from "src/utils/work/common";
 import Dict from "src/components/dict/index.vue";
+import {filterSuccess} from "src/pages/work/config";
 import TaskTitle from "src/components/task/title.vue";
 import ImageDownload from "src/pages/image/download.vue";
 import TaskLog from "src/components/task/log/button.vue";
 import {Table, Button, Card, Space} from "ant-design-vue";
 import {RouterLink, useRoute, useRouter} from "vue-router";
 
-import type {TaskData} from "src/types/task";
+import type {TaskData, Project} from "src/types";
 
 const route = useRoute();
 const router = useRouter();
 
+// 任务详情
 const {state: stateData, isReady} = model.result<TaskData>(() => {
   return api.task.getTaskInfoById(route.params.taskId as string);
 }, {} as TaskData, true);
+
+// 项目详情
+const {state: projectInfo} = model.result<Project>(() => {
+  return api.project.getProjectInfoByTId(route.params.taskId as string);
+}, {} as Project, true);
 
 const {state, execute: onLoad, isLoading} = model.list<object>(
   // 执行逻辑
@@ -76,6 +83,14 @@ const onSave = function (data: object) {
   const workId = safeGet<string>(data, "id");
   work.onSave(workId, () => onLoad(150));
 }
+
+const onSubmit = async function () {
+  const {status, taskList} = await work.onSubmit(stateData.value, projectInfo.value);
+  if (status) {
+    await router.replace(taskList);
+  }
+}
+
 </script>
 
 <template>
@@ -89,7 +104,12 @@ const onSave = function (data: object) {
           <a v-if="isReady" :href="getKnowledgeUrl()" target="_blank">
             <Button>知识库</Button>
           </a>
-          <!--          <Button type="primary">提交</Button>-->
+          <template v-if="state.total > 0 && filterSuccess(state.results).length===state.total">
+            <Button type="primary" @click="onSubmit">提交</Button>
+          </template>
+          <template v-else>
+            <Button type="primary" :disabled="true">提交</Button>
+          </template>
         </Space>
       </div>
     </Card>

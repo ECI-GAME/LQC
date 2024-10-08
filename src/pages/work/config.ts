@@ -126,7 +126,7 @@ export const getNextRoute = function (list: ImageData[], value: ImageData) {
   }
 }
 
-export const filterSuccess = function (list: ImageData[]): ImageData[] {
+export const filterSuccess = function<T = object>(list: T[]): T[] {
   const db = new DBList([]);
   db.insert(list);
   return db.select({isFinish: ["1", 1]});

@@ -5,9 +5,13 @@
 
 import api from "src/api";
 import * as message from "@ue/message";
+import * as alias from "src/router/alias";
 import safeGet from "@fengqiaogang/safe-get";
 import {API_BASE, TOKEN_KEY, TOKEN_NAME} from "src/config";
 import Authorization from "src/libs/http/config/authorization";
+
+
+import type {TaskData, Project} from "src/types";
 
 // 图片保存
 export const onSave = async function (workId?: string | number, callback?: () => void) {
@@ -42,4 +46,30 @@ export const onDownloadText = function (taskId: string | number) {
     const tips = safeGet<string>(error, "message") || "导出时出错，还有未翻译的文本信息需处理。"
     message.error(tips);
   });
+}
+
+// 提交
+export const onSubmit = async function (task: TaskData, project: Project) {
+  const data = {
+    // 必传
+    id: task.id,
+    taskStatus: task.taskStatus,
+    projectNum: project.projectNum,
+    projectId: project.id,
+    // 非必传
+    taskName: task.taskName,
+    taskOrder: task.taskOrder,
+    sourceLanguage: task.sourceLanguage,
+    targetLanguage: task.targetLanguage,
+    versionId: task.versionId,
+    versionName: task.versionName,
+  };
+  const status = await api.work.onSubmit(data);
+  const page = {
+    name: alias.TaskList.name,
+    params: {
+      versionId: task.versionId, projectId: project.id
+    }
+  }
+  return {status, taskList: page};
 }

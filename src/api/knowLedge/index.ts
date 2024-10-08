@@ -17,17 +17,16 @@ export default class extends Graphql {
    */
   @tryError(new PageResult())
   async list<T = object>(pageNum: number, projectId: number | string, versionId: number | string = 0, searchValue: string = "", resourceType: string, pageSize: number = 20): Promise<PageResult<T>> {
-    const name = "knowledgeList";
     const input = {
-      pageNum,
-      pageSize,
-      projectId,
+      pageNum: Number(pageNum),
+      pageSize: Number(pageSize),
+      projectId: Number(projectId),
       searchValue: _.trim(searchValue),
       versionId: Number(versionId || 0),
       resourceType: String(resourceType),
     }
     const keys = ["code", "rows", "total", "msg"];
-    const res = await this.graphQL<object>(name, [{input}], keys);
+    const res = await this.graphQL<object>("knowledgeList", [{input}], keys);
     return new PageResult<T>(res);
   }
 

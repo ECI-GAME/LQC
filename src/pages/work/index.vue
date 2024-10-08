@@ -39,7 +39,7 @@ const recordTabs = ref<string[]>([RecordTabType.Word, RecordTabType.Comment]);
 
 
 const currentFile = ref<ImageData>();
-// 任务详情
+// 项目详情
 const {state: projectInfo} = model.result<Project>(() => {
   return api.project.getProjectInfoByTId(route.params.taskId as string);
 }, {} as Project, true);
@@ -157,29 +157,11 @@ const backOption = function (task: TaskData) {
   }
 }
 
+// 提交
 const onSubmit = async function () {
-  const data = {
-    // 必传
-    id: taskInfo.value.id,
-    taskStatus: taskInfo.value.taskStatus,
-    projectNum: projectInfo.value.projectNum,
-    projectId: projectInfo.value.id,
-    // 非必传
-    taskName: taskInfo.value.taskName,
-    taskOrder: taskInfo.value.taskOrder,
-    sourceLanguage: taskInfo.value.sourceLanguage,
-    targetLanguage: taskInfo.value.targetLanguage,
-    versionId: taskInfo.value.versionId,
-    versionName: taskInfo.value.versionName,
-  };
-  const status = await api.work.onSubmit(data);
+  const {status, taskList} = await work.onSubmit(taskInfo.value, projectInfo.value);
   if (status) {
-    await router.replace({
-      name: alias.TaskList.name,
-      params: {
-        versionId: taskInfo.value.versionId, projectId: taskInfo.value.projectId
-      }
-    });
+    await router.replace(taskList);
   }
 }
 
