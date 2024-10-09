@@ -1,9 +1,10 @@
 import path from "path";
 import vue from '@vitejs/plugin-vue'
 import jsx from "@vitejs/plugin-vue-jsx";
-import {defineConfig, loadEnv, type UserConfig} from 'vite';
+import safeGet from "@fengqiaogang/safe-get";
 import commonjs from 'vite-plugin-commonjs';
 import htmlPlugin from "vite-plugin-html-config";
+import {defineConfig, loadEnv, type UserConfig} from 'vite';
 // @ts-ignore
 import ElementPlus from 'unplugin-element-plus/vite';
 
@@ -15,10 +16,10 @@ const Config = defineConfig(function (config: UserConfig) {
   if (env.VITE_APP_ICONFONT) {
     headScripts.push({defer: true, src: env.VITE_APP_ICONFONT});
   }
-  // const command = safeGet<string>(config, "command");
-  // if (command !== "build") {
-  //   alias["vue"] = path.resolve("node_modules", "vue/dist", "vue.esm-browser.js");
-  // }
+  const command = safeGet<string>(config, "command");
+  if (command !== "build") {
+    alias["vue"] = path.resolve("node_modules", "vue/dist", "vue.esm-browser.js");
+  }
   return {
     resolve: {
       extensions: [".ts", ".vue", ".cjs", ".js", ".tsx"],

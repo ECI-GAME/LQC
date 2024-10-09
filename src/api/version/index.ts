@@ -129,6 +129,19 @@ export default class extends Graphql {
     return {params, callback};
   }
 
+  /**
+   * 版本图片排序
+   **/
+  @tryError(false)
+  @$error()
+  @Post("/project/images/changeImageSort")
+  @validate
+  versionImageSort(@required data: object[]): Promise<boolean> {
+    const callback = () => true;
+    // @ts-ignore
+    return {data, callback};
+  }
+
 
   /** 图片名称重名检查 */
   @tryError(false)

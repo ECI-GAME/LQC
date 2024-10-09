@@ -1,14 +1,22 @@
 <script setup lang="ts">
+/**
+ * @file 版本图片管理
+ * @author svon.me@gmail.com
+ **/
+
 import {ref} from 'vue';
 import api from "src/api";
 import * as _ from "lodash-es";
+import * as modal from "@ue/modal";
 import * as model from "src/utils/model";
 import {checkFileImage} from "src/utils/accpet";
 import Upload from "src/components/upload/index.vue";
+import UeSort from "src/components/ue/sort/image.vue";
+import Loading from "src/components/loading/index.vue";
 import {initSelectedList, autoSelectedList, getAllSelectList} from "./common";
 import {Image, Space, Checkbox, CheckboxGroup, Divider, Button, message} from "ant-design-vue";
 
-import type {PropType} from "vue";
+import type {PropType, Component} from "vue";
 import type {FileData} from "src/utils/upload/common";
 import type {VersionInfo, ProjectImage} from "src/types";
 
@@ -47,7 +55,7 @@ const {state: info} = model.result<VersionInfo>(function () {
   return api.version.geVersionInfoById<VersionInfo>(props.versionId)
 }, {} as VersionInfo, true);
 
-const {state: list, execute: reLoad} = model.list<ProjectImage>(async function () {
+const {state: list, execute: reLoad, isLoading} = model.list<ProjectImage>(async function () {
   const res = await api.version.geVersionImageById<ProjectImage>(props.versionId);
   // 根据 taskID 和 默认的 props.value 筛选需要默认选中的数据
   const all = getAllSelectList(res.results, props.taskId);
@@ -134,19 +142,43 @@ const onSave = function () {
   }
 }
 
+// 更新排序
+const updateSort = function (list: object[]) {
+  return api.version.versionImageSort(list);
+}
+
+const onSort = async function () {
+  const status = await modal.confirm<Component, boolean>(UeSort, {
+    title: "图片排序",
+    width: 720,
+    onOk: updateSort
+  }, {
+    // @ts-ignore
+    value: list.value.results
+  });
+  if (status) {
+    await reLoad(100);
+  }
+}
+
 defineExpose({onSubmit: onSave, getList: () => list.value.results});
 
 </script>
 <template>
-  <div class="py-3">
+  <Loading class="py-3" :status="isLoading">
     <div class="flex items-center justify-between px-3">
       <Checkbox v-model:checked="checkAll" :indeterminate="indeterminate" @change="onCheckAllChange">全选</Checkbox>
-      <Upload :multiple="true" :accept="checkFileImage" @success="onSuccess" v-model:loading="isOnloading">
-        <Button :loading="isOnloading">图片上传</Button>
-      </Upload>
+      <div class="flex items-center">
+        <Space size="large">
+          <Upload :multiple="true" :accept="checkFileImage" @success="onSuccess" v-model:loading="isOnloading">
+            <Button :loading="isOnloading">图片上传</Button>
+          </Upload>
+          <Button @click="onSort">排序</Button>
+        </Space>
+      </div>
     </div>
     <Divider class="my-3"/>
-    <div class="max-h-100 overflow-auto mb-3">
+    <div class="max-h-100 min-h-50 overflow-auto mb-3">
       <CheckboxGroup class="block clearfix cursor-default" v-model:value="imageIds" @change="onChangeValue">
         <div class="float-left ml-3 mb-3 w-25 truncate" v-for="item in list.results" :key="item.id">
           <div class="h-40 rounded-md overflow-hidden text-center" :title="item.imageName">
@@ -171,6 +203,6 @@ defineExpose({onSubmit: onSave, getList: () => list.value.results});
         </div>
       </slot>
     </div>
-  </div>
+  </Loading>
 </template>
 
