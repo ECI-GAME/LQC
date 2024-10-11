@@ -77,7 +77,9 @@ const onCheckText = async function () {
 editor.on("create", async function () {
   await onCheckText();
   if (props.autofocus) {
-    editor.commands.setTextSelection(__html.length)
+    if (__html && __html.length > 0) {
+      editor.commands.setTextSelection(__html.length)
+    }
     editor.commands.focus(); // 确保编辑器获得焦点
   }
 });

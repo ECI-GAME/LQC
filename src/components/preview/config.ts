@@ -1,9 +1,5 @@
 import {basename} from "src/utils/image";
 
-export const DotType = {
-  "1": "框内",
-  "2": "框外"
-}
 
 export const scaleTipFormatter = function (value: string | number): string {
   return `${value}%`;
@@ -27,7 +23,7 @@ export class DotData {
   public taskId!: string | number;
   public imageId!: string | number;
   public imageName?: string;
-  public imageFlag: string | number = "6"; // 类型， 默认框内
+  public imageFlag?: string | number = "6"; // 类型， 默认框内
   public translatedText: string = "";      // 译文
   public translatedHtml: string = "";
   public originalText: string = "";       // 原文 / 图片识别的文字内容

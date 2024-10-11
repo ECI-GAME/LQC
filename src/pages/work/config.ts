@@ -4,9 +4,11 @@ import {userStore} from "src/store";
 import * as alias from "src/router/alias";
 import {DBList} from "@fengqiaogang/dblist";
 import safeGet from "@fengqiaogang/safe-get";
-import type {ImageData} from "src/types/image";
 
 import {CheckCode} from "src/types";
+import type {Remark} from "src/types";
+import type {ImageData} from "src/types/image";
+import type {PageResult} from "src/utils/model";
 import type {DotData} from "src/components/preview/config";
 
 export enum RecordTabType {
@@ -126,8 +128,26 @@ export const getNextRoute = function (list: ImageData[], value: ImageData) {
   }
 }
 
-export const filterSuccess = function<T = object>(list: T[]): T[] {
+export const filterSuccess = function <T = object>(list: T[]): T[] {
   const db = new DBList([]);
   db.insert(list);
   return db.select({isFinish: ["1", 1]});
+}
+
+export const typeFieldNames = {
+  value: "id",
+  label: "errorTypeName",
+  children: "childrenList"
+};
+
+interface TypeData<T = Remark> {
+  db: DBList<T>;
+  list: PageResult<T>;
+}
+
+export const getTypeList = async function <T = Remark>(projectId: string | number): Promise<TypeData<T>> {
+  const res = await api.project.projectErrorType<T>(projectId);
+  const db = new DBList([], typeFieldNames.value);
+  db.insert(res.results, typeFieldNames.children);
+  return {list: res, db};
 }

@@ -15,6 +15,7 @@ import * as work from "src/utils/work/common";
 import {useRoute, useRouter} from "vue-router";
 import RegisterWord from "./register/word.vue";
 import Tab from "src/components/tab/index.vue";
+import RecordFast from "./register/record_fast.vue";
 import RegisterComment from "./register/comment.vue";
 import Screen from "src/components/screen/index.vue";
 import Preview from "src/components/preview/index.vue";
@@ -25,7 +26,6 @@ import UeProgress from "src/components/ue/progress.vue";
 import {ref, onMounted, onBeforeUnmount, computed} from "vue";
 import {filterSuccess, pickImage, RecordTabType} from "./config";
 import {DotDataType, DotData} from "src/components/preview/config";
-import WordFast from "./register/word_fast.vue";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
 
 import type {ImageData, TaskData, Project} from "src/types";
@@ -279,13 +279,14 @@ const calcDotValue = function (data: DotData): DotData {
                       v-model:y1="dotAddTempValue.yCorrdinate1"
                       v-model:x2="dotAddTempValue.xCorrdinate2"
                       v-model:y2="dotAddTempValue.yCorrdinate2">
-                <WordFast :data="calcDotValue(dotAddTempValue)"
-                          :file="currentFile"
-                          :language="taskInfo.sourceLanguage"
-                          :projectId="taskInfo.projectId"
-                          :read-order="projectInfo.readOrder"
-                          :active="recordActive"
-                          @save="onUpDataDots"/>
+                <!--快捷记录-->
+                <RecordFast :data="calcDotValue(dotAddTempValue)"
+                            :file="currentFile"
+                            :language="taskInfo.sourceLanguage"
+                            :projectId="taskInfo.projectId"
+                            :read-order="projectInfo.readOrder"
+                            :active="recordActive"
+                            @save="onUpDataDots"/>
               </Screen>
             </template>
           </Preview>

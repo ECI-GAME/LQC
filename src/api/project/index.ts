@@ -194,11 +194,11 @@ export default class extends Graphql {
    */
   @tryError([])
   @validate
-  async projectErrorType(@required projectId: string | number): Promise<PageResult<Remark>> {
+  async projectErrorType<T = Remark>(@required projectId: string | number): Promise<PageResult<T>> {
     const name = "getProjectErrorTypeList";
     const input = {projectId: Number(projectId)};
-    const res = await this.graphQL<{ data: Remark[] }>(name, {input}, ["data"]);
-    return new PageResult<Remark>(safeGet<Remark[]>(res, "data"));
+    const res = await this.graphQL<{ data: T[] }>(name, {input}, ["data"]);
+    return new PageResult<T>(safeGet<T[]>(res, "data"));
   }
 
 
