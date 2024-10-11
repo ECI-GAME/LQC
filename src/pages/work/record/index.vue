@@ -44,6 +44,10 @@ const props = defineProps({
   isFinish: {
     type: [String, Number],
     required: false,
+  },
+  disabled: {
+    type: Boolean,
+    required: false,
   }
 });
 
@@ -96,7 +100,7 @@ const onSort = function (res: object[]) {
 
 <template>
   <div class="pb-2 deep-[th]:whitespace-nowrap deep-[th]:w-35">
-    <UeSort v-if="list.length > 0" v-model:value="nodeList" :key="active" :field-names="fieldNames" @sort="onSort">
+    <UeSort v-if="list.length > 0" v-model:value="nodeList" :key="active" :field-names="fieldNames" @sort="onSort" :disabled="disabled">
       <template #default="{ data, index }">
         <WorkNode class="mt-2 first:mt-0"
                   :data="data"
@@ -104,6 +108,7 @@ const onSort = function (res: object[]) {
                   :active="active"
                   :project-id="projectId"
                   :image-status="imageStatus"
+                  :disabled="disabled"
                   @update="onUpdate"
                   @edit="onEditDetail"
                   @view="onShowDetail"/>

@@ -5,17 +5,16 @@
  */
 
 import api from "src/api";
-import {ref, onMounted} from "vue";
 import Switch from "./switch.vue";
 import BigNumber from "bignumber.js";
 import {TaskStatus} from "src/types";
 import Record from "./record/index.vue";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
+import * as work from "src/utils/work/common";
 import {useRoute, useRouter} from "vue-router";
 import RegisterWord from "./register/word.vue";
 import Tab from "src/components/tab/index.vue";
-import * as work from "src/utils/work/common";
 import RegisterComment from "./register/comment.vue";
 import Screen from "src/components/screen/index.vue";
 import Preview from "src/components/preview/index.vue";
@@ -23,8 +22,10 @@ import TaskTitle from "src/components/task/title.vue";
 import Loading from "src/components/loading/index.vue";
 import TaskLog from "src/components/task/log/button.vue";
 import UeProgress from "src/components/ue/progress.vue";
+import {ref, onMounted, onBeforeUnmount, computed} from "vue";
 import {filterSuccess, pickImage, RecordTabType} from "./config";
 import {DotDataType, DotData} from "src/components/preview/config";
+import WordFast from "./register/word_fast.vue";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
 
 import type {ImageData, TaskData, Project} from "src/types";
@@ -35,7 +36,12 @@ const route = useRoute();
 const router = useRouter();
 const recordActive = ref<string>();
 const dotAddTempValue = ref<DotData>();
+const dotEditTempValue = ref<DotData>();
 const recordTabs = ref<string[]>([RecordTabType.Word, RecordTabType.Comment]);
+
+const disabled = computed<boolean>(function () {
+  return !!(dotAddTempValue.value || dotEditTempValue.value);
+})
 
 
 const currentFile = ref<ImageData>();
@@ -92,8 +98,9 @@ const onReloadList = function () {
 }
 
 const onUpDataDots = function () {
+  onCancelDot();
+  onRemoveKeydown();
   _reloadDots(100);
-  dotAddTempValue.value = void 0;
 }
 
 const onChangeTabValue = function () {
@@ -144,13 +151,14 @@ const onEditLocation = function (id: string | number) {
     const data = pickImage<DotData>(dots.value.results, id)
     if (data) {
       image.setBoxDot(data);
-      dotAddTempValue.value = data;
+      dotEditTempValue.value = data;
     }
   }
 }
 
 const onCancelDot = function () {
   dotAddTempValue.value = void 0;
+  dotEditTempValue.value = void 0;
 }
 
 const backOption = function (task: TaskData) {
@@ -175,7 +183,25 @@ const onDownloadText = function () {
   work.onDownloadText(route.params.taskId as string);
 }
 
+const handleKeydown = function (e: KeyboardEvent) {
+  if (e.key === 'Escape') {
+    e.stopPropagation();
+    e.preventDefault();
+    onRemoveKeydown();
+  }
+}
+
+const onRemoveKeydown = function () {
+  onCancelDot();
+  window.removeEventListener('keydown', handleKeydown);
+}
+
+onBeforeUnmount(onRemoveKeydown);
+
 const onClickImage = function (e: Event, data: { x: number, y: number, width: number, height: number }) {
+  onRemoveKeydown();
+  window.addEventListener('keydown', handleKeydown);
+
   dotAddTempValue.value = new DotData(
     data.x,
     data.y,
@@ -252,16 +278,24 @@ const calcDotValue = function (data: DotData): DotData {
                       v-model:x1="dotAddTempValue.xCorrdinate1"
                       v-model:y1="dotAddTempValue.yCorrdinate1"
                       v-model:x2="dotAddTempValue.xCorrdinate2"
-                      v-model:y2="dotAddTempValue.yCorrdinate2"/>
+                      v-model:y2="dotAddTempValue.yCorrdinate2">
+                <WordFast :data="calcDotValue(dotAddTempValue)"
+                          :file="currentFile"
+                          :language="taskInfo.sourceLanguage"
+                          :projectId="taskInfo.projectId"
+                          :read-order="projectInfo.readOrder"
+                          :active="recordActive"
+                          @save="onUpDataDots"/>
+              </Screen>
             </template>
           </Preview>
         </LayoutContent>
         <LayoutSider class="!w-120 !max-w-120 !flex-auto bg-white overflow-y-auto">
           <Loading class="h-full p-2" :status="isLoading">
             <Tab class="mb-2" v-model:value="recordActive" :list="recordTabs" @change="onChangeTabValue"
-                 :disabled="!!dotAddTempValue"></Tab>
+                 :disabled="disabled"></Tab>
             <!-- 标记数量大于0或者正在创建标记点数据 -->
-            <template v-if="dotAddTempValue || dots.total > 0">
+            <template v-if="dotEditTempValue || dots.total > 0">
               <Record v-if="currentFile && taskInfo && taskInfo.projectId"
                       @view="onViewLocation"
                       @edit="onEditLocation"
@@ -272,16 +306,17 @@ const calcDotValue = function (data: DotData): DotData {
                       :key="recordActive"
                       :list="dots.results"
                       :image-status="currentFile.imageStatus"
-                      :is-finish="currentFile.isFinish">
-                <Card v-if="dotAddTempValue" class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small">
+                      :is-finish="currentFile.isFinish"
+                      :disabled="disabled">
+                <Card v-if="dotEditTempValue" class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small">
                   <RegisterComment v-if="recordActive === RecordTabType.Comment"
-                                   :data="dotAddTempValue"
+                                   :data="calcDotValue(dotEditTempValue)"
                                    :file="currentFile"
                                    :projectId="taskInfo.projectId"
                                    @save="onUpDataDots"
                                    @cancel="onCancelDot"></RegisterComment>
                   <RegisterWord v-else-if="currentFile"
-                                :data="calcDotValue(dotAddTempValue)"
+                                :data="calcDotValue(dotEditTempValue)"
                                 :file="currentFile"
                                 :language="taskInfo.sourceLanguage"
                                 :projectId="taskInfo.projectId"

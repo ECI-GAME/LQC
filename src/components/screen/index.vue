@@ -181,6 +181,9 @@ const stopDrag = () => {
         <div class="screen-dot" :class="name" @mousedown="onResize($event, name)"></div>
       </template>
     </div>
+    <div class="mt-1 min-w-60">
+      <slot></slot>
+    </div>
   </div>
 </template>
 

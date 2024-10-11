@@ -45,6 +45,10 @@ const props = defineProps({
     type: [String, Number],
     required: false,
   },
+  disabled: {
+    type: Boolean,
+    required: false,
+  }
 });
 
 const {isCreateBy} = useCreateBy();
@@ -98,14 +102,14 @@ const onRemoveDetail = async function (data: DotData) {
             <!--标记-->
             <span class="flex-1 w-1 truncate mr-2 ml-1" :class="getTitleColor(data)">{{ data.translatedText }}</span>
             <Space>
-              <Button class="p-0 text-lg" type="primary" link @click.stop="onShowDetail(data)" title="查看详情">
+              <Button class="p-0 text-lg" type="primary" link :disabled="disabled" @click.stop="onShowDetail(data)" title="查看详情">
                 <Icon type="detail"></Icon>
               </Button>
-              <Button class="p-0 text-lg" type="warning" link @click.stop="onEditDetail(data)" title="编辑">
+              <Button class="p-0 text-lg" type="warning" link :disabled="disabled" @click.stop="onEditDetail(data)" title="编辑">
                 <Icon type="edit-square"></Icon>
               </Button>
               <template v-if="imageStatus && _.includes(['2', '3', '15', '16'], String(imageStatus))">
-                <Button class="p-0 text-lg" type="danger" link @click.stop="onRemoveDetail(data)" title="删除">
+                <Button class="p-0 text-lg" type="danger" link :disabled="disabled" @click.stop="onRemoveDetail(data)" title="删除">
                   <Icon type="delete-fill"></Icon>
                 </Button>
               </template>
@@ -115,14 +119,14 @@ const onRemoveDetail = async function (data: DotData) {
             <!--批注-->
             <span class="flex-1 w-1 truncate mr-2 ml-1" :title="data.remark">{{ data.remark }}</span>
             <Space>
-              <Button class="p-0 text-lg" type="primary" link @click.stop="onShowDetail(data)" title="查看详情">
+              <Button class="p-0 text-lg" type="primary" link :disabled="disabled" @click.stop="onShowDetail(data)" title="查看详情">
                 <Icon type="detail"></Icon>
               </Button>
               <template v-if="isCreateBy(data)">
-                <Button class="p-0 text-lg" type="warning" link @click.stop="onEditDetail(data)" title="编辑">
+                <Button class="p-0 text-lg" type="warning" link :disabled="disabled" @click.stop="onEditDetail(data)" title="编辑">
                   <Icon type="edit-square"></Icon>
                 </Button>
-                <Button class="p-0 text-lg" type="danger" link @click.stop="onRemoveDetail(data)" title="删除">
+                <Button class="p-0 text-lg" type="danger" link :disabled="disabled" @click.stop="onRemoveDetail(data)" title="删除">
                   <Icon type="delete-fill"></Icon>
                 </Button>
               </template>

@@ -235,7 +235,7 @@ const onScanWord = function () {
       </div>
     </FormItem>
 
-    <FormItem class="deep-[label]:w-full" name="originalText" :rules="rules.text('请填写原文！')">
+    <FormItem class="deep-[label]:w-full" name="originalText">
       <template #label>
         <div class="w-full flex items-center justify-between">
           <div>

@@ -25,6 +25,10 @@ const props = defineProps({
       return {id: "id"};
     }
   },
+  disabled: {
+    type: Boolean,
+    required: false,
+  }
 });
 
 const uuid = ref<number>(Math.random());
@@ -52,6 +56,9 @@ const getValue = function () {
 }
 
 const onDragSortEnd = function (e: object) {
+  if (props.disabled) {
+    return false;
+  }
   const newIndex = safeGet<number>(e, "moved.newIndex")!;
   const oldIndex = safeGet<number>(e, "moved.oldIndex")!;
   const res = _.map(list.value, toRaw);
@@ -67,11 +74,16 @@ const onDragSortEnd = function (e: object) {
 
 defineExpose({onSubmit: getValue});
 
+const noTransitionOnDrag = function () {
+  return !props.disabled;
+}
+
 </script>
 
 <template>
   <div>
-    <VueDraggableNext v-if="_.size(list) > 1" class="block" :key="uuid" :list="[...list]" @change="onDragSortEnd">
+    <VueDraggableNext v-if="_.size(list) > 1" class="block" :key="uuid" :list="[...list]" @change="onDragSortEnd"
+                      :move="noTransitionOnDrag">
       <template v-for="(item, index) in list" :key="`${item[keyName]}-${index}`">
         <slot :data="item" :index="index"></slot>
       </template>
