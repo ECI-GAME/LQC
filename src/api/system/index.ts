@@ -1,8 +1,6 @@
 import cache from "src/utils/cache";
 import {PageResult} from "src/utils/model";
 import {validate, required, Get, Post, tryError} from "@js-lion/api";
-import safeGet from "@fengqiaogang/safe-get";
-import * as message from "@ue/message";
 
 import type { DictItem } from "src/types";
 
@@ -11,7 +9,7 @@ export default class {
    * 枚举列表
    **/
   @tryError(new PageResult<object>())
-  @cache()
+  @cache(60 * 1000)
   @Get("/system/dict/data/type/:name")
   @validate
   getDictData<T = DictItem>(@required name: string): Promise<PageResult<T>> {

@@ -26,7 +26,12 @@ export default class extends GraphQL {
   @cache(5 * 1000)
   @Get("/project/task/relations/checkButtonStatus/:id")
   @validate
-  taskButtons(@required relationId: string | number): Promise<TaskButtonStatus> {
+  async taskButtons(@required relationId: string | number, @required taskId: string | number): Promise<TaskButtonStatus> {
+    if (taskId) {
+      // 记录任务状态
+      await this.track(taskId);
+    }
+    // 获取安装状态
     const params = {id: relationId};
     const callback = function (value: object): TaskButtonStatus {
       return new TaskButtonStatus(value);

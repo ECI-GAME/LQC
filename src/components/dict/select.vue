@@ -45,6 +45,7 @@ const props = defineProps({
   placeholder: {
     type: String,
     required: false,
+    default: () => "请选择"
   }
 });
 

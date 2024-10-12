@@ -15,6 +15,7 @@ import * as work from "src/utils/work/common";
 import {useRoute, useRouter} from "vue-router";
 import RegisterWord from "./register/word.vue";
 import Tab from "src/components/tab/index.vue";
+import {ref, onBeforeUnmount, computed} from "vue";
 import RecordFast from "./register/record_fast.vue";
 import RegisterComment from "./register/comment.vue";
 import Screen from "src/components/screen/index.vue";
@@ -23,7 +24,6 @@ import TaskTitle from "src/components/task/title.vue";
 import Loading from "src/components/loading/index.vue";
 import TaskLog from "src/components/task/log/button.vue";
 import UeProgress from "src/components/ue/progress.vue";
-import {ref, onMounted, onBeforeUnmount, computed} from "vue";
 import {filterSuccess, pickImage, RecordTabType} from "./config";
 import {DotDataType, DotData} from "src/components/preview/config";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
@@ -45,10 +45,6 @@ const disabled = computed<boolean>(function () {
 
 
 const currentFile = ref<ImageData>();
-
-onMounted(function () {
-  api.task.track(route.params.taskId as string);
-})
 
 // 项目详情
 const {state: projectInfo} = model.result<Project>(() => {

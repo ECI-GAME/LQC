@@ -51,7 +51,7 @@ const _state = ref<DotData[]>([]);
 
 // 按钮操作权限
 const {state: taskButton} = model.result<TaskButtonStatus>(() => {
-  return api.task.taskButtons(props.file.id);
+  return api.task.taskButtons(props.file.id, props.file.taskId);
 }, new TaskButtonStatus(), true);
 
 const nodeList = computed<DotData[]>({

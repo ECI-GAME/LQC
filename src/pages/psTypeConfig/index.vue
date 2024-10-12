@@ -6,10 +6,11 @@
 
 import api from "src/api";
 import {ref, onMounted} from "vue";
-import * as model from "src/utils/model";
 import {useRoute, useRouter} from "vue-router";
+import Dict from "src/components/dict/index.vue";
+import Select from "src/components/dict/select.vue";
 import Loading from "src/components/loading/index.vue";
-import {Card, Button, Form, FormItem, Select, InputNumber} from "ant-design-vue";
+import {Card, Button, Form, FormItem, InputNumber} from "ant-design-vue";
 
 import type {PsConfig} from "src/types";
 
@@ -17,18 +18,8 @@ const route = useRoute();
 const router = useRouter();
 const isLoading = ref<boolean>(true);
 const labelCol = {style: {width: '5rem'}};
-const fieldNames = {label: 'dictLabel', value: 'dictValue'};
 
 const psConfigList = ref<PsConfig[]>([]);
-const {state: psFontList, isReady: isReadyFont} = model.list(() => api.system.getDictData('sys_ps_font'), void 0, true);
-const {
-  state: psFontConfigList,
-  isReady: isReadyDirect
-} = model.list(() => api.system.getDictData('comic_ps_font_direction'), void 0, true);
-const {
-  state: psTitleConfigList,
-  isReady: isReadyTitle
-} = model.list(() => api.system.getDictData('comic_ps_title_config'), void 0, true);
 
 const getConfigList = async function () {
   isLoading.value = true;
@@ -41,17 +32,6 @@ const getConfigList = async function () {
 
 onMounted(getConfigList);
 
-const findTitle = function (dictValue: string | number): string | undefined {
-  let text: string | undefined;
-  for (const data of psTitleConfigList.value.results) {
-    if (data.dictValue === dictValue) {
-      text = data.dictLabel;
-      break;
-    }
-  }
-  return text;
-}
-
 const onSubmit = async function () {
   const status = await api.project.updateProjectPSErrorData(psConfigList.value);
   if (status) {
@@ -62,32 +42,19 @@ const onSubmit = async function () {
 
 <template>
   <Loading :status="isLoading">
-    <Form class="min-h-150" layout="horizontal" :label-col="labelCol" v-if="isReadyFont && isReadyDirect && isReadyTitle">
-      <Card class="mt-5 first:mt-0" size="small"
-            v-for="item in psConfigList"
-            :key="item.id"
-            :title="findTitle(item.category)">
-        <FormItem label="文字方向">
-          <Select
-              class="w-full max-w-50"
-              v-model:value="item.textDirection"
-              size="small"
-              placeholder="请选择"
-              :fieldNames="fieldNames"
-              :options="psFontConfigList.results">
-          </Select>
+    <Form class="min-h-150" size="small" layout="horizontal" :label-col="labelCol">
+      <Card class="mt-5 first:mt-0" size="small" v-for="item in psConfigList" :key="item.id">
+        <template #title>
+          <Dict :value="item.category" type="comic_ps_title_config"></Dict>
+        </template>
+        <FormItem class="pt-3" label="文字方向">
+          <Select class="max-w-50" v-model:value="item.textDirection" type="comic_ps_font_direction"></Select>
         </FormItem>
 
         <FormItem label="字体">
           <div class="flex items-center">
             <div class="flex-1 max-w-50">
-              <Select class="w-full" v-model:value="item.font"
-                      size="small"
-                      showSearch
-                      placeholder="请选择"
-                      :fieldNames="fieldNames"
-                      :options="psFontList.results">
-              </Select>
+              <Select v-model:value="item.font" showSearch type="sys_ps_font"></Select>
             </div>
             <div class="flex-1 max-w-50 ml-5">
               <InputNumber v-model:value="item.fontSize" :min="1" :max="1296" :step="1" :precision="0" size="small"
@@ -103,9 +70,9 @@ const onSubmit = async function () {
           </div>
         </FormItem>
       </Card>
-      <div class="mt-5 first:mt-0 text-right">
-        <Button type="primary" @click="onSubmit">保存</Button>
-      </div>
     </Form>
+    <div class="mt-5 first:mt-0 text-right">
+      <Button type="primary" @click="onSubmit">保存</Button>
+    </div>
   </Loading>
 </template>
