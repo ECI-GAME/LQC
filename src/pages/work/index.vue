@@ -24,7 +24,7 @@ import TaskTitle from "src/components/task/title.vue";
 import Loading from "src/components/loading/index.vue";
 import TaskLog from "src/components/task/log/button.vue";
 import UeProgress from "src/components/ue/progress.vue";
-import {filterSuccess, pickImage, RecordTabType} from "./config";
+import {filterSuccess, pickImage, RecordTabType, backTaskListOption} from "./config";
 import {DotDataType, DotData} from "src/components/preview/config";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
 
@@ -157,14 +157,7 @@ const onCancelDot = function () {
   dotEditTempValue.value = void 0;
 }
 
-const backOption = function (task: TaskData) {
-  return {
-    name: alias.TaskDetails.name,
-    params: {
-      versionId: task.versionId, taskId: task.id
-    }
-  }
-}
+
 
 // 提交
 const onSubmit = async function () {
@@ -248,7 +241,7 @@ const calcDotValue = function (data: DotData): DotData {
             <template v-else>
               <Button type="primary" :disabled="true">提交</Button>
             </template>
-            <router-link :to="backOption(task)" :replace="true">
+            <router-link :to="backTaskListOption(task)" :replace="true">
               <Button>返回</Button>
             </router-link>
           </Space>

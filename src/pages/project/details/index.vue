@@ -6,16 +6,17 @@
 
 import {Icon} from "@ue/icon";
 import {computed, ref} from "vue";
-import {useRoute} from 'vue-router';
 import Version from './version.vue';
 import {useImageAlbum} from "./common";
 import * as alias from "src/router/alias";
+import {useRoute, useRouter} from 'vue-router';
 import Dict from "src/components/dict/index.vue";
 import Loading from "src/components/loading/index.vue";
 import LanguageDetail from "src/components/language/detail.vue";
 import {Descriptions, DescriptionsItem, Card, Button, Space} from 'ant-design-vue';
 
 const route = useRoute();
+const router = useRouter();
 const uuid = ref<number>(Math.random());
 const projectId = computed<string | number>(() => route.params.projectId as string);
 
@@ -28,6 +29,14 @@ const onCreateVersion = async function () {
     uuid.value = Math.random();
   }
 }
+
+const imageLink = computed(function () {
+  const page = router.resolve({name: alias.VersionImage.name, params: route.params})
+  if (page) {
+    return page.fullPath;
+  }
+  return "javascript:;";
+});
 
 </script>
 
@@ -104,14 +113,14 @@ const onCreateVersion = async function () {
                 <span>创建画册</span>
               </Space>
             </Button>
-            <RouterLink :to="{ name: alias.VersionImage.name, params: route.params }">
+            <a :href="imageLink">
               <Button type="primary" class="ml-2">
                 <Space>
                   <Icon class="flex" type="file-image"/>
                   <span>图片管理</span>
                 </Space>
               </Button>
-            </RouterLink>
+            </a>
           </Space>
         </div>
       </template>

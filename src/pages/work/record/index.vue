@@ -6,7 +6,7 @@
 
 import api from "src/api";
 import WorkNode from "./node.vue";
-import {RecordTabType} from "../config";
+import {useRouter} from "vue-router";
 import * as model from "src/utils/model";
 import onSure from "src/utils/tips/sure";
 import {ref, computed, toRaw} from "vue";
@@ -15,11 +15,13 @@ import safeGet from "@fengqiaogang/safe-get";
 import * as work from "src/utils/work/common";
 import {ElButton as Button} from "element-plus";
 import UeSort from "src/components/ue/sort/row.vue";
+import {RecordTabType, backTaskListOption} from "../config";
 
 import type {PropType} from "vue";
 import type {ImageData, TaskData} from "src/types";
 import type {DotData} from "src/components/preview/config";
 
+const router = useRouter();
 const $emit = defineEmits(["view", "edit", "success"]);
 
 const props = defineProps({
@@ -103,7 +105,7 @@ const onCommit = async function () {
     status = await api.task.confirm(props.file.id);
   }
   if (status) {
-    window.location.reload();
+    await router.replace(backTaskListOption(props.taskData));
   }
 }
 

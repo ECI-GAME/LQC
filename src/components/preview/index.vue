@@ -3,10 +3,12 @@ import {ref} from "vue";
 import {Icon} from "@ue/icon";
 import BigNumber from "bignumber.js";
 import safeGet from "@fengqiaogang/safe-get";
+import UeTag from "src/components/ue/tag.vue";
 import * as image from "src/utils/brower/image";
-import {DotDataType, DotData, scaleTipFormatter} from "./config";
+import Dict from "src/components/dict/index.vue";
 import {downloadFile} from "src/utils/brower/download";
 import Loading from "src/components/loading/index.vue";
+import {DotDataType, DotData, scaleTipFormatter} from "./config";
 import {Badge, Button, Layout, LayoutContent, LayoutHeader, Result, Slider, Space} from "ant-design-vue";
 
 import type {PropType} from "vue";
@@ -149,13 +151,14 @@ defineExpose({setBoxScroll, setBoxDot, scrollValue});
       <LayoutHeader class="bg-white h-[initial] leading-[initial] px-2 border-b border-gray border-solid">
         <div class="flex items-center">
           <div class="flex-1 flex items-center">
-            <Button class="px-0" type="link" @click="downloadFile(data.imagePath)" :disabled="isLoading || isLoadError">
+            <Button class="px-0 ml-3 first:ml-0" type="link" @click="downloadFile(data.imagePath)"
+                    :disabled="isLoading || isLoadError">
               <Space :size="4">
                 <Icon class="text-xl flex" type="download"></Icon>
                 <span>下载</span>
               </Space>
             </Button>
-            <a class="inline-block mx-3" :href="image.preview(data.imagePath)" target="_blank">
+            <a class="inline-block ml-3 first:ml-0" :href="image.preview(data.imagePath)" target="_blank">
               <Button class="px-0" type="link" :disabled="isLoading || isLoadError">
                 <Space :size="4">
                   <Icon class="text-xl flex" type="expend"></Icon>
@@ -163,10 +166,12 @@ defineExpose({setBoxScroll, setBoxDot, scrollValue});
                 </Space>
               </Button>
             </a>
-            <span class="flex-1 w-1 truncate">{{ data.imageName }}</span>
+            <UeTag v-if="data.handlerName" class="ml-3 first:ml-0" :value="data.handlerName"></UeTag>
+            <Dict class="ml-3 first:ml-0" :value="data.imageStatus" type="comic_task_status"></Dict>
+            <span class="ml-3 first:ml-0 flex-1 w-1 truncate">{{ data.imageName }}</span>
           </div>
-          <div class="w-20 flex-1 flex justify-end pl-10 pr-2">
-            <Slider class="w-100 max-w-full"
+          <div class="w-15 flex-1 flex justify-end pl-10 pr-2">
+            <Slider class="w-full"
                     :min="30"
                     :max="300"
                     :step="1"
@@ -208,7 +213,8 @@ defineExpose({setBoxScroll, setBoxDot, scrollValue});
                   <span
                       class="inline-block cursor-pointer absolute left-[var(--dot-x)] top-[var(--dot-y)] transform -translate-x-1/2 -translate-y-1/2"
                       :style="`--dot-x: ${item.xCorrdinate1 || 0}px; --dot-y: ${item.yCorrdinate1 || 0}px;`">
-                    <Badge v-if="String(item.coordinateType) === String(DotDataType.Comment)" :count="index + 1" color="orange"></Badge>
+                    <Badge v-if="String(item.coordinateType) === String(DotDataType.Comment)" :count="index + 1"
+                           color="orange"></Badge>
                     <Badge v-else :count="index + 1" color="blue"></Badge>
                   </span>
                 </template>
