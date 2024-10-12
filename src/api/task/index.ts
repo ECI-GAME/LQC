@@ -259,8 +259,14 @@ export default class extends GraphQL {
     const params = {id: imageId, type: imageType, ...query};
     const callback = (value: object) => {
       const src = safeGet<string>(value, "path");
+      const key = safeGet<string>(value, "key");
       if (src) {
-        return src;
+        if(src.startsWith('http')){
+          return src;
+        }else{
+          return key;
+        }
+        
       }
       return Promise.reject(new Error("预览图片还未生成，请稍后再试。"));
     };
