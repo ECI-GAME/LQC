@@ -115,12 +115,12 @@ onMounted(async function () {
     model.value.imageFlag = String(props.data.imageFlag || 6);
   }
 });
-
 </script>
 
 <template>
   <div class="deep-[textarea]:resize-none">
-    <Textarea ref="textareaRef" v-model:value="model.text"
+    <Textarea ref="textareaRef" class="bg-[#fff] bg-opacity-90"
+              v-model:value="model.text"
               rows="5"
               :autofocus="true"
               @keydown.ctrl="onSave"

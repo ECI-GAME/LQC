@@ -301,14 +301,12 @@ const calcDotValue = function (data: DotData): DotData {
                       @view="onViewLocation"
                       @edit="onEditLocation"
                       @success="onReloadList"
-                      :work-id="currentFile.id"
                       :active="recordActive"
-                      :projectId="taskInfo.projectId"
+                      :task-data="taskInfo"
                       :key="recordActive"
                       :list="dots.results"
-                      :image-status="currentFile.imageStatus"
-                      :is-finish="currentFile.isFinish"
-                      :disabled="disabled">
+                      :disabled="disabled"
+                      :file="currentFile">
                 <Card v-if="dotEditTempValue" class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small">
                   <RegisterComment v-if="recordActive === RecordTabType.Comment"
                                    :data="calcDotValue(dotEditTempValue)"

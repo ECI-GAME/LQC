@@ -1,8 +1,10 @@
 import * as _ from "lodash-es";
 import cache from "src/utils/cache";
+import loading from "src/utils/loading";
 import {PageResult} from "src/utils/model";
+import {TaskButtonStatus} from "src/types";
 import safeGet from "@fengqiaogang/safe-get";
-import {$error, $success} from "@ue/message"
+import {$error, $success} from "@ue/message";
 import {Get, Gql, post, tryError, validate, required, Put, Post} from "@js-lion/api";
 
 import GraphQL from "../graphql";
@@ -10,11 +12,55 @@ import GraphQL from "../graphql";
 import type {TaskData} from "src/types/task";
 
 export default class extends GraphQL {
+  @tryError(void 0)
   @Post("/project/tasks/changeStatus")
+  @validate
   track(@required taskId: number | string): Promise<void> {
     const data = {id: taskId};
     // @ts-ignore
     return {data};
+  }
+
+  // 获取操作按钮权限
+  @tryError(new TaskButtonStatus())
+  @cache(5 * 1000)
+  @Get("/project/task/relations/checkButtonStatus/:id")
+  @validate
+  taskButtons(@required relationId: string | number): Promise<TaskButtonStatus> {
+    const params = {id: relationId};
+    const callback = function (value: object): TaskButtonStatus {
+      return new TaskButtonStatus(value);
+    };
+    // @ts-ignore
+    return {params, callback};
+  }
+
+  // 提交
+  @tryError(false)
+  @loading()
+  @$error()
+  @$success("操作成功")
+  @Put("/project/task/relations/commitBackPicture")
+  @validate
+  confirm(@required relationId: string | number): Promise<boolean> {
+    const params = {id: relationId};
+    const callback = () => true;
+    // @ts-ignore
+    return {params, callback};
+  }
+
+  // 退回任务到之前的节点
+  // 提交
+  @tryError(false)
+  @loading()
+  @$error()
+  @$success("操作成功")
+  @Post("/project/task/relations/back/image")
+  @validate
+  goBack(@required data: object): Promise<boolean> {
+    const callback = () => true;
+    // @ts-ignore
+    return {data, callback};
   }
 
 

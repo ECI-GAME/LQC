@@ -12,7 +12,7 @@ import { Result, Button } from "ant-design-vue";
       <template #extra>
         <RouterLink to="/">
           <Button type="primary">
-            <span class="font-600">Back Home</span>
+            <span class="font-600">回到首页</span>
           </Button>
         </RouterLink>
       </template>
