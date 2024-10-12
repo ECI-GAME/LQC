@@ -239,6 +239,7 @@ export const useTask = function () {
           sourceLanguage,
           targetLanguage,
           id: data.id,
+          taskId: data.id,
           estimatedStartDate: `${estimatedStartDate} 00:00:00`,
           estimatedEndDate: `${estimatedEndDate} 23:59:59`,
           versionId: versionId.value,

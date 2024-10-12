@@ -31,6 +31,11 @@ const getSrc = function (value: object) {
   return safeGet<string>(value, key);
 }
 
+const getTitle = function (value: object) {
+  const key = safeGet<string>(props.fieldNames, 'label');
+  return safeGet<string>(value, key);
+}
+
 const onSubmit = function () {
   const key = safeGet<string>(props.fieldNames, "id");
   return [...images.value].map(function (item: object, index: number) {
@@ -47,13 +52,14 @@ defineExpose({onSubmit});
 
 <template>
   <div>
-    <div class="overflow-y-auto h-100">
+    <div class="overflow-y-auto h-100 deep-[.ant-image]:w-full">
       <VueDraggableNext class="block" v-model:list="images">
-        <div class="w-30 h-40 ml-5 mt-5 inline-block rounded-md overflow-hidden border border-solid border-gray"
-             v-for="(data, index) in images" :key="`${index}-${getSrc(data)}`">
+        <div v-for="(data, index) in images" :key="`${index}-${getSrc(data)}`"
+             class="w-30 h-40 ml-5 mt-5 inline-block rounded-md overflow-hidden border border-solid border-gray relative">
           <slot name="item" :data="data">
-            <Image class="cursor-move object-cover" height="100%" :preview="false" :src="getSrc(data)"/>
+            <Image class="object-cover w-full block" :src="getSrc(data)" height="100%"/>
           </slot>
+          <div class="absolute z-1 top-0 left-0 right-0 bg-black bg-opacity-60 text-primary p-1 line-clamp-3">{{ getTitle(data) }}</div>
         </div>
       </VueDraggableNext>
     </div>

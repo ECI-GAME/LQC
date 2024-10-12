@@ -179,10 +179,10 @@ defineExpose({onSubmit: onSave, getList: () => list.value.results});
     </div>
     <Divider class="my-3"/>
     <div class="max-h-100 min-h-50 overflow-auto mb-3">
-      <CheckboxGroup class="block clearfix cursor-default" v-model:value="imageIds" @change="onChangeValue">
+      <CheckboxGroup class="block clearfix cursor-default deep-[.ant-image]:w-full" v-model:value="imageIds" @change="onChangeValue">
         <div class="float-left ml-3 mb-3 w-25 truncate" v-for="item in list.results" :key="item.id">
-          <div class="h-40 rounded-md overflow-hidden text-center" :title="item.imageName">
-            <Image class="object-cover" :src="item.originalImagePath" height="100%"/>
+          <div class="h-40 rounded-md overflow-hidden text-center border border-solid border-gray" :title="item.imageName">
+            <Image class="object-cover w-full block" :src="item.originalImagePath" height="100%"/>
           </div>
           <template v-if="item.taskId">
             <Checkbox class="mt-2 select-none" :value="item.id" :disabled="true">{{ item.imageName }}</Checkbox>
