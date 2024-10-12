@@ -259,7 +259,7 @@ export default class extends Graphql {
   @tryError(false)
   @$error()
   @$success("操作成功")
-  @Post("system/psconfig/update")
+  @Post("/system/psconfig/update")
   @validate
   updateProjectPSErrorData(data: PsConfig[]): Promise<boolean> {
     // @ts-ignore

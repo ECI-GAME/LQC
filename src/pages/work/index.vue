@@ -7,7 +7,6 @@
 import api from "src/api";
 import Switch from "./switch.vue";
 import BigNumber from "bignumber.js";
-import {TaskStatus} from "src/types";
 import Record from "./record/index.vue";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
@@ -15,16 +14,17 @@ import * as work from "src/utils/work/common";
 import {useRoute, useRouter} from "vue-router";
 import RegisterWord from "./register/word.vue";
 import Tab from "src/components/tab/index.vue";
+import {ref, onBeforeUnmount, computed} from "vue";
 import RecordFast from "./register/record_fast.vue";
 import RegisterComment from "./register/comment.vue";
 import Screen from "src/components/screen/index.vue";
 import Preview from "src/components/preview/index.vue";
 import TaskTitle from "src/components/task/title.vue";
+import {TaskStatus, TaskButtonStatus} from "src/types";
 import Loading from "src/components/loading/index.vue";
 import TaskLog from "src/components/task/log/button.vue";
 import UeProgress from "src/components/ue/progress.vue";
-import {ref, onMounted, onBeforeUnmount, computed} from "vue";
-import {filterSuccess, pickImage, RecordTabType} from "./config";
+import {filterSuccess, pickImage, RecordTabType, backTaskListOption} from "./config";
 import {DotDataType, DotData} from "src/components/preview/config";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
 
@@ -37,18 +37,19 @@ const router = useRouter();
 const recordActive = ref<string>();
 const dotAddTempValue = ref<DotData>();
 const dotEditTempValue = ref<DotData>();
+const taskButton = ref<TaskButtonStatus>(new TaskButtonStatus());
 const recordTabs = ref<string[]>([RecordTabType.Word, RecordTabType.Comment]);
 
 const disabled = computed<boolean>(function () {
+  const button = taskButton.value;
+  if (!button.back && !button.commit && !button.save && !button.update) {
+    return true;
+  }
   return !!(dotAddTempValue.value || dotEditTempValue.value);
 })
 
 
 const currentFile = ref<ImageData>();
-
-onMounted(function () {
-  api.task.track(route.params.taskId as string);
-})
 
 // 项目详情
 const {state: projectInfo} = model.result<Project>(() => {
@@ -161,14 +162,6 @@ const onCancelDot = function () {
   dotEditTempValue.value = void 0;
 }
 
-const backOption = function (task: TaskData) {
-  return {
-    name: alias.TaskDetails.name,
-    params: {
-      versionId: task.versionId, taskId: task.id
-    }
-  }
-}
 
 // 提交
 const onSubmit = async function () {
@@ -252,7 +245,7 @@ const calcDotValue = function (data: DotData): DotData {
             <template v-else>
               <Button type="primary" :disabled="true">提交</Button>
             </template>
-            <router-link :to="backOption(task)" :replace="true">
+            <router-link :to="backTaskListOption(task)" :replace="true">
               <Button>返回</Button>
             </router-link>
           </Space>
@@ -265,7 +258,7 @@ const calcDotValue = function (data: DotData): DotData {
           <Preview v-if="currentFile && projectInfo.readOrder"
                    ref="previewRef"
                    class="h-full"
-                   :disabled="!!dotAddTempValue"
+                   :disabled="disabled"
                    :data="currentFile"
                    :dots="dots.results"
                    :key="currentFile.id"
@@ -294,7 +287,7 @@ const calcDotValue = function (data: DotData): DotData {
         <LayoutSider class="!w-120 !max-w-120 !flex-auto bg-white overflow-y-auto">
           <Loading class="h-full p-2" :status="isLoading">
             <Tab class="mb-2" v-model:value="recordActive" :list="recordTabs" @change="onChangeTabValue"
-                 :disabled="disabled"></Tab>
+                 :disabled="dotAddTempValue || dotEditTempValue"></Tab>
             <!-- 标记数量大于0或者正在创建标记点数据 -->
             <template v-if="dotEditTempValue || dots.total > 0">
               <Record v-if="currentFile && taskInfo && taskInfo.projectId"
@@ -306,7 +299,8 @@ const calcDotValue = function (data: DotData): DotData {
                       :key="recordActive"
                       :list="dots.results"
                       :disabled="disabled"
-                      :file="currentFile">
+                      :file="currentFile"
+                      v-model:buttons="taskButton">
                 <Card v-if="dotEditTempValue" class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small">
                   <RegisterComment v-if="recordActive === RecordTabType.Comment"
                                    :data="calcDotValue(dotEditTempValue)"

@@ -5,22 +5,24 @@
  */
 
 import api from "src/api";
+import {ref, computed} from "vue";
 import WorkNode from "./node.vue";
-import {RecordTabType} from "../config";
+import {useRouter} from "vue-router";
 import * as model from "src/utils/model";
 import onSure from "src/utils/tips/sure";
-import {ref, computed, toRaw} from "vue";
 import {TaskButtonStatus} from "src/types";
 import safeGet from "@fengqiaogang/safe-get";
 import * as work from "src/utils/work/common";
 import {ElButton as Button} from "element-plus";
 import UeSort from "src/components/ue/sort/row.vue";
+import {RecordTabType, backTaskListOption} from "../config";
 
 import type {PropType} from "vue";
 import type {ImageData, TaskData} from "src/types";
 import type {DotData} from "src/components/preview/config";
 
-const $emit = defineEmits(["view", "edit", "success"]);
+const router = useRouter();
+const $emit = defineEmits(["view", "edit", "success", "update:buttons"]);
 
 const props = defineProps({
   active: {
@@ -42,6 +44,10 @@ const props = defineProps({
   taskData: {
     type: Object as PropType<TaskData>,
     required: true,
+  },
+  buttons: {
+    type: Object as PropType<TaskButtonStatus>,
+    required: false,
   }
 });
 
@@ -50,8 +56,10 @@ const fieldNames = {id: "id"};
 const _state = ref<DotData[]>([]);
 
 // 按钮操作权限
-const {state: taskButton} = model.result<TaskButtonStatus>(() => {
-  return api.task.taskButtons(props.file.id);
+const {state: taskButton} = model.result<TaskButtonStatus>(async () => {
+  const value = await api.task.taskButtons(props.file.id, props.file.taskId);
+  $emit("update:buttons", value);
+  return value;
 }, new TaskButtonStatus(), true);
 
 const nodeList = computed<DotData[]>({
@@ -103,7 +111,7 @@ const onCommit = async function () {
     status = await api.task.confirm(props.file.id);
   }
   if (status) {
-    window.location.reload();
+    await router.replace(backTaskListOption(props.taskData));
   }
 }
 

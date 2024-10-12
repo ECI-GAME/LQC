@@ -6,10 +6,9 @@ import {DBList} from "@fengqiaogang/dblist";
 import safeGet from "@fengqiaogang/safe-get";
 
 import {CheckCode} from "src/types";
-import type {Remark} from "src/types";
-import type {ImageData} from "src/types/image";
 import type {PageResult} from "src/utils/model";
 import type {DotData} from "src/components/preview/config";
+import type {ImageData, TaskData, Remark} from "src/types";
 
 export enum RecordTabType {
   Word = "文字翻译",
@@ -19,6 +18,15 @@ export enum RecordTabType {
 interface CheckWordResut {
   translation: string[][];
   html: string | undefined;
+}
+
+export const backTaskListOption = function (task: TaskData) {
+  return {
+    name: alias.TaskDetails.name,
+    params: {
+      versionId: task.versionId, taskId: task.id
+    }
+  }
 }
 
 export const useCreateBy = function () {
