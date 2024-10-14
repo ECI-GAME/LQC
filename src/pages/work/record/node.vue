@@ -103,7 +103,7 @@ const onRemoveDetail = async function (data: DotData) {
           <span>({{ index + 1 }})</span>
           <template v-if="active === RecordTabType.Word">
             <!--标记-->
-            <span class="flex-1 w-1 truncate mr-2 ml-1" :class="getTitleColor(data)">{{data.id}}/{{ data.translatedText }}</span>
+            <span class="flex-1 w-1 truncate mr-2 ml-1" :class="getTitleColor(data)">{{ data.translatedText }}</span>
             <Space>
               <Checkbox v-if="merge" :value="data.id" @click.stop></Checkbox>
               <Button class="p-0 text-lg" type="primary" link :disabled="disabled" @click.stop="onShowDetail(data)" title="查看详情">

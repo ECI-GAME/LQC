@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import {Icon} from "@ue/icon";
+import NodeView from "./node.vue";
 import BigNumber from "bignumber.js";
+import {scaleTipFormatter} from "./config";
 import safeGet from "@fengqiaogang/safe-get";
 import UeTag from "src/components/ue/tag.vue";
 import * as image from "src/utils/brower/image";
 import Dict from "src/components/dict/index.vue";
 import {downloadFile} from "src/utils/brower/download";
 import Loading from "src/components/loading/index.vue";
-import {DotDataType, DotData, scaleTipFormatter} from "./config";
-import {Badge, Button, Layout, LayoutContent, LayoutHeader, Result, Slider, Space} from "ant-design-vue";
+import {Button, Layout, LayoutContent, LayoutHeader, Result, Slider, Space} from "ant-design-vue";
 
 import type {PropType} from "vue";
-import type {ImageData} from "src/types/image";
+import type {DotData} from "./config";
+import type {ImageData} from "src/types";
 
 const $emit = defineEmits(["switch", "click"]);
 
@@ -209,15 +211,7 @@ defineExpose({setBoxScroll, setBoxDot, scrollValue});
                    crossorigin="anonymous" :key="`${ratio}-${key}`"
                    @click="onCaptureLocation" @load="onLoad" @error="onError"/>
               <div>
-                <template v-for="(item, index) in dots" :key="index">
-                  <span
-                      class="inline-block cursor-pointer absolute left-[var(--dot-x)] top-[var(--dot-y)] transform -translate-x-1/2 -translate-y-1/2"
-                      :style="`--dot-x: ${item.xCorrdinate1 || 0}px; --dot-y: ${item.yCorrdinate1 || 0}px;`">
-                    <Badge v-if="String(item.coordinateType) === String(DotDataType.Comment)" :count="index + 1"
-                           color="orange"></Badge>
-                    <Badge v-else :count="index + 1" color="blue"></Badge>
-                  </span>
-                </template>
+                <NodeView v-for="(item, index) in dots" :key="item.id || index" :index="index" :data="item"/>
               </div>
             </div>
           </div>
