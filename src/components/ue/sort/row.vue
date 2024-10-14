@@ -4,8 +4,8 @@
  * @author svon.me@gmail.com
  **/
 
+import {computed} from "vue";
 import * as _ from "lodash-es";
-import {computed, toRaw, ref} from "vue";
 import safeGet from "@fengqiaogang/safe-get";
 import {VueDraggableNext} from 'vue-draggable-next';
 
@@ -31,7 +31,6 @@ const props = defineProps({
   }
 });
 
-const uuid = ref<number>(Math.random());
 const list = computed<object[]>({
   get: () => {
     return props.value || [];
@@ -47,9 +46,9 @@ const keyName = computed<string>(function () {
 
 const getValue = function () {
   const key = keyName.value;
-  return _.map(props.value, function (item: object, index: number) {
+  return _.map(list.value, function (item: object, index: number) {
     return {
-      sort: index + 1,
+      sort: index,
       [key]: safeGet<string | number>(item, key),
     };
   });
@@ -59,17 +58,8 @@ const onDragSortEnd = function (e: object) {
   if (props.disabled) {
     return false;
   }
-  const newIndex = safeGet<number>(e, "moved.newIndex")!;
-  const oldIndex = safeGet<number>(e, "moved.oldIndex")!;
-  const res = _.map(list.value, toRaw);
-  const temp = res[oldIndex];
-  res[oldIndex] = res[newIndex];
-  res[newIndex] = temp;
-  list.value = res;
-
-  uuid.value = Math.random();
-
-  $emit("sort", getValue());
+  const sortValue = _.sortBy(getValue(), "sort");
+  $emit("sort", sortValue);
 }
 
 defineExpose({onSubmit: getValue});
@@ -82,7 +72,7 @@ const noTransitionOnDrag = function () {
 
 <template>
   <div>
-    <VueDraggableNext v-if="_.size(list) > 1" class="block" :key="uuid" :list="[...list]" @change="onDragSortEnd"
+    <VueDraggableNext v-if="_.size(list) > 1" class="block" :list="list" @change="onDragSortEnd"
                       :move="noTransitionOnDrag">
       <template v-for="(item, index) in list" :key="`${item[keyName]}-${index}`">
         <slot :data="item" :index="index"></slot>

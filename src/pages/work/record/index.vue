@@ -4,8 +4,8 @@
  * @author svon.me@gmail.com
  */
 
+import {ref} from "vue";
 import api from "src/api";
-import {ref, computed} from "vue";
 import WorkNode from "./node.vue";
 import {useRouter} from "vue-router";
 import * as model from "src/utils/model";
@@ -54,8 +54,8 @@ const props = defineProps({
 
 
 const fieldNames = {id: "id"};
+const uuid = ref<number>(0);
 const isMerge = ref<boolean>(false);
-const _state = ref<DotData[]>([]);
 const mergeList = ref<Array<string | number>>([]);
 
 // 按钮操作权限
@@ -68,17 +68,6 @@ const {state: taskButton} = model.result<TaskButtonStatus>(async () => {
   return buttons;
 }, new TaskButtonStatus(), true);
 
-const nodeList = computed<DotData[]>({
-  get: () => {
-    if (_state.value && _state.value.length > 0) {
-      return _state.value;
-    }
-    return props.list;
-  },
-  set: (value: DotData[]) => {
-    _state.value = [...value];
-  }
-});
 
 // 查看图片描点位置
 const onShowDetail = function (data: DotData) {
@@ -101,14 +90,15 @@ const onSave = function () {
 const onSort = async function (res: object[]) {
   const sort = new Map<string | number, number>();
   for (const item of res) {
-    const value = safeGet<number>(item, "sort")!;
+    const value = (safeGet<number>(item, "sort") || 0) + 1;
     const key = safeGet<string | number>(item, fieldNames.id)!;
     sort.set(key, value);
   }
   const data = Object.fromEntries(sort);
   const status = await api.work.word.sort(data);
   if (status) {
-    onUpdate();
+    uuid.value = Date.now();
+    setTimeout(onUpdate);
   }
 }
 
@@ -152,6 +142,7 @@ const onMerge = async function () {
     status = await api.task.merge(list);
   }
   if (status) {
+    mergeList.value = [];
     onUpdate();
   }
 }
@@ -161,11 +152,11 @@ const onMerge = async function () {
 <template>
   <div class="pb-2 deep-[th]:whitespace-nowrap deep-[th]:w-35">
     <CheckboxGroup v-if="list.length > 0" class="block" v-model:value="mergeList">
-      <UeSort v-model:value="nodeList" :key="active" :field-names="fieldNames" @sort="onSort"
+      <UeSort :value="list" :key="`${active}-${uuid}`" :field-names="fieldNames" @sort="onSort"
               :disabled="disabled">
         <template #default="{ data, index }">
           <WorkNode class="mt-2 first:mt-0"
-                    :merge="isMerge"
+                    :merge="disabled ? false : isMerge"
                     :data="data"
                     :index="index"
                     :active="active"
