@@ -105,7 +105,9 @@ const onRemoveDetail = async function (data: DotData) {
             <!--标记-->
             <span class="flex-1 w-1 truncate mr-2 ml-1" :class="getTitleColor(data)">{{ data.translatedText }}</span>
             <Space>
-              <Checkbox v-if="merge" :value="data.id" @click.stop></Checkbox>
+              <div class="flex" v-if="!disabled && merge" >
+                <Checkbox :value="data.id" @click.stop></Checkbox>
+              </div>
               <Button class="p-0 text-lg" type="primary" link :disabled="disabled" @click.stop="onShowDetail(data)" title="查看详情">
                 <Icon type="detail"></Icon>
               </Button>
