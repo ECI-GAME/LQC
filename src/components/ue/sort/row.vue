@@ -49,7 +49,7 @@ const getValue = function () {
   const key = keyName.value;
   return _.map(props.value, function (item: object, index: number) {
     return {
-      sort: index,
+      sort: index + 1,
       [key]: safeGet<string | number>(item, key),
     };
   });

@@ -198,8 +198,8 @@ const onClickImage = function (e: Event, data: { x: number, y: number, width: nu
   dotAddTempValue.value = new DotData(
     data.x,
     data.y,
-    data.x,
-    data.y,
+    data.x + 150,
+    data.y + 150,
     data.width,
     data.height
   );

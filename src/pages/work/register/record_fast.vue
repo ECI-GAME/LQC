@@ -72,11 +72,11 @@ const getResult = function (): DotData | undefined {
     } else {
       data.coordinateType = DotDataType.Word;
       // 译文
-      data.translatedText = text;
-      data.translatedHtml = text;
+      data.translatedText = props.data.translatedText;
+      data.translatedHtml = props.data.translatedHtml;
       // 原文
-      data.originalText = props.data.translatedText;
-      data.originalHtml = props.data.translatedHtml;
+      data.originalText = text;
+      data.originalHtml = text;
     }
     return data;
   }
@@ -124,6 +124,6 @@ onMounted(async function () {
               rows="5"
               :autofocus="true"
               @keydown.ctrl="onSave"
-              placeholder="请输入译文"></Textarea>
+              placeholder="请输入原文"></Textarea>
   </div>
 </template>

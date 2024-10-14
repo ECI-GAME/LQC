@@ -16,6 +16,7 @@ import * as work from "src/utils/work/common";
 import {ElButton as Button} from "element-plus";
 import UeSort from "src/components/ue/sort/row.vue";
 import {RecordTabType, backTaskListOption} from "../config";
+import {CheckboxGroup} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import type {ImageData, TaskData} from "src/types";
@@ -53,13 +54,18 @@ const props = defineProps({
 
 
 const fieldNames = {id: "id"};
+const isMerge = ref<boolean>(false);
 const _state = ref<DotData[]>([]);
+const mergeList = ref<Array<string | number>>([]);
 
 // 按钮操作权限
 const {state: taskButton} = model.result<TaskButtonStatus>(async () => {
-  const value = await api.task.taskButtons(props.file.id, props.file.taskId);
-  $emit("update:buttons", value);
-  return value;
+  const buttons = await api.task.taskButtons(props.file.id, props.file.taskId);
+  $emit("update:buttons", buttons);
+  if (buttons.commit || buttons.save || buttons.update) {
+    isMerge.value = true;
+  }
+  return buttons;
 }, new TaskButtonStatus(), true);
 
 const nodeList = computed<DotData[]>({
@@ -92,7 +98,7 @@ const onSave = function () {
 }
 
 // 排序
-const onSort = function (res: object[]) {
+const onSort = async function (res: object[]) {
   const sort = new Map<string | number, number>();
   for (const item of res) {
     const value = safeGet<number>(item, "sort")!;
@@ -100,7 +106,10 @@ const onSort = function (res: object[]) {
     sort.set(key, value);
   }
   const data = Object.fromEntries(sort);
-  api.work.word.sort(data);
+  const status = await api.work.word.sort(data);
+  if (status) {
+    onUpdate();
+  }
 }
 
 // 提交
@@ -136,25 +145,39 @@ const onReturn = async function () {
   }
 }
 
+const onMerge = async function () {
+  let status = await onSure("是否确认合并？");
+  if (status) {
+    const list = [...mergeList.value];
+    status = await api.task.merge(list);
+  }
+  if (status) {
+    onUpdate();
+  }
+}
+
 </script>
 
 <template>
   <div class="pb-2 deep-[th]:whitespace-nowrap deep-[th]:w-35">
-    <UeSort v-if="list.length > 0" v-model:value="nodeList" :key="active" :field-names="fieldNames" @sort="onSort"
-            :disabled="disabled">
-      <template #default="{ data, index }">
-        <WorkNode class="mt-2 first:mt-0"
-                  :data="data"
-                  :index="index"
-                  :active="active"
-                  :project-id="taskData.projectId"
-                  :image-status="file.imageStatus"
-                  :disabled="disabled"
-                  @update="onUpdate"
-                  @edit="onEditDetail"
-                  @view="onShowDetail"/>
-      </template>
-    </UeSort>
+    <CheckboxGroup v-if="list.length > 0" class="block" v-model:value="mergeList">
+      <UeSort v-model:value="nodeList" :key="active" :field-names="fieldNames" @sort="onSort"
+              :disabled="disabled">
+        <template #default="{ data, index }">
+          <WorkNode class="mt-2 first:mt-0"
+                    :merge="isMerge"
+                    :data="data"
+                    :index="index"
+                    :active="active"
+                    :project-id="taskData.projectId"
+                    :image-status="file.imageStatus"
+                    :disabled="disabled"
+                    @update="onUpdate"
+                    @edit="onEditDetail"
+                    @view="onShowDetail"/>
+        </template>
+      </UeSort>
+    </CheckboxGroup>
     <slot>
       <div v-if="list.length > 0 && active === RecordTabType.Word" class="mt-2 first:mt-0 sticky bottom-0">
         <!--提交-->
@@ -162,23 +185,31 @@ const onReturn = async function () {
           <Button class="w-full" type="warning" @click="onCommit">提交</Button>
         </div>
         <!--保存、更新 / 退回-->
-        <div v-else-if="taskButton.back && (taskButton.save || taskButton.update)" class="grid grid-cols-2 gap-x-5">
-          <div>
+        <div v-else-if="taskButton.back && (taskButton.save || taskButton.update)" class="flex items-center">
+          <div class="flex-1 ml-5 first:ml-0">
             <Button class="w-full" type="primary" @click="onSave">
               <template v-if="!file.isFinish || Number(file.isFinish) === 0">保存</template>
               <template v-else>更新</template>
             </Button>
           </div>
-          <div>
+          <div class="flex-1 ml-5 first:ml-0">
             <Button class="w-full" type="danger" @click="onReturn">退回</Button>
+          </div>
+          <div class="flex-1 ml-5 first:ml-0">
+            <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
           </div>
         </div>
         <!--保存、更新-->
-        <div v-else-if="taskButton.save || taskButton.update">
-          <Button class="w-full" type="primary" @click="onSave">
-            <template v-if="!file.isFinish || Number(file.isFinish) === 0">保存</template>
-            <template v-else>更新</template>
-          </Button>
+        <div v-else-if="taskButton.save || taskButton.update" class="flex items-center">
+          <div class="flex-1 ml-5 first:ml-0" v-if="isMerge">
+            <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
+          </div>
+          <div class="flex-1 ml-5 first:ml-0">
+            <Button class="w-full" type="primary" @click="onSave">
+              <template v-if="!file.isFinish || Number(file.isFinish) === 0">保存</template>
+              <template v-else>更新</template>
+            </Button>
+          </div>
         </div>
         <!--退回-->
         <div v-else-if="taskButton.back">

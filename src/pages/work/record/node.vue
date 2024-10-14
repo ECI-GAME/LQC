@@ -4,7 +4,6 @@
  * @author svon.me@gmail.com
  */
 
-import {ref} from "vue";
 import api from "src/api";
 import * as _ from "lodash-es";
 import Word from "./word.vue";
@@ -13,7 +12,7 @@ import Comment from "./comment.vue";
 import sure from "src/utils/tips/sure";
 import {ElButton as Button} from "element-plus";
 import {RecordTabType, useCreateBy} from "../config";
-import {Space, Collapse, CollapsePanel} from "ant-design-vue";
+import {Space, Collapse, CollapsePanel, Checkbox} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import {DotData, DotMatchType} from "src/components/preview/config";
@@ -46,6 +45,10 @@ const props = defineProps({
     required: false,
   },
   disabled: {
+    type: Boolean,
+    required: false,
+  },
+  merge: {
     type: Boolean,
     required: false,
   }
@@ -102,6 +105,7 @@ const onRemoveDetail = async function (data: DotData) {
             <!--标记-->
             <span class="flex-1 w-1 truncate mr-2 ml-1" :class="getTitleColor(data)">{{ data.translatedText }}</span>
             <Space>
+              <Checkbox v-if="merge" :value="data.id" @click.stop></Checkbox>
               <Button class="p-0 text-lg" type="primary" link :disabled="disabled" @click.stop="onShowDetail(data)" title="查看详情">
                 <Icon type="detail"></Icon>
               </Button>

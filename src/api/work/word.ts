@@ -1,3 +1,4 @@
+import loading from "src/utils/loading";
 import * as message from "@ue/message";
 import {PageResult} from "src/utils/model";
 import {Get, Post, Delete, Put, validate, required, tryError} from "@js-lion/api";
@@ -78,6 +79,7 @@ export default class {
    **/
   @tryError(false)
   @message.$error()
+  @loading()
   @Post("/project/image/translations/changSort")
   @validate
   sort(@required data: object): Promise<boolean> {

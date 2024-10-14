@@ -54,6 +54,18 @@ export default class extends GraphQL {
     return {params, callback};
   }
 
+  /** 合并翻译节点 */
+  @tryError(false)
+  @$error()
+  @$success("操作成功")
+  @Post("/project/image/translations/merge")
+  @validate
+  merge(@required data: Array<string | number>): Promise<boolean> {
+    const callback = () => true;
+    // @ts-ignore
+    return {data, callback};
+  }
+
   // 退回任务到之前的节点
   // 提交
   @tryError(false)
@@ -266,12 +278,12 @@ export default class extends GraphQL {
       const src = safeGet<string>(value, "path");
       const key = safeGet<string>(value, "key");
       if (src) {
-        if(src.startsWith('http')){
+        if (src.startsWith('http')) {
           return src;
-        }else{
+        } else {
           return key;
         }
-        
+
       }
       return Promise.reject(new Error("预览图片还未生成，请稍后再试。"));
     };
