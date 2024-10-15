@@ -44,7 +44,7 @@ export default class {
   @tryError(false)
   @message.$error()
   @message.$success("已修改")
-  @Put("/project/image/check/insureCheck")
+  @Post("/project/image/check/insureCheck")
   @validate
   updateCheck(@required data: object): Promise<boolean> {
     const callback = () => true;

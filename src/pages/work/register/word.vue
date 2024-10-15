@@ -261,7 +261,7 @@ const onScanWord = function () {
                 v-model:text="model.originalText"
                 @translation="onChangeTranslationList"></Textarea>
     </FormItem>
-    <FormItem label="译文" name="translatedText" :rules="rules.text('请填写译文！')">
+    <FormItem label="译文" name="translatedText">
         <Textarea ref="translation2Ref" :key="translateUuid"
                   :project-id="projectId"
                   v-model:html="model.translatedHtml"
