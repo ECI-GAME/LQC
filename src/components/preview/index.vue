@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import {Icon} from "@ue/icon";
+import * as _ from "lodash-es";
 import NodeView from "./node.vue";
 import BigNumber from "bignumber.js";
 import {scaleTipFormatter} from "./config";
@@ -27,6 +28,12 @@ const props = defineProps({
     required: false,
     default: () => [],
     type: Array as PropType<DotData[]>,
+  },
+  // 需要隐藏的 dots 数据
+  hidden: {
+    required: false,
+    type: Array as PropType<Array<string | number>>,
+    default: () => [],
   },
   disabled: {
     type: Boolean,
@@ -57,6 +64,14 @@ const getScale = function (value: number) {
   return scale;
 }
 
+const isHidden = function (id: string | number): boolean {
+  if (props.hidden && _.size(props.hidden) > 0) {
+    if (_.includes(props.hidden, id)) {
+      return false;
+    }
+  }
+  return true;
+}
 
 const onCaptureLocation = function (e: Event) {
   if (props.disabled) {
@@ -211,7 +226,9 @@ defineExpose({setBoxScroll, setBoxDot, scrollValue});
                    crossorigin="anonymous" :key="`${ratio}-${key}`"
                    @click="onCaptureLocation" @load="onLoad" @error="onError"/>
               <div>
-                <NodeView v-for="(item, index) in dots" :key="item.id || index" :index="index" :data="item"/>
+                <template v-for="(item, index) in dots" :key="item.id || index">
+                  <NodeView v-if="isHidden(item.id)" :index="index" :data="item"/>
+                </template>
               </div>
             </div>
           </div>

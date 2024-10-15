@@ -1,13 +1,14 @@
 import api from "src/api";
 import * as _ from "lodash-es";
+import {CheckCode} from "src/types";
 import {userStore} from "src/store";
+import BigNumber from "bignumber.js";
 import * as alias from "src/router/alias";
 import {DBList} from "@fengqiaogang/dblist";
 import safeGet from "@fengqiaogang/safe-get";
+import {DotData} from "src/components/preview/config";
 
-import {CheckCode} from "src/types";
 import type {PageResult} from "src/utils/model";
-import type {DotData} from "src/components/preview/config";
 import type {ImageData, TaskData, Remark} from "src/types";
 
 export enum RecordTabType {
@@ -158,4 +159,48 @@ export const getTypeList = async function <T = Remark>(projectId: string | numbe
   const db = new DBList([], typeFieldNames.value);
   db.insert(res.results, typeFieldNames.children);
   return {list: res, db};
+}
+
+
+export const calcDotValue = function (data: DotData, preview: any): DotData {
+  const scroll = preview.scrollValue();
+  const temp = new DotData(
+    Number(new BigNumber(data.xCorrdinate1).plus(scroll.left).div(scroll.scale).toFixed(2)),
+    Number(new BigNumber(data.yCorrdinate1).plus(scroll.top).div(scroll.scale).toFixed(2)),
+    Number(new BigNumber(data.xCorrdinate2).plus(scroll.left).div(scroll.scale).toFixed(2)),
+    Number(new BigNumber(data.yCorrdinate2).plus(scroll.top).div(scroll.scale).toFixed(2)),
+    data.imageWidth,
+    data.imageHeight,
+  );
+  if (data.id) {
+    data.xCorrdinate1 = temp.xCorrdinate1;
+    data.yCorrdinate1 = temp.yCorrdinate1;
+    data.xCorrdinate2 = temp.xCorrdinate2;
+    data.yCorrdinate2 = temp.yCorrdinate2;
+    data.imageWidth = temp.imageWidth;
+    data.imageHeight = temp.imageHeight;
+    data.imageName = temp.imageName;
+    return { ...data };
+  }
+  return temp;
+}
+
+export const reverseCalcDotValue = function (data: DotData, preview: any): DotData {
+  const scroll = preview.scrollValue();
+  const temp = new DotData(
+    Number(new BigNumber(data.xCorrdinate1).times(scroll.scale).minus(scroll.left).toFixed(2)),
+    Number(new BigNumber(data.yCorrdinate1).times(scroll.scale).minus(scroll.top).toFixed(2)),
+    Number(new BigNumber(data.xCorrdinate2).times(scroll.scale).minus(scroll.left).toFixed(2)),
+    Number(new BigNumber(data.yCorrdinate2).times(scroll.scale).minus(scroll.top).toFixed(2)),
+    data.imageWidth,
+    data.imageHeight,
+  );
+  data.xCorrdinate1 = temp.xCorrdinate1;
+  data.yCorrdinate1 = temp.yCorrdinate1;
+  data.xCorrdinate2 = temp.xCorrdinate2;
+  data.yCorrdinate2 = temp.yCorrdinate2;
+  data.imageWidth = temp.imageWidth;
+  data.imageHeight = temp.imageHeight;
+  data.imageName = temp.imageName;
+  return { ...data };
 }

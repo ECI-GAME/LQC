@@ -29,6 +29,10 @@ const props = defineProps({
       return {};
     }
   },
+  corrdinate: {
+    type: Function,
+    required: true,
+  },
   file: {
     type: Object as PropType<ImageData>,
     required: true,
@@ -63,6 +67,7 @@ const model = ref({
 });
 
 const getResult = function () {
+  const corrdinate = props.corrdinate();
   const data = {
     ...model.value,
     imageName: void 0,
@@ -70,10 +75,10 @@ const getResult = function () {
     imageId: safeGet<string | number>(props.file, "imageId")!,     //图片ID
     // imageName: props.data.imageName || basename(props.data.imagePath),    //图片名称
     // imagePath: props.data.imagePath,              //图片路径
-    xCorrdinate1: _.toInteger(props.data.xCorrdinate1),
-    yCorrdinate1: _.toInteger(props.data.yCorrdinate1),
-    xCorrdinate2: _.toInteger(props.data.xCorrdinate2),
-    yCorrdinate2: _.toInteger(props.data.yCorrdinate2),
+    xCorrdinate1: _.toInteger(corrdinate.xCorrdinate1),
+    yCorrdinate1: _.toInteger(corrdinate.yCorrdinate1),
+    xCorrdinate2: _.toInteger(corrdinate.xCorrdinate2),
+    yCorrdinate2: _.toInteger(corrdinate.yCorrdinate2),
     imageWidth: _.toInteger(props.data.imageWidth),
     imageHeight: _.toInteger(props.data.imageHeight),
   } as DotData;

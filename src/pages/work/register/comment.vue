@@ -19,6 +19,10 @@ const props = defineProps({
       return {};
     }
   },
+  corrdinate: {
+    type: Function,
+    required: true,
+  },
   file: {
     type: Object,
     required: true,
@@ -53,14 +57,15 @@ const {state: typeList} = model.list<object>(async function () {
 }, new model.PageResult<object>(), true);
 
 const getResult = function () {
+  const corrdinate = props.corrdinate();
   const data = {
     ...formData.value,
     taskId: safeGet<string | number>(props.file, "taskId"),  //任务ID
     imageId: safeGet<string | number>(props.file, "imageId"),     //图片ID
-    xCorrdinate1: _.toInteger(props.data.xCorrdinate1),
-    yCorrdinate1: _.toInteger(props.data.yCorrdinate1),
-    xCorrdinate2: _.toInteger(props.data.xCorrdinate2),
-    yCorrdinate2: _.toInteger(props.data.yCorrdinate2),
+    xCorrdinate1: _.toInteger(corrdinate.xCorrdinate1),
+    yCorrdinate1: _.toInteger(corrdinate.yCorrdinate1),
+    xCorrdinate2: _.toInteger(corrdinate.xCorrdinate2),
+    yCorrdinate2: _.toInteger(corrdinate.yCorrdinate2),
     imageWidth: _.toInteger(props.data.imageWidth),
     imageHeight: _.toInteger(props.data.imageHeight),
     coordinateType: DotDataType.Comment,

@@ -6,7 +6,6 @@
 
 import api from "src/api";
 import Switch from "./switch.vue";
-import BigNumber from "bignumber.js";
 import Record from "./record/index.vue";
 import * as model from "src/utils/model";
 import * as alias from "src/router/alias";
@@ -24,9 +23,9 @@ import {TaskStatus, TaskButtonStatus} from "src/types";
 import Loading from "src/components/loading/index.vue";
 import TaskLog from "src/components/task/log/button.vue";
 import UeProgress from "src/components/ue/progress.vue";
-import {filterSuccess, pickImage, RecordTabType, backTaskListOption} from "./config";
 import {DotDataType, DotData} from "src/components/preview/config";
 import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
+import {filterSuccess, pickImage, RecordTabType, backTaskListOption, calcDotValue, reverseCalcDotValue} from "./config";
 
 import type {ImageData, TaskData, Project} from "src/types";
 
@@ -152,7 +151,9 @@ const onEditLocation = function (id: string | number) {
     const data = pickImage<DotData>(dots.value.results, id)
     if (data) {
       image.setBoxDot(data);
-      dotEditTempValue.value = data;
+      setTimeout(() => {
+        dotEditTempValue.value = reverseCalcDotValue(data, previewRef.value);
+      }, 300);
     }
   }
 }
@@ -205,20 +206,12 @@ const onClickImage = function (e: Event, data: { x: number, y: number, width: nu
   );
 }
 
-const calcDotValue = function (data: DotData): DotData {
-  if (data.id) {
-    return data;
+const getDotCorrdinate = function () {
+  if (dotEditTempValue.value) {
+    return calcDotValue(dotEditTempValue.value, previewRef.value);
+  } else if (dotAddTempValue.value) {
+    return calcDotValue(dotAddTempValue.value, previewRef.value);
   }
-  const preview = previewRef.value;
-  const scroll = preview.scrollValue();
-  return new DotData(
-    Number(new BigNumber(data.xCorrdinate1).plus(scroll.left).div(scroll.scale).toFixed(2)),
-    Number(new BigNumber(data.yCorrdinate1).plus(scroll.top).div(scroll.scale).toFixed(2)),
-    Number(new BigNumber(data.xCorrdinate2).plus(scroll.left).div(scroll.scale).toFixed(2)),
-    Number(new BigNumber(data.yCorrdinate2).plus(scroll.top).div(scroll.scale).toFixed(2)),
-    data.imageWidth,
-    data.imageHeight,
-  );
 }
 
 </script>
@@ -261,19 +254,28 @@ const calcDotValue = function (data: DotData): DotData {
                    :disabled="disabled"
                    :data="currentFile"
                    :dots="dots.results"
+                   :hidden="dotEditTempValue ? [dotEditTempValue.id] : []"
                    :key="currentFile.id"
                    @click="onClickImage">
             <template #operate>
               <Switch :current="currentFile" :list="state.results"></Switch>
             </template>
             <template #extend="scope">
-              <Screen v-if="dotAddTempValue && !dotAddTempValue.id"
+              <Screen v-if="dotEditTempValue && dotEditTempValue.id"
+                      v-model:x1="dotEditTempValue.xCorrdinate1"
+                      v-model:y1="dotEditTempValue.yCorrdinate1"
+                      v-model:x2="dotEditTempValue.xCorrdinate2"
+                      v-model:y2="dotEditTempValue.yCorrdinate2">
+              </Screen>
+
+              <Screen v-else-if="dotAddTempValue && !dotAddTempValue.id"
                       v-model:x1="dotAddTempValue.xCorrdinate1"
                       v-model:y1="dotAddTempValue.yCorrdinate1"
                       v-model:x2="dotAddTempValue.xCorrdinate2"
                       v-model:y2="dotAddTempValue.yCorrdinate2">
                 <!--快捷记录-->
-                <RecordFast :data="calcDotValue(dotAddTempValue)"
+                <RecordFast :data="dotAddTempValue"
+                            :corrdinate="getDotCorrdinate"
                             :file="currentFile"
                             :language="taskInfo.sourceLanguage"
                             :projectId="taskInfo.projectId"
@@ -303,13 +305,15 @@ const calcDotValue = function (data: DotData): DotData {
                       v-model:buttons="taskButton">
                 <Card v-if="dotEditTempValue" class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small">
                   <RegisterComment v-if="recordActive === RecordTabType.Comment"
-                                   :data="calcDotValue(dotEditTempValue)"
+                                   :data="dotEditTempValue"
+                                   :corrdinate="getDotCorrdinate"
                                    :file="currentFile"
                                    :projectId="taskInfo.projectId"
                                    @save="onUpDataDots"
                                    @cancel="onCancelDot"></RegisterComment>
                   <RegisterWord v-else-if="currentFile"
-                                :data="calcDotValue(dotEditTempValue)"
+                                :data="dotEditTempValue"
+                                :corrdinate="getDotCorrdinate"
                                 :file="currentFile"
                                 :language="taskInfo.sourceLanguage"
                                 :projectId="taskInfo.projectId"

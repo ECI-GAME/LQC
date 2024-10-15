@@ -19,6 +19,10 @@ const props = defineProps({
       return {};
     }
   },
+  corrdinate: {
+    type: Function,
+    required: true,
+  },
   file: {
     type: Object as PropType<ImageData>,
     required: true,
@@ -52,16 +56,17 @@ const getResult = function (): DotData | undefined {
   const text = safeGet<string>(model.value, "text");
   const imageFlag = safeGet<string | number>(model.value, "imageFlag");
   if (text && _.size(_.trim(text)) > 0) {
+    const corrdinate = props.corrdinate();
     const data = {
       imageFlag,
       taskId: safeGet<string | number>(props.file, "taskId")!,       //任务ID
       imageId: safeGet<string | number>(props.file, "imageId")!,     //图片ID
       imageName: props.data.imageName || basename(props.data.imagePath),   //图片名称
       imagePath: props.data.imagePath,                                     //图片路径
-      xCorrdinate1: _.toInteger(props.data.xCorrdinate1),
-      yCorrdinate1: _.toInteger(props.data.yCorrdinate1),
-      xCorrdinate2: _.toInteger(props.data.xCorrdinate2),
-      yCorrdinate2: _.toInteger(props.data.yCorrdinate2),
+      xCorrdinate1: _.toInteger(corrdinate.xCorrdinate1),
+      yCorrdinate1: _.toInteger(corrdinate.yCorrdinate1),
+      xCorrdinate2: _.toInteger(corrdinate.xCorrdinate2),
+      yCorrdinate2: _.toInteger(corrdinate.yCorrdinate2),
       imageWidth: _.toInteger(props.data.imageWidth),
       imageHeight: _.toInteger(props.data.imageHeight),
     } as DotData;
