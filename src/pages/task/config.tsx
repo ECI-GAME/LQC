@@ -138,13 +138,18 @@ const onSubmit = async function (formData: TaskData) {
 
 //更新
 const onUpdate = async function (formData: TaskData) {
+  let status: boolean = false;
   const value = _.omit(formData, ["projectVersionImages"]);
-  const status = await api.task.updateTask(value as TaskData);
+  const images = safeGet<Array<object>>(formData, "projectVersionImages") || [];
+  if (images.length > 0) {
+    const taskId = formData.taskId;
+    const list = _.map(images, (v: object) => {
+      return {...v, taskId};
+    })
+    status = await api.task.updateImageInfo(list);
+  }
   if (status) {
-    const images = safeGet<Array<object>>(formData, "projectVersionImages") || [];
-    if (images.length > 0) {
-      await api.task.updateImageInfo(images);
-    }
+    status = await api.task.updateTask(value as TaskData);
   }
   return status
 };
