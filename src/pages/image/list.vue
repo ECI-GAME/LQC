@@ -7,6 +7,7 @@
 import {ref} from "vue";
 import api from "src/api";
 import {Icon} from "@ue/icon";
+import * as _ from "lodash-es";
 import {columns} from "./config";
 import Preview from "./preview.vue";
 import Download from "./download.vue";
@@ -140,6 +141,15 @@ const getVersionList = async function () {
   }
   return void 0;
 }
+
+const onRelodOCR = async function (data: object) {
+  const value = _.pick(data, ["id", "projectNum", "originalImagePath", "imageName", "versionId"]);
+  const status = await api.version.ocrImage(value);
+  if (status) {
+    await onSearch();
+  }
+}
+
 </script>
 
 <template>
@@ -207,20 +217,28 @@ const getVersionList = async function () {
           </Space>
           <Dict v-else-if="column.key === 'imageStatus'" type="comic_task_status" :value="text" auto-value="--"></Dict>
           <Tags v-else-if="column.key === 'handlerName'" :value="text"></Tags>
+          <template v-else-if="column.key === 'ocr'">
+            <template v-if="String(text) === '2'">识别中</template>
+            <template v-else-if="String(text) === '1'">识别成功</template>
+            <Button v-else class="m-0" type="text" danger @click="onRelodOCR(record)">
+              <Space size="small">
+                <Icon class="text-sx flex" type="reload"></Icon>
+                <span>重新识别</span>
+              </Space>
+            </Button>
+          </template>
           <template v-else-if="column.key === 'action'">
-          <span class="inline-block">
-            <Popconfirm
-                title="确认需要删除当前图片信息吗?"
-                ok-text="Yes"
-                cancel-text="No"
-                @confirm="confirmDelete(record)"
-            >
-              <Button class="p-0" type="link" title="删除画册" :danger="true">
-                <Icon class="text-xl" type="delete"></Icon>
-              </Button>
-            </Popconfirm>
-            
-          </span>
+            <span class="inline-block">
+              <Popconfirm
+                  title="确认需要删除当前图片信息吗?"
+                  ok-text="Yes"
+                  cancel-text="No"
+                  @confirm="confirmDelete(record)">
+                <Button class="p-0" type="link" title="删除画册" :danger="true">
+                  <Icon class="text-xl" type="delete"></Icon>
+                </Button>
+              </Popconfirm>
+            </span>
           </template>
         </template>
       </Table>

@@ -13,6 +13,7 @@ export const columns = [
   {title: "QA 图片", dataIndex: 'notesImagePath', key: 'preview', align: "center"},
   {title: "归档图片", dataIndex: 'deliveryImagePath', key: 'preview', align: "center"},
   {title: "关联任务", dataIndex: 'taskName', key: 'image', align: "center"},
+  {title: "OCR", dataIndex: 'ocrStatus', key: 'ocr', align: "center"},
   {title: "操作", dataIndex: 'id', key: 'action', align: "center"},
 ];
 

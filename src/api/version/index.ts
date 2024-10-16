@@ -5,6 +5,7 @@
 
 import * as _ from "lodash-es";
 import Graphql from "../graphql";
+import loading from "src/utils/loading";
 import {PageResult} from "src/utils/model";
 import safeGet from "@fengqiaogang/safe-get";
 import {$error, $success} from "@ue/message";
@@ -191,5 +192,17 @@ export default class extends Graphql {
       imageName: String(imageName || "").trim(),
     };
     return this.graphQL(name, {input}, keys);
+  }
+
+  @tryError(false)
+  @$error()
+  @$success("正在识别中")
+  @loading()
+  @Post("/project/images/repeatOcrTranslation")
+  @validate
+  async ocrImage(@required image: object): Promise<boolean> {
+    const callback = () => true;
+    // @ts-ignore
+    return {data: image, callback};
   }
 }
