@@ -2,7 +2,7 @@ import cache from "src/utils/cache";
 import {PageResult} from "src/utils/model";
 import {validate, required, Get, Post, tryError} from "@js-lion/api";
 
-import type { DictItem } from "src/types";
+import type {DictItem} from "src/types";
 
 export default class {
   /**
@@ -34,22 +34,23 @@ export default class {
     data.append("file", image);
     data.append("readOrder", readOrder);
     data.append("language", language);
-    const callback = function (value: string) {
-      return value;
+    const callback = function (value: string | object) {
+      if (typeof value === "string") {
+        return value;
+      }
+      return "";
     }
 
     // @ts-ignore
     return {data, callback};
   }
 
-  
 
-
-   //查询角色列表
+  //查询角色列表
   @Get("/system/role/list")
   getRoleList() {
-    const params = {pageNum: 100,pageSize: 100};
-   
+    const params = {pageNum: 100, pageSize: 100};
+
     return {params};
   }
 }
