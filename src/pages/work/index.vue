@@ -13,7 +13,7 @@ import * as work from "src/utils/work/common";
 import {useRoute, useRouter} from "vue-router";
 import RegisterWord from "./register/word.vue";
 import Tab from "src/components/tab/index.vue";
-import {ref, onBeforeUnmount, computed} from "vue";
+import {ref, onBeforeUnmount, computed, toRaw} from "vue";
 import RecordFast from "./register/record_fast.vue";
 import RegisterComment from "./register/comment.vue";
 import Screen from "src/components/screen/index.vue";
@@ -152,7 +152,7 @@ const onEditLocation = function (id: string | number) {
     if (data) {
       image.setBoxDot(data);
       setTimeout(() => {
-        dotEditTempValue.value = reverseCalcDotValue(data, previewRef.value);
+        dotEditTempValue.value = reverseCalcDotValue({ ...toRaw(data) }, previewRef.value);
       }, 300);
     }
   }

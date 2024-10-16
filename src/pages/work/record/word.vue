@@ -27,9 +27,11 @@ defineProps({
       <Dict v-if="data.imageFlag" :value="data.imageFlag" type="comic_ps_title_config"></Dict>
     </DescriptionsItem>
     <DescriptionsItem label="原文" class="deep-[s]:text-[red]">
-      <div v-html="data.originalHtml"></div>
+      <div class="whitespace-pre-wrap" v-html="data.originalHtml"></div>
     </DescriptionsItem>
-    <DescriptionsItem label="译文">{{ data.translatedText }}</DescriptionsItem>
+    <DescriptionsItem label="译文">
+      <div class="whitespace-pre-wrap" v-html="data.translatedHtml"></div>
+    </DescriptionsItem>
   </Descriptions>
   <template v-if="data.matchType">
     <template v-if="String(data.matchType) === DotMatchType.match || String(data.matchType) === DotMatchType.noUpdate">
