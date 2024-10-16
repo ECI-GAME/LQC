@@ -143,7 +143,7 @@ const getVersionList = async function () {
 }
 
 const onRelodOCR = async function (data: object) {
-  const value = _.pick(data, ["id", "projectNum", "originalImagePath", "imageName", "versionId"]);
+  const value = _.pick(data, ["id", "projectNum", "originalImagePath", "imageName", "versionId", "imageSize"]);
   const status = await api.version.ocrImage(value);
   if (status) {
     await onSearch();
