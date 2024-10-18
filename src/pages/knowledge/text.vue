@@ -12,6 +12,7 @@ import {ref, onMounted} from 'vue';
 import {API_BASE} from "src/config";
 import * as model from "src/utils/model";
 import onSure from "src/utils/tips/sure";
+import * as path from "src/utils/brower/path";
 import Page from "src/components/page/index.vue";
 import {onCreate, onEdit} from "./resource/text";
 import Upload from "src/components/upload/index.vue";
@@ -21,7 +22,7 @@ import {Table, Form, FormItem, InputSearch, Button, Space} from "ant-design-vue"
 import type {TextResource} from "src/types";
 
 // 模板导出地址
-const textExportTemplate = ref<string>(`${API_BASE}project/text/export/textTmp`);
+const textExportTemplate = ref<string>(path.join(API_BASE, "project/text/export/textTmp"));
 // 构造公共数据
 const {versionId, projectId, isShowProject, pageSize, pageNumber, fromData} = useCommon();
 // 文本列表
@@ -38,7 +39,7 @@ const onSearch = () => {
 const onChangePage = function () {
   onLoad(100);
 };
-const downloadTxtFile = function(){
+const downloadTxtFile = function () {
   window.open(textExportTemplate.value)
 }
 // 新增文本
