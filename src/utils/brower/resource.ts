@@ -13,7 +13,6 @@ export const normalize = function (value: string): string | undefined {
       return void 0;
     }
     const url = URL.parse(value, true);
-    console.log(url)
     // 修复错误地址，比如 http://http://xxx
     if (url.hostname && /^https?$/i.test(url.hostname)) {
       return normalize(`${url.hostname}:${url.pathname}${url.search || ""}`);

@@ -1,6 +1,11 @@
-import URL from "url";
+/**
+ * @file URL 解析
+ * @author svon.me@gmail.com
+ **/
 
-export default class {
+import _URL from "url";
+
+export default class Url {
   public protocol?: string;
   public hostname?: string;
   public host?: string;
@@ -10,7 +15,7 @@ export default class {
 
   constructor(value?: string) {
     if (value) {
-      const url = URL.parse(value, true);
+      const url = _URL.parse(value, true);
       this.protocol = url.protocol || void 0;
       this.hostname = url.hostname || void 0;
       this.host = url.host || void 0;
@@ -25,16 +30,48 @@ export default class {
   }
 
   setSearch(value?: string): void {
-    this.search = value;
+    if (value) {
+      this.search = (value[0] === "?" ? value : `?${value}`);
+    } else {
+      this.search = value;
+    }
   }
 
-  setQuery(key: string, value: string | number): void {
+  get query(): Map<string, string | number | undefined> {
+    const query = new Map<string, string | number | undefined>();
+    if (this.search) {
+      const text: string = this.search.slice(1);
+      for (const item of text.split("&")) {
+        const [key, ...value] = item.split("=");
+        query.set(key, value.join("="));
+      }
+    }
+    return query;
+  }
 
+  getQuery(name: string): string | number | undefined {
+    const query = this.query;
+    return query.get(name);
+  }
+
+  setQuery(key: string, value: string | number | undefined): void {
+    if (this.search) {
+      const query = this.query;
+      query.set(key, value);
+      const search: string[] = [];
+      for (const key of query.keys()) {
+        const value = query.get(key);
+        search.push(`${key}=${value}`);
+      }
+      this.search = `?${search.join("&")}`;
+    } else {
+      this.search = `?${key}=${value}`;
+    }
   }
 
   format(): string {
     if (this.host) {
-      return URL.format({
+      return _URL.format({
         protocol: this.protocol,
         hostname: this.hostname,
         host: this.host,

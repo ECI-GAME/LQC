@@ -1,4 +1,4 @@
-import URL from "url";
+import URL from "./url";
 import {normalize} from "./resource";
 
 // 使用 a 标签模拟点击下载附件
@@ -43,11 +43,8 @@ export const downloadFile = function (link?: string, name?: string) {
   if (value && name) {
     return linkDownload(value, name);
   } else if (value) {
-    const data = URL.parse(value);
-    if (data.search) {
-      const params = new URLSearchParams(data.search);
-      return linkDownload(value, params.get('filename'));
-    }
-    return linkDownload(value);
+    const data = new URL(value);
+    const text = data.getQuery("filename");
+    return linkDownload(value, text ? String(text) : void 0);
   }
 }
