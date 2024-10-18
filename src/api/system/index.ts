@@ -1,5 +1,6 @@
 import cache from "src/utils/cache";
 import {PageResult} from "src/utils/model";
+import safeGet from "@fengqiaogang/safe-get";
 import {validate, required, Get, Post, tryError} from "@js-lion/api";
 
 import type {DictItem} from "src/types";
@@ -38,7 +39,7 @@ export default class {
       if (typeof value === "string") {
         return value;
       }
-      return "";
+      return safeGet<string>(value, "content");
     }
 
     // @ts-ignore

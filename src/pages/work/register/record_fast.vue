@@ -8,7 +8,7 @@ import safeGet from "@fengqiaogang/safe-get";
 import Select from "src/components/dict/select.vue";
 import {Textarea, Button, Cascader} from "ant-design-vue";
 import {DotData, DotDataType} from "src/components/preview/config";
-import {RecordTabType, getTypeList, typeFieldNames} from "../config";
+import {RecordTabType, getTypeList, typeFieldNames, ImageOCR} from "../config";
 
 import type {PropType} from "vue";
 import type {ImageData} from "src/types";
@@ -118,11 +118,24 @@ const onSubmit = async function () {
   }
 }
 
-const onSave = function (e: KeyboardEvent) {
+const onOCR = async function () {
+  const dot = props.corrdinate();
+  const text = await ImageOCR(props.file.imagePath, dot, props.language, props.readOrder);
+  if (text) {
+    formData.value.text = text;
+  }
+}
+
+const onKeydown = function (e: KeyboardEvent) {
   if (e.ctrlKey && e.key === "s") {
     e.stopPropagation();
     e.preventDefault();
     setTimeout(onSubmit);
+  }
+  if (e.ctrlKey && e.key === "e") {
+    e.stopPropagation();
+    e.preventDefault();
+    setTimeout(onOCR);
   }
 }
 
@@ -144,12 +157,12 @@ onMounted(async function () {
     <div class="flex items-center justify-end">
       <div class="flex-1 max-w-50" v-if="active === RecordTabType.Comment">
         <Cascader class="w-full"
-            v-model:value="formData.imageFlag"
-            placeholder="请选择类别"
-            :options="typeList.results"
-            :multiple="false"
-            :allow-clear="false"
-            :field-names="typeFieldNames"></Cascader>
+                  v-model:value="formData.imageFlag"
+                  placeholder="请选择类别"
+                  :options="typeList.results"
+                  :multiple="false"
+                  :allow-clear="false"
+                  :field-names="typeFieldNames"></Cascader>
       </div>
       <div class="flex-1 max-w-50" v-else>
         <Select v-model:value="formData.imageFlag" placeholder="请选择类别" type="comic_ps_title_config"></Select>
@@ -163,7 +176,7 @@ onMounted(async function () {
                 v-model:value="formData.text"
                 rows="5"
                 :autofocus="true"
-                @keydown.ctrl="onSave"
+                @keydown.ctrl="onKeydown"
                 placeholder="请输入原文"></Textarea>
     </div>
   </div>

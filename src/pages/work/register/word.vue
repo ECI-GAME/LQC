@@ -1,18 +1,15 @@
 <script setup lang="ts">
+import {ref} from "vue";
 import api from "src/api";
 import {Icon} from "@ue/icon";
 import Tips from "./tips.vue";
 import * as _ from "lodash-es";
-import {ref, toRaw} from "vue";
 import Textarea from "./textarea.vue";
-import Cropper from "src/utils/cropper";
 import {basename} from "src/utils/image";
 import {useValidate, rules} from "@ue/form";
-import * as ImageUtil from "src/utils/image";
 import safeGet from "@fengqiaogang/safe-get";
-import {changeTranslationList} from "../config";
 import Select from "src/components/dict/select.vue";
-import {ElLoading} from 'element-plus';
+import {changeTranslationList, ImageOCR} from "../config";
 import {Button, Form, FormItem, Space, Spin} from "ant-design-vue";
 import {DotData, DotDataType, DotMatchType} from "src/components/preview/config";
 
@@ -159,33 +156,12 @@ const getBgPosition = function (src: string, dot: DotData) {
   };
 }
 
-const onOCR = async function (dot: DotData) {
-  const loading = ElLoading.service({
-    lock: true,
-    text: 'Loading',
-    background: 'rgba(0, 0, 0, 0.7)',
-  })
-  try {
-    const cropper = new Cropper(props.file.imagePath);
-    // 裁剪获取 base64 图片数据
-    const value = await cropper.cutXY(dot.xCorrdinate1, dot.yCorrdinate1, dot.xCorrdinate2, dot.yCorrdinate2);
-    if (value) {
-      // base64 数据转换为 File 对象
-      const img = ImageUtil.base64ToImage(value);
-      const res = {...toRaw(model.value)};
-      // 上传 File 获取图片地址
-      const text = await api.system.ocr(img, props.readOrder, props.language);
-      if (text) {
-        res.originalText = text;
-        res.originalHtml = text;
-      }
-    }
-  } catch (e) {
-    // todo
-  } finally {
-    setTimeout(() => {
-      loading.close();
-    }, 500);
+const onOCR = async function () {
+  const dot = props.corrdinate();
+  const text = await ImageOCR(props.file.imagePath, dot, props.language, props.readOrder);
+  if (text) {
+    model.value.originalText = text;
+    model.value.originalHtml = text;
   }
 }
 
@@ -235,7 +211,7 @@ const onScanWord = function () {
     <div class="flex items-center justify-between">
       <Space v-if="file.imagePath">
         <Button type="primary" danger @click="onCancel">取消</Button>
-        <Button type="primary" @click="onOCR(data)">OCR</Button>
+        <Button type="primary" @click="onOCR">OCR</Button>
       </Space>
       <template v-else>
         <Button type="primary" danger @click="onCancel">取消</Button>

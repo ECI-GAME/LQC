@@ -3,9 +3,12 @@ import * as _ from "lodash-es";
 import {CheckCode} from "src/types";
 import {userStore} from "src/store";
 import BigNumber from "bignumber.js";
+import {ElLoading} from 'element-plus';
+import Cropper from "src/utils/cropper";
 import * as alias from "src/router/alias";
 import {DBList} from "@fengqiaogang/dblist";
 import safeGet from "@fengqiaogang/safe-get";
+import * as ImageUtil from "src/utils/image";
 import {DotData} from "src/components/preview/config";
 
 import type {PageResult} from "src/utils/model";
@@ -180,7 +183,7 @@ export const calcDotValue = function (data: DotData, preview: any): DotData {
     data.imageWidth = temp.imageWidth;
     data.imageHeight = temp.imageHeight;
     data.imageName = temp.imageName;
-    return { ...data };
+    return {...data};
   }
   return temp;
 }
@@ -202,5 +205,32 @@ export const reverseCalcDotValue = function (data: DotData, preview: any): DotDa
   data.imageWidth = temp.imageWidth;
   data.imageHeight = temp.imageHeight;
   data.imageName = temp.imageName;
-  return { ...data };
+  return {...data};
+}
+
+
+export const ImageOCR = async function (image: HTMLImageElement | string, dot: DotData, language: string, order: string | number): Promise<string | undefined> {
+  const loading = ElLoading.service({
+    lock: true,
+    text: 'Loading',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+  try {
+    const cropper = new Cropper(image);
+    // 裁剪获取 base64 图片数据
+    const value = await cropper.cutXY(dot.xCorrdinate1, dot.yCorrdinate1, dot.xCorrdinate2, dot.yCorrdinate2);
+    if (value) {
+      // base64 数据转换为 File 对象
+      const img = ImageUtil.base64ToImage(value);
+      // 上传 File 获取图片地址
+      const res = await api.system.ocr(img, String(order), language);
+      return res ? res : void 0;
+    }
+  } catch (e) {
+    // todo
+  } finally {
+    setTimeout(() => {
+      loading.close();
+    }, 500);
+  }
 }
