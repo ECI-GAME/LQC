@@ -15,8 +15,8 @@ import safeGet from "@fengqiaogang/safe-get";
 import * as work from "src/utils/work/common";
 import {ElButton as Button} from "element-plus";
 import UeSort from "src/components/ue/sort/row.vue";
+import {CheckboxGroup, Empty, Card} from "ant-design-vue";
 import {RecordTabType, backTaskListOption} from "../config";
-import {CheckboxGroup} from "ant-design-vue";
 
 import type {PropType} from "vue";
 import type {ImageData, TaskData} from "src/types";
@@ -151,62 +151,68 @@ const onMerge = async function () {
 
 <template>
   <div class="pb-2 deep-[th]:whitespace-nowrap deep-[th]:w-35">
-    <CheckboxGroup v-if="list.length > 0" class="block" v-model:value="mergeList">
-      <UeSort :value="list" :key="`${active}-${uuid}`" :field-names="fieldNames" @sort="onSort"
-              :disabled="disabled">
-        <template #default="{ data, index }">
-          <WorkNode class="mt-2 first:mt-0"
-                    :merge="taskButton.commit ? false : isMerge"
-                    :data="data"
-                    :index="index"
-                    :active="active"
-                    :project-id="taskData.projectId"
-                    :image-status="file.imageStatus"
-                    :disabled="disabled"
-                    @update="onUpdate"
-                    @edit="onEditDetail"
-                    @view="onShowDetail"/>
-        </template>
-      </UeSort>
-    </CheckboxGroup>
-    <slot>
-      <div v-if="list.length > 0 && active === RecordTabType.Word" class="mt-2 first:mt-0 sticky bottom-0">
-        <!--提交-->
-        <div v-if="taskButton.commit">
-          <Button class="w-full" type="warning" @click="onCommit">提交</Button>
-        </div>
-        <!--保存、更新 / 退回-->
-        <div v-else-if="taskButton.back && (taskButton.save || taskButton.update)" class="flex items-center">
-          <div class="flex-1 ml-5 first:ml-0">
-            <Button class="w-full" type="primary" @click="onSave">
-              <template v-if="!file.isFinish || Number(file.isFinish) === 0">保存</template>
-              <template v-else>更新</template>
-            </Button>
+    <template v-if="list.length > 0">
+      <CheckboxGroup class="block" v-model:value="mergeList">
+        <UeSort :value="list" :key="`${active}-${uuid}`" :field-names="fieldNames" @sort="onSort"
+                :disabled="disabled">
+          <template #default="{ data, index }">
+            <WorkNode class="mt-2 first:mt-0"
+                      :merge="taskButton.commit ? false : isMerge"
+                      :data="data"
+                      :index="index"
+                      :active="active"
+                      :project-id="taskData.projectId"
+                      :image-status="file.imageStatus"
+                      :disabled="disabled"
+                      @update="onUpdate"
+                      @edit="onEditDetail"
+                      @view="onShowDetail"/>
+          </template>
+        </UeSort>
+      </CheckboxGroup>
+      <slot>
+        <div v-if="active === RecordTabType.Word" class="mt-2 first:mt-0 sticky bottom-0">
+          <!--提交-->
+          <div v-if="taskButton.commit">
+            <Button class="w-full" type="warning" @click="onCommit">提交</Button>
           </div>
-          <div class="flex-1 ml-5 first:ml-0">
+          <!--保存、更新 / 退回-->
+          <div v-else-if="taskButton.back && (taskButton.save || taskButton.update)" class="flex items-center">
+            <div class="flex-1 ml-5 first:ml-0">
+              <Button class="w-full" type="primary" @click="onSave">
+                <template v-if="!file.isFinish || Number(file.isFinish) === 0">保存</template>
+                <template v-else>更新</template>
+              </Button>
+            </div>
+            <div class="flex-1 ml-5 first:ml-0">
+              <Button class="w-full" type="danger" @click="onReturn">退回</Button>
+            </div>
+            <div class="flex-1 ml-5 first:ml-0">
+              <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
+            </div>
+          </div>
+          <!--保存、更新-->
+          <div v-else-if="taskButton.save || taskButton.update" class="flex items-center">
+            <div class="flex-1 ml-5 first:ml-0" v-if="isMerge">
+              <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
+            </div>
+            <div class="flex-1 ml-5 first:ml-0">
+              <Button class="w-full" type="primary" @click="onSave">
+                <template v-if="!file.isFinish || Number(file.isFinish) === 0">保存</template>
+                <template v-else>更新</template>
+              </Button>
+            </div>
+          </div>
+          <!--退回-->
+          <div v-else-if="taskButton.back">
             <Button class="w-full" type="danger" @click="onReturn">退回</Button>
           </div>
-          <div class="flex-1 ml-5 first:ml-0">
-            <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
-          </div>
         </div>
-        <!--保存、更新-->
-        <div v-else-if="taskButton.save || taskButton.update" class="flex items-center">
-          <div class="flex-1 ml-5 first:ml-0" v-if="isMerge">
-            <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
-          </div>
-          <div class="flex-1 ml-5 first:ml-0">
-            <Button class="w-full" type="primary" @click="onSave">
-              <template v-if="!file.isFinish || Number(file.isFinish) === 0">保存</template>
-              <template v-else>更新</template>
-            </Button>
-          </div>
-        </div>
-        <!--退回-->
-        <div v-else-if="taskButton.back">
-          <Button class="w-full" type="danger" @click="onReturn">退回</Button>
-        </div>
-      </div>
-    </slot>
+      </slot>
+    </template>
+    <!-- 提示数据为空 -->
+    <Card v-else class="py-10" size="small">
+      <Empty></Empty>
+    </Card>
   </div>
 </template>

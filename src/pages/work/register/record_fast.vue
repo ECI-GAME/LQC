@@ -2,9 +2,11 @@
 import api from "src/api";
 import * as _ from "lodash-es";
 import {ref, onMounted} from "vue";
-import {Textarea} from "ant-design-vue";
+import * as model from "src/utils/model";
 import {basename} from "src/utils/image";
 import safeGet from "@fengqiaogang/safe-get";
+import Select from "src/components/dict/select.vue";
+import {Textarea, Button, Cascader} from "ant-design-vue";
 import {DotData, DotDataType} from "src/components/preview/config";
 import {RecordTabType, getTypeList, typeFieldNames} from "../config";
 
@@ -47,14 +49,32 @@ const props = defineProps({
 
 const textareaRef = ref();
 
-const model = ref<{ text?: string; imageFlag?: string | number; }>({
+const formData = ref<{ text?: string; imageFlag?: string | number | Array<string | number>; }>({
   text: void 0,          // 译文
   imageFlag: void 0,     // 类型
 });
 
+// 任务类型列表
+const {state: typeList, execute: onLoadTypeList} = model.list<object>(async function () {
+  const {list, db} = await getTypeList(props.projectId);
+  const res = db.childrenDeep();
+  const first = safeGet(res, "[0].children[0]");
+  const firstValue = safeGet<string | number>(first, typeFieldNames.value);
+  if (firstValue) {
+    const parents = db.parentDeepFlatten({[db.primary]: firstValue});
+    const list = parents.map((item: object) => safeGet<number>(item, typeFieldNames.value));
+    const value = _.compact(_.reverse(list));
+    formData.value = {
+      imageFlag: value,
+      text: formData.value.text,
+    };
+  }
+  return list;
+}, new model.PageResult<object>(), false);
+
 const getResult = function (): DotData | undefined {
-  const text = safeGet<string>(model.value, "text");
-  const imageFlag = safeGet<string | number>(model.value, "imageFlag");
+  const text = safeGet<string>(formData.value, "text");
+  const imageFlag = safeGet<string | number>(formData.value, "imageFlag");
   if (text && _.size(_.trim(text)) > 0) {
     const corrdinate = props.corrdinate();
     const data = {
@@ -112,23 +132,39 @@ onMounted(async function () {
   }
   // 设置默认类型
   if (props.active === RecordTabType.Comment) {
-    const {db} = await getTypeList(props.projectId);
-    const res = db.childrenDeep();
-    const first = safeGet(res, "[0].children[0]");
-    model.value.imageFlag = safeGet<string | number>(first, typeFieldNames.value);
+    await onLoadTypeList(50);
   } else {
-    model.value.imageFlag = String(props.data.imageFlag || 6);
+    formData.value.imageFlag = String(props.data.imageFlag || 6);
   }
 });
 </script>
 
 <template>
   <div class="deep-[textarea]:resize-none">
-    <Textarea ref="textareaRef" class="bg-[#fff] bg-opacity-90"
-              v-model:value="model.text"
-              rows="5"
-              :autofocus="true"
-              @keydown.ctrl="onSave"
-              placeholder="请输入原文"></Textarea>
+    <div class="flex items-center justify-end">
+      <div class="flex-1 max-w-50" v-if="active === RecordTabType.Comment">
+        <Cascader class="w-full"
+            v-model:value="formData.imageFlag"
+            placeholder="请选择类别"
+            :options="typeList.results"
+            :multiple="false"
+            :allow-clear="false"
+            :field-names="typeFieldNames"></Cascader>
+      </div>
+      <div class="flex-1 max-w-50" v-else>
+        <Select v-model:value="formData.imageFlag" placeholder="请选择类别" type="comic_ps_title_config"></Select>
+      </div>
+      <div class="ml-3">
+        <Button type="primary" :disabled="!formData.text || formData.text.length < 1" @click="onSubmit">保存</Button>
+      </div>
+    </div>
+    <div class="mt-3">
+      <Textarea ref="textareaRef" class="bg-[#fff] bg-opacity-90"
+                v-model:value="formData.text"
+                rows="5"
+                :autofocus="true"
+                @keydown.ctrl="onSave"
+                placeholder="请输入原文"></Textarea>
+    </div>
   </div>
 </template>

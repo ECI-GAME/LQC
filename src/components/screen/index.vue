@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import {Icon} from "@ue/icon";
 import {ref, computed} from "vue";
+import {Button} from "ant-design-vue";
 import safeGet from "@fengqiaogang/safe-get";
 
-const $emit = defineEmits(["update:x1", "update:y1", "update:x2", "update:y2"]);
+const $emit = defineEmits(["update:x1", "update:y1", "update:x2", "update:y2", "close"]);
 const props = defineProps({
   x1: {
     type: Number,
@@ -172,6 +174,10 @@ const stopDrag = () => {
   document.removeEventListener('mouseup', stopDrag);
 };
 
+const onClose = function () {
+  $emit("close");
+}
+
 </script>
 
 <template>
@@ -180,8 +186,13 @@ const stopDrag = () => {
       <template v-for="name in direction" :key="name">
         <div class="screen-dot" :class="name" @mousedown="onResize($event, name)"></div>
       </template>
+      <div class="absolute top-0 left-full inline-block transform -translate-y-4.5">
+        <Button class="m-0 p-2" type="link" danger @click.stop.prevent="onClose">
+          <Icon class="flex text-xl" type="close-circle-fill"></Icon>
+        </Button>
+      </div>
     </div>
-    <div class="mt-1 min-w-60">
+    <div class="pt-3 -ml-1 min-w-60">
       <slot></slot>
     </div>
   </div>

@@ -13,22 +13,21 @@ import * as work from "src/utils/work/common";
 import {useRoute, useRouter} from "vue-router";
 import RegisterWord from "./register/word.vue";
 import Tab from "src/components/tab/index.vue";
-import {ref, onBeforeUnmount, computed, toRaw} from "vue";
 import RecordFast from "./register/record_fast.vue";
 import RegisterComment from "./register/comment.vue";
 import Screen from "src/components/screen/index.vue";
-import Preview from "src/components/preview/index.vue";
 import TaskTitle from "src/components/task/title.vue";
+import Preview from "src/components/preview/index.vue";
 import {TaskStatus, TaskButtonStatus} from "src/types";
 import Loading from "src/components/loading/index.vue";
-import TaskLog from "src/components/task/log/button.vue";
 import UeProgress from "src/components/ue/progress.vue";
+import TaskLog from "src/components/task/log/button.vue";
+import {ref, onBeforeUnmount, computed, toRaw} from "vue";
 import {DotDataType, DotData} from "src/components/preview/config";
-import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card, Empty} from "ant-design-vue";
+import {Button, Layout, LayoutContent, LayoutHeader, LayoutSider, Space, Card} from "ant-design-vue";
 import {filterSuccess, pickImage, RecordTabType, backTaskListOption, calcDotValue, reverseCalcDotValue} from "./config";
 
 import type {ImageData, TaskData, Project} from "src/types";
-
 
 const previewRef = ref();
 const route = useRoute();
@@ -265,14 +264,14 @@ const getDotCorrdinate = function () {
                       v-model:x1="dotEditTempValue.xCorrdinate1"
                       v-model:y1="dotEditTempValue.yCorrdinate1"
                       v-model:x2="dotEditTempValue.xCorrdinate2"
-                      v-model:y2="dotEditTempValue.yCorrdinate2">
+                      v-model:y2="dotEditTempValue.yCorrdinate2" @close="onCancelDot">
               </Screen>
 
               <Screen v-else-if="dotAddTempValue && !dotAddTempValue.id"
                       v-model:x1="dotAddTempValue.xCorrdinate1"
                       v-model:y1="dotAddTempValue.yCorrdinate1"
                       v-model:x2="dotAddTempValue.xCorrdinate2"
-                      v-model:y2="dotAddTempValue.yCorrdinate2">
+                      v-model:y2="dotAddTempValue.yCorrdinate2" @close="onCancelDot">
                 <!--快捷记录-->
                 <RecordFast :data="dotAddTempValue"
                             :corrdinate="getDotCorrdinate"
@@ -291,42 +290,36 @@ const getDotCorrdinate = function () {
             <Tab class="mb-2" v-model:value="recordActive" :list="recordTabs" @change="onChangeTabValue"
                  :disabled="dotAddTempValue || dotEditTempValue"></Tab>
             <!-- 标记数量大于0或者正在创建标记点数据 -->
-            <template v-if="dotEditTempValue || dots.total > 0">
-              <Record v-if="currentFile && taskInfo && taskInfo.projectId"
-                      @view="onViewLocation"
-                      @edit="onEditLocation"
-                      @success="onReloadList"
-                      :active="recordActive"
-                      :task-data="taskInfo"
-                      :key="recordActive"
-                      :list="dots.results"
-                      :disabled="disabled"
-                      :file="currentFile"
-                      v-model:buttons="taskButton">
-                <Card v-if="dotEditTempValue" class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small">
-                  <RegisterComment v-if="recordActive === RecordTabType.Comment"
-                                   :data="dotEditTempValue"
-                                   :corrdinate="getDotCorrdinate"
-                                   :file="currentFile"
-                                   :projectId="taskInfo.projectId"
-                                   @save="onUpDataDots"
-                                   @cancel="onCancelDot"></RegisterComment>
-                  <RegisterWord v-else-if="currentFile"
-                                :data="dotEditTempValue"
-                                :corrdinate="getDotCorrdinate"
-                                :file="currentFile"
-                                :language="taskInfo.sourceLanguage"
-                                :projectId="taskInfo.projectId"
-                                :read-order="projectInfo.readOrder"
-                                @save="onUpDataDots"
-                                @cancel="onCancelDot"></RegisterWord>
-                </Card>
-              </Record>
-            </template>
-            <!-- 提示数据为空 -->
-            <Card v-else class="py-10" size="small">
-              <Empty></Empty>
-            </Card>
+            <Record v-if="currentFile && taskInfo && taskInfo.projectId"
+                    @view="onViewLocation"
+                    @edit="onEditLocation"
+                    @success="onReloadList"
+                    :active="recordActive"
+                    :task-data="taskInfo"
+                    :key="recordActive"
+                    :list="dots.results"
+                    :disabled="disabled"
+                    :file="currentFile"
+                    v-model:buttons="taskButton">
+              <Card v-if="dotEditTempValue" class="mt-2 shadow-2xl border-primary sticky bottom-2" size="small">
+                <RegisterComment v-if="recordActive === RecordTabType.Comment"
+                                 :data="dotEditTempValue"
+                                 :corrdinate="getDotCorrdinate"
+                                 :file="currentFile"
+                                 :projectId="taskInfo.projectId"
+                                 @save="onUpDataDots"
+                                 @cancel="onCancelDot"></RegisterComment>
+                <RegisterWord v-else-if="currentFile"
+                              :data="dotEditTempValue"
+                              :corrdinate="getDotCorrdinate"
+                              :file="currentFile"
+                              :language="taskInfo.sourceLanguage"
+                              :projectId="taskInfo.projectId"
+                              :read-order="projectInfo.readOrder"
+                              @save="onUpDataDots"
+                              @cancel="onCancelDot"></RegisterWord>
+              </Card>
+            </Record>
           </Loading>
         </LayoutSider>
       </Layout>
