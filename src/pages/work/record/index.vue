@@ -55,16 +55,12 @@ const props = defineProps({
 
 const fieldNames = {id: "id"};
 const uuid = ref<number>(0);
-const isMerge = ref<boolean>(false);
 const mergeList = ref<Array<string | number>>([]);
 
 // 按钮操作权限
 const {state: taskButton} = model.result<TaskButtonStatus>(async () => {
   const buttons = await api.task.taskButtons(props.file.id, props.file.taskId);
   $emit("update:buttons", buttons);
-  if (buttons.commit || buttons.save || buttons.update) {
-    isMerge.value = true;
-  }
   return buttons;
 }, new TaskButtonStatus(), true);
 
@@ -157,13 +153,12 @@ const onMerge = async function () {
                 :disabled="disabled">
           <template #default="{ data, index }">
             <WorkNode class="mt-2 first:mt-0"
-                      :merge="taskButton.commit ? false : isMerge"
                       :data="data"
                       :index="index"
                       :active="active"
                       :project-id="taskData.projectId"
-                      :image-status="file.imageStatus"
                       :disabled="disabled"
+                      :taskButton="taskButton"
                       @update="onUpdate"
                       @edit="onEditDetail"
                       @view="onShowDetail"/>
@@ -179,6 +174,9 @@ const onMerge = async function () {
           <!--保存、更新 / 退回-->
           <div v-else-if="taskButton.back && (taskButton.save || taskButton.update)" class="flex items-center">
             <div class="flex-1 ml-5 first:ml-0">
+              <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
+            </div>
+            <div class="flex-1 ml-5 first:ml-0">
               <Button class="w-full" type="primary" @click="onSave">
                 <template v-if="!file.isFinish || Number(file.isFinish) === 0">保存</template>
                 <template v-else>更新</template>
@@ -187,13 +185,10 @@ const onMerge = async function () {
             <div class="flex-1 ml-5 first:ml-0">
               <Button class="w-full" type="danger" @click="onReturn">退回</Button>
             </div>
-            <div class="flex-1 ml-5 first:ml-0">
-              <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
-            </div>
           </div>
           <!--保存、更新-->
           <div v-else-if="taskButton.save || taskButton.update" class="flex items-center">
-            <div class="flex-1 ml-5 first:ml-0" v-if="isMerge">
+            <div class="flex-1 ml-5 first:ml-0" v-if="taskButton.merge">
               <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
             </div>
             <div class="flex-1 ml-5 first:ml-0">

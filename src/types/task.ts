@@ -13,12 +13,16 @@ export class TaskButtonStatus {
   update: boolean = false; // 是否可以更新
   back: boolean = false;   // 是否可以回退
   commit: boolean = false; // 是否可以提交
+  merge: boolean = false;  // 是否可以合并
+  remove: boolean = false; // 是否可以删除
   constructor(value?: object) {
     if (value) {
       this.save = !!safeGet<boolean>(value, "saveButton");
       this.update = !!safeGet<boolean>(value, "updateButton");
       this.back = !!safeGet<boolean>(value, "backButton");
       this.commit = !!safeGet<boolean>(value, "comitButton");
+      this.merge = !!safeGet<boolean>(value, "mergeButton");
+      this.remove = !!safeGet<boolean>(value, "deleteButton");
     }
   }
 

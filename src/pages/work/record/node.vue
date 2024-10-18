@@ -12,10 +12,11 @@ import Comment from "./comment.vue";
 import sure from "src/utils/tips/sure";
 import {ElButton as Button} from "element-plus";
 import {RecordTabType, useCreateBy} from "../config";
+import {DotData, DotMatchType} from "src/components/preview/config";
 import {Space, Collapse, CollapsePanel, Checkbox} from "ant-design-vue";
 
 import type {PropType} from "vue";
-import {DotData, DotMatchType} from "src/components/preview/config";
+import type {TaskButtonStatus} from "src/types";
 
 const $emit = defineEmits(["update", "view", "edit", "update:activeKey"]);
 const props = defineProps({
@@ -39,18 +40,13 @@ const props = defineProps({
     type: [String, Number],
     required: true,
   },
-  // 图片流程节点状态
-  imageStatus: {
-    type: [String, Number],
-    required: false,
-  },
   disabled: {
     type: Boolean,
     required: false,
   },
-  merge: {
-    type: Boolean,
-    required: false,
+  taskButton: {
+    type: Object as PropType<TaskButtonStatus>,
+    required: true,
   }
 });
 
@@ -103,36 +99,51 @@ const onRemoveDetail = async function (data: DotData) {
           <span>({{ index + 1 }})</span>
           <template v-if="active === RecordTabType.Word">
             <!--标记-->
-            <span class="flex-1 w-1 truncate mr-2 ml-1" :class="getTitleColor(data)" :title="data.translatedText">{{ data.translatedText }}</span>
+            <span class="flex-1 w-1 truncate mr-2 ml-1"
+                  :class="getTitleColor(data)"
+                  :title="data.translatedText">{{ data.translatedText }}</span>
             <Space>
-              <div class="flex" v-if="!disabled && merge" >
+              <div class="flex" v-if="!disabled && taskButton.merge">
                 <Checkbox :value="data.id" @click.stop></Checkbox>
               </div>
-              <Button class="p-0 text-lg" type="primary" link :disabled="disabled" @click.stop="onShowDetail(data)" title="查看详情">
+              <Button class="p-0 text-lg" type="primary" link :disabled="disabled" @click.stop="onShowDetail(data)"
+                      title="查看详情">
                 <Icon type="detail"></Icon>
               </Button>
-              <Button class="p-0 text-lg" type="warning" link :disabled="disabled" @click.stop="onEditDetail(data)" title="编辑">
+              <Button class="p-0 text-lg" type="warning" link :disabled="disabled" @click.stop="onEditDetail(data)"
+                      title="编辑">
                 <Icon type="edit-square"></Icon>
               </Button>
-              <template v-if="imageStatus && _.includes(['2', '3', '15', '16'], String(imageStatus))">
-                <Button class="p-0 text-lg" type="danger" link :disabled="disabled" @click.stop="onRemoveDetail(data)" title="删除">
-                  <Icon type="delete-fill"></Icon>
-                </Button>
-              </template>
+              <Button v-if="taskButton.remove"
+                      class="p-0 text-lg"
+                      type="danger"
+                      :link="true"
+                      :disabled="disabled"
+                      @click.stop="onRemoveDetail(data)"
+                      title="删除">
+                <Icon type="delete-fill"></Icon>
+              </Button>
             </Space>
           </template>
           <template v-else>
             <!--批注-->
             <span class="flex-1 w-1 truncate mr-2 ml-1" :title="data.remark">{{ data.remark }}</span>
             <Space>
-              <Button class="p-0 text-lg" type="primary" link :disabled="disabled" @click.stop="onShowDetail(data)" title="查看详情">
+              <Button class="p-0 text-lg" type="primary" link :disabled="disabled" @click.stop="onShowDetail(data)"
+                      title="查看详情">
                 <Icon type="detail"></Icon>
               </Button>
               <template v-if="isCreateBy(data)">
-                <Button class="p-0 text-lg" type="warning" link :disabled="disabled" @click.stop="onEditDetail(data)" title="编辑">
+                <Button class="p-0 text-lg" type="warning" link :disabled="disabled" @click.stop="onEditDetail(data)"
+                        title="编辑">
                   <Icon type="edit-square"></Icon>
                 </Button>
-                <Button class="p-0 text-lg" type="danger" link :disabled="disabled" @click.stop="onRemoveDetail(data)" title="删除">
+                <Button v-if="taskButton.remove"
+                        class="p-0 text-lg"
+                        type="danger"
+                        :link="true"
+                        :disabled="disabled"
+                        @click.stop="onRemoveDetail(data)" title="删除">
                   <Icon type="delete-fill"></Icon>
                 </Button>
               </template>
