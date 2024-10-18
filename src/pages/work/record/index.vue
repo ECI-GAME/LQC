@@ -168,12 +168,17 @@ const onMerge = async function () {
       <slot>
         <div v-if="active === RecordTabType.Word" class="mt-2 first:mt-0 sticky bottom-0">
           <!--提交-->
-          <div v-if="taskButton.commit">
-            <Button class="w-full" type="warning" @click="onCommit">提交</Button>
+          <div v-if="taskButton.commit" class="flex items-center">
+            <div v-if="taskButton.merge" class="flex-1 ml-5 first:ml-0">
+              <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
+            </div>
+            <div class="flex-1 ml-5 first:ml-0">
+              <Button class="w-full" type="warning" @click="onCommit">提交</Button>
+            </div>
           </div>
           <!--保存、更新 / 退回-->
           <div v-else-if="taskButton.back && (taskButton.save || taskButton.update)" class="flex items-center">
-            <div class="flex-1 ml-5 first:ml-0">
+            <div v-if="taskButton.merge" class="flex-1 ml-5 first:ml-0">
               <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
             </div>
             <div class="flex-1 ml-5 first:ml-0">
@@ -188,7 +193,7 @@ const onMerge = async function () {
           </div>
           <!--保存、更新-->
           <div v-else-if="taskButton.save || taskButton.update" class="flex items-center">
-            <div class="flex-1 ml-5 first:ml-0" v-if="taskButton.merge">
+            <div v-if="taskButton.merge" class="flex-1 ml-5 first:ml-0">
               <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
             </div>
             <div class="flex-1 ml-5 first:ml-0">
@@ -200,7 +205,12 @@ const onMerge = async function () {
           </div>
           <!--退回-->
           <div v-else-if="taskButton.back">
-            <Button class="w-full" type="danger" @click="onReturn">退回</Button>
+            <div v-if="taskButton.merge" class="flex-1 ml-5 first:ml-0">
+              <Button class="w-full" :disabled="mergeList.length <= 1" @click="onMerge">合并</Button>
+            </div>
+            <div class="flex-1 ml-5 first:ml-0">
+              <Button class="w-full" type="danger" @click="onReturn">退回</Button>
+            </div>
           </div>
         </div>
       </slot>
