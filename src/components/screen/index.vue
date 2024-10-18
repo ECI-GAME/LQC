@@ -192,7 +192,7 @@ const onClose = function () {
         </Button>
       </div>
     </div>
-    <div class="pt-3 -ml-1 min-w-60">
+    <div class="pt-3 -ml-1 min-w-70">
       <slot></slot>
     </div>
   </div>

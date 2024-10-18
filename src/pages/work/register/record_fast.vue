@@ -5,8 +5,9 @@ import {ref, onMounted} from "vue";
 import * as model from "src/utils/model";
 import {basename} from "src/utils/image";
 import safeGet from "@fengqiaogang/safe-get";
+import {ElButton as Button} from "element-plus";
 import Select from "src/components/dict/select.vue";
-import {Textarea, Button, Cascader} from "ant-design-vue";
+import {Textarea, Cascader, Space} from "ant-design-vue";
 import {DotData, DotDataType} from "src/components/preview/config";
 import {RecordTabType, getTypeList, typeFieldNames, ImageOCR} from "../config";
 
@@ -107,7 +108,7 @@ const getResult = function (): DotData | undefined {
   }
 }
 
-const onSubmit = async function () {
+const onSubmit = _.debounce(async function () {
   let status = false;
   const value = getResult();
   if (value) {
@@ -116,15 +117,21 @@ const onSubmit = async function () {
   if (status) {
     $emit("save");
   }
-}
+}, 1000, {
+  'leading': true,
+  'trailing': false
+})
 
-const onOCR = async function () {
+const onOCR = _.debounce(async function () {
   const dot = props.corrdinate();
   const text = await ImageOCR(props.file.imagePath, dot, props.language, props.readOrder);
   if (text) {
     formData.value.text = text;
   }
-}
+}, 1000, {
+  'leading': true,
+  'trailing': false
+});
 
 const onKeydown = function (e: KeyboardEvent) {
   if (e.ctrlKey && e.key === "s") {
@@ -167,9 +174,11 @@ onMounted(async function () {
       <div class="flex-1 max-w-50" v-else>
         <Select v-model:value="formData.imageFlag" placeholder="请选择类别" type="comic_ps_title_config"></Select>
       </div>
-      <div class="ml-3">
-        <Button type="primary" :disabled="!formData.text || formData.text.length < 1" @click="onSubmit">保存</Button>
-      </div>
+      <Space class="ml-3">
+        <Button type="success" @click="onOCR">OCR</Button>
+        <Button v-if="!formData.text || formData.text.length < 1" :disabled="true" class="bg-white">保存</Button>
+        <Button v-else type="primary" @click="onSubmit">保存</Button>
+      </Space>
     </div>
     <div class="mt-3">
       <Textarea ref="textareaRef" class="bg-[#fff] bg-opacity-90"
