@@ -3,11 +3,30 @@ import GraphQL from "../graphql";
 import loading from "src/utils/loading";
 import * as message from "@ue/message";
 import {PageResult} from "src/utils/model";
-import {validate, required, Put, Post, tryError} from "@js-lion/api";
+import {validate, required, Put, Post, tryError, Get} from "@js-lion/api";
 
 
 export default class extends GraphQL {
   word: Word = new Word();
+
+  // 获取需要待处理的任务ID
+  @tryError(void 0)
+  @Get("/project/task/relations/onDealImage/:taskId")
+  @validate
+  getTodo(@required taskId: string | number): Promise<string | number | undefined> {
+    const params = {taskId};
+    const callback = function (value: string | number): string | number | undefined {
+      if (value && typeof value === "string") {
+        return value;
+      }
+      if (typeof value === "number" && value > 0) {
+        return value;
+      }
+      return void 0;
+    }
+    // @ts-ignore
+    return {params, callback};
+  }
 
   @validate
   async getImages<T>(@required versionId: string | number): Promise<PageResult<T>> {

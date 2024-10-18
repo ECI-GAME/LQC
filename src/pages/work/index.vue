@@ -68,13 +68,16 @@ const {state: taskInfo} = model.result<TaskData>(async () => {
 
 // 任务明细列表
 const {state, execute: _reloadList} = model.list<ImageData>(async function () {
-  const res = await api.work.getImages<ImageData>(route.params.taskId as string);
+  const taskId: string | number = route.params.taskId as string;
+  const [res, workId] = await Promise.all([
+    // 获取工作列表
+    api.work.getImages<ImageData>(taskId),
+    // 如果未指定工作ID，则根据任务ID获取待处理工作项ID
+    route.params.workId ? String(route.params.workId) : api.work.getTodo(taskId)
+  ]);
   if (res.total > 0) {
-    if (route.params.workId) {
-      currentFile.value = pickImage(res.results, route.params.workId as string);
-    } else {
-      currentFile.value = res.results[0];
-    }
+    // 匹配工作项详细数据
+    currentFile.value = pickImage(res.results, workId) || res.results[0];
     setTimeout(onUpDataDots);
   }
   return res;
@@ -123,16 +126,6 @@ const getKnowledgeUrl = function () {
   return "javascript:;";
 }
 
-// 打点（描点）
-const onChangeDot = async function (data: DotData) {
-  if (recordActive.value === RecordTabType.Comment) {
-    data.coordinateType = DotDataType.Comment;
-  } else {
-    data.coordinateType = DotDataType.Ocr;
-  }
-  dotAddTempValue.value = data;
-}
-
 // 查看标记位置
 const onViewLocation = function (id: string | number) {
   const image = previewRef.value;
@@ -151,7 +144,7 @@ const onEditLocation = function (id: string | number) {
     if (data) {
       image.setBoxDot(data);
       setTimeout(() => {
-        dotEditTempValue.value = reverseCalcDotValue({ ...toRaw(data) }, previewRef.value);
+        dotEditTempValue.value = reverseCalcDotValue({...toRaw(data)}, previewRef.value);
       }, 300);
     }
   }
@@ -207,9 +200,11 @@ const onClickImage = function (e: Event, data: { x: number, y: number, width: nu
 
 const getDotCorrdinate = function () {
   if (dotEditTempValue.value) {
-    return calcDotValue(dotEditTempValue.value, previewRef.value);
+    const value = toRaw(dotEditTempValue.value);
+    return calcDotValue({...value}, previewRef.value);
   } else if (dotAddTempValue.value) {
-    return calcDotValue(dotAddTempValue.value, previewRef.value);
+    const value = toRaw(dotAddTempValue.value);
+    return calcDotValue({...value}, previewRef.value);
   }
 }
 

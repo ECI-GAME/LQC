@@ -93,11 +93,14 @@ export const changeTranslationList = function (data: string[][], originValue?: o
   return void 0;
 }
 
-export const pickImage = function <T = ImageData>(list: T[], id: string | number): T | undefined {
-  return _.find(list, function (item: T) {
-    const key = safeGet<string | number>(item, "id")!;
-    return String(key) === String(id);
-  });
+export const pickImage = function <T = ImageData>(list: T[], id?: string | number): T | undefined {
+  if (id) {
+    return _.find(list, function (item: T) {
+      const key = safeGet<string | number>(item, "id")!;
+      return String(key) === String(id);
+    });
+  }
+  return void 0;
 }
 
 export const indexOfImage = function (list: ImageData[], value: ImageData) {

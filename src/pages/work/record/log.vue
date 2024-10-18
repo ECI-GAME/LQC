@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import api from "src/api";
+import * as date from "src/utils/date";
 import * as model from "src/utils/model";
 import {Descriptions, DescriptionsItem} from "ant-design-vue";
 
@@ -30,10 +31,10 @@ const {state} = model.list<DotCheckData>(async function () {
 <template>
   <Descriptions v-if="state.total > 0" class="mb-5 deep-[th]:hidden" :column="1" :bordered="true" size="small">
     <template v-for="item in state.results" :key="item.id">
-      <DescriptionsItem>
+      <DescriptionsItem class="whitespace-pre-wrap">
         <span>{{ item.createBy }}</span>
         <span>在</span>
-        <span class="px-1">{{ item.createTime }}</span>
+        <span class="px-1">{{ date.template(item.createTime) }}</span>
         <span>将内容</span>
         <span class="line-through px-1">{{ item.originalText }}</span>
         <span>变更为</span>
